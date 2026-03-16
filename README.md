@@ -7,7 +7,7 @@
   
 	**Transforme sua presença digital com quem entende de inovação!**
   
-	<b>Desenvolvido por <span style="color:#0078D7">Techlab Software</span></b>
+	**Desenvolvido por _Techlab Software_**
 </div>
 
 ---

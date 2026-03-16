@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;700&display=swap');
+
+:root {
+  --primary: #0ff1ce;
+  --dark: #181c24;
+  --light: #f4f4f4;
+  --accent: #00e0ff;
+  --text: #e0e6ed;
+  --card-bg: #23283a;
+  --card-border: #2d334d;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  background: linear-gradient(120deg, #181c24 60%, #23283a 100%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+header {
+  background: var(--dark);
+  box-shadow: 0 2px 8px #0003;
+}
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 0;
+}
+.logo {
+  width: 56px;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-family: 'Orbitron', Arial, sans-serif;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+nav a:hover {
+  color: var(--accent);
+}
+.hero {
+  background: linear-gradient(120deg, #0ff1ce 0%, #23283a 100%);
+  color: #181c24;
+  text-align: center;
+  padding: 5rem 1rem 4rem 1rem;
+}
+.hero h1 {
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-size: 3rem;
+  margin: 0 0 1rem 0;
+  letter-spacing: 2px;
+}
+.hero h2 {
+  font-size: 1.7rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+.hero .cta {
+  display: inline-block;
+  background: var(--dark);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 30px;
+  padding: 0.8rem 2.2rem;
+  font-size: 1.1rem;
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 2rem;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.hero .cta:hover {
+  background: var(--primary);
+  color: var(--dark);
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.servicos, .diferenciais, .sobre, .contato {
+  padding: 4rem 0 3rem 0;
+}
+.servicos h3, .diferenciais h3, .sobre h3, .contato h3 {
+  font-family: 'Orbitron', Arial, sans-serif;
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  letter-spacing: 1px;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 2rem 1.2rem;
+  box-shadow: 0 4px 24px #0002;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px #0ff1ce33;
+}
+.diferenciais ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+.diferenciais li {
+  background: var(--card-bg);
+  border-left: 4px solid var(--primary);
+  padding: 1.2rem 1rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 12px #0001;
+}
+.sobre-flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2.5rem;
+}
+.sobre-img {
+  width: 120px;
+  border-radius: 50%;
+  box-shadow: 0 4px 24px #0ff1ce33;
+}
+.sobre p {
+  font-size: 1.15rem;
+  color: var(--light);
+}
+.contato form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 420px;
+  margin: 0 auto 2rem auto;
+  background: var(--card-bg);
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px #0002;
+}
+.contato input, .contato textarea {
+  background: #23283a;
+  border: 1px solid var(--primary);
+  color: var(--text);
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-family: 'Roboto', Arial, sans-serif;
+  resize: none;
+}
+.contato button {
+  background: var(--primary);
+  color: var(--dark);
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-size: 1.1rem;
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.contato button:hover {
+  background: var(--accent);
+  color: var(--dark);
+}
+.creditos {
+  text-align: center;
+  color: var(--primary);
+  font-size: 1rem;
+  margin-top: 1.5rem;
+}
+footer {
+  background: var(--dark);
+  color: var(--primary);
+  text-align: center;
+  padding: 1.2rem 0;
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  box-shadow: 0 -2px 8px #0003;
+}
+@media (max-width: 700px) {
+  .header-flex, .sobre-flex {
+    flex-direction: column;
+    gap: 1.2rem;
+    text-align: center;
+  }
+  .cards, .diferenciais ul {
+    grid-template-columns: 1fr;
+  }
+  .sobre-img {
+    margin: 0 auto;
+  }
+}

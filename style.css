@@ -148,43 +148,35 @@ nav a:hover {
   font-size: 1.15rem;
   color: var(--light);
 }
-.contato form {
+.contato-texto {
+  text-align: center;
+  color: var(--light);
+  font-size: 1.1rem;
+  margin: 0 0 1.5rem 0;
+}
+.contato-actions {
   display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  max-width: 420px;
-  margin: 0 auto 2rem auto;
-  background: var(--card-bg);
-  padding: 2rem 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px #0002;
+  justify-content: center;
+  margin-bottom: 1.5rem;
 }
-.contato input, .contato textarea {
-  background: #23283a;
-  border: 1px solid var(--primary);
-  color: var(--text);
-  font-size: 1rem;
-  border-radius: 8px;
-  padding: 0.8rem;
-  font-family: 'Roboto', Arial, sans-serif;
-  resize: none;
-}
-.contato button {
+.contato-btn {
+  display: inline-block;
   background: var(--primary);
   color: var(--dark);
-  border: none;
-  border-radius: 8px;
-  padding: 0.9rem;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  padding: 0.9rem 1.8rem;
   font-size: 1.1rem;
   font-family: 'Orbitron', Arial, sans-serif;
   font-weight: 700;
   letter-spacing: 1px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
 }
-.contato button:hover {
+.contato-btn:hover {
   background: var(--accent);
   color: var(--dark);
+  transform: translateY(-2px);
 }
 .creditos {
   text-align: center;

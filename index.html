@@ -25,10 +25,6 @@
       <h1>LinkSites</h1>
       <h2>O futuro da presença digital começa aqui</h2>
       <p>Sites profissionais, modernos e inteligentes para pessoas e empresas visionárias.</p>
-      <div class="visit-counter" aria-live="polite">
-        <span class="visit-counter-label">Acessos na home</span>
-        <strong id="visit-count" class="visit-counter-value">Carregando...</strong>
-      </div>
       <a href="#contato" class="cta">Solicite seu projeto</a>
     </div>
   </section>
@@ -69,9 +65,15 @@
   </section>
   <section id="sobre" class="sobre">
     <div class="container sobre-flex">
-      <div>
+      <div class="sobre-copy">
         <h3>Sobre a LinkSites</h3>
         <p>Somos uma startup do grupo <strong>Techlab Software</strong>, referência em soluções digitais. Nossa missão é transformar ideias em experiências digitais marcantes, com tecnologia de ponta, design futurista e foco total no resultado do cliente.</p>
+        <div class="visit-counter visit-counter--about" aria-live="polite">
+          <span class="visit-counter-kicker">Presença em crescimento</span>
+          <strong id="visit-count" class="visit-counter-value">Carregando...</strong>
+          <span class="visit-counter-label">Visitantes únicos estimados</span>
+          <span class="visit-counter-note">Contado uma vez por navegador</span>
+        </div>
       </div>
       <img src="https://img.icons8.com/color/96/000000/artificial-intelligence.png" alt="Futuro Digital" class="sobre-img">
     </div>
@@ -90,7 +92,7 @@
       <div class="whatsapp-contato">
         <strong>WhatsApp:</strong> <a href="https://wa.me/5591982460001" target="_blank" rel="noopener">+55 91 98246-0001</a>
       </div>
-      <p class="creditos">LinkSites &copy; 2026 — Uma startup do grupo Techlab Software</p>
+      <p class="creditos">LinkSites &copy; 2026 - Uma startup do grupo Techlab Software</p>
     </div>
   </section>
   <footer>
@@ -101,12 +103,23 @@
   <script>
     (function () {
       var countElement = document.getElementById('visit-count');
+      var endpointBase = 'https://api.countapi.xyz';
+      var namespace = 'linksites.github.io';
+      var key = 'home-unique-visitors';
+      var storageKey = 'linksites-home-unique-visitor-v1';
+      var hasVisited = false;
 
       if (!countElement) {
         return;
       }
 
-      fetch('https://api.countapi.xyz/hit/linksites.github.io/home')
+      try {
+        hasVisited = window.localStorage.getItem(storageKey) === '1';
+      } catch (error) {
+        hasVisited = false;
+      }
+
+      fetch(endpointBase + '/' + (hasVisited ? 'get' : 'hit') + '/' + namespace + '/' + key)
         .then(function (response) {
           if (!response.ok) {
             throw new Error('counter_unavailable');
@@ -117,6 +130,14 @@
         .then(function (data) {
           if (typeof data.value !== 'number') {
             throw new Error('invalid_counter_value');
+          }
+
+          if (!hasVisited) {
+            try {
+              window.localStorage.setItem(storageKey, '1');
+            } catch (error) {
+              // Storage may be unavailable in some browsers or privacy modes.
+            }
           }
 
           countElement.textContent = data.value.toLocaleString('pt-BR');

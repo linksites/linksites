@@ -141,6 +141,8 @@ const cases = [
   {
     owner: "sergiosrdev",
     repo: "sradv-final-version",
+    updateOwner: "linksites",
+    updateRepo: "sergiorodrigues",
     label: "Portfolio React",
     eyebrow: "Portfolio / React",
     name: "Sergio Rodrigues",
@@ -214,6 +216,13 @@ function formatRepoUpdateStatus(dateString) {
   }
 
   return `Atualizado ${formatRelativeTime(dateString)}`;
+}
+
+function getUpdateRepoSource(item) {
+  return {
+    owner: item.updateOwner ?? item.owner,
+    repo: item.updateRepo ?? item.repo,
+  };
 }
 
 function SectionTag({ children }) {
@@ -314,8 +323,9 @@ export default function App() {
     async function loadRepoUpdates() {
       const responses = await Promise.allSettled(
           cases.map(async (item) => {
+            const source = getUpdateRepoSource(item);
             const response = await fetch(
-              `https://api.github.com/repos/${item.owner}/${item.repo}`,
+              `https://api.github.com/repos/${source.owner}/${source.repo}`,
               {
                 cache: "no-store",
                 signal: controller.signal,

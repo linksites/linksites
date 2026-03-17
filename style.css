@@ -51,6 +51,9 @@ body {
 }
 
 header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   background: linear-gradient(180deg, #12172a, #0b101d);
   box-shadow: 0 2px 0 #0ff1ce33, 0 6px 18px #0009;
   border-bottom: 2px solid #0ff1ce22;

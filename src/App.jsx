@@ -161,6 +161,8 @@ const heroPoints = [
   "Experiencia responsiva",
 ];
 
+const REPO_UPDATE_FALLBACK = "sem resposta";
+
 function formatRelativeTime(dateString) {
   const updatedAt = new Date(dateString);
   const diffMs = Date.now() - updatedAt.getTime();
@@ -286,6 +288,7 @@ export default function App() {
   const [visitCount, setVisitCount] = useState("Sincronizando");
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+  const [isCurrentSiteDialogOpen, setIsCurrentSiteDialogOpen] = useState(false);
   const trackRef = useRef(null);
   const dragStateRef = useRef({
     isPointerDown: false,
@@ -317,7 +320,7 @@ export default function App() {
               key: `${item.owner}/${item.repo}`,
               value: repo.pushed_at
                 ? formatRelativeTime(repo.pushed_at)
-                : "GitHub indisponivel",
+                : REPO_UPDATE_FALLBACK,
             };
           }),
         );
@@ -341,7 +344,7 @@ export default function App() {
         const fallback = {};
 
         cases.forEach((item) => {
-          fallback[`${item.owner}/${item.repo}`] = "GitHub indisponivel";
+          fallback[`${item.owner}/${item.repo}`] = REPO_UPDATE_FALLBACK;
         });
 
         setRepoUpdates(fallback);
@@ -463,6 +466,24 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isCurrentSiteDialogOpen) {
+      return undefined;
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsCurrentSiteDialogOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isCurrentSiteDialogOpen]);
+
   function scrollCases(direction) {
     const track = trackRef.current;
 
@@ -474,6 +495,15 @@ export default function App() {
     const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 0;
     const amount = Math.max(340, Math.round(cardWidth || track.clientWidth * 0.72));
     track.scrollBy({ left: amount * direction, behavior: "smooth" });
+  }
+
+  function handleProjectClick(event, item) {
+    if (item.repo !== "linksites") {
+      return;
+    }
+
+    event.preventDefault();
+    setIsCurrentSiteDialogOpen(true);
   }
 
   function handleTrackPointerDown(event) {
@@ -880,15 +910,27 @@ export default function App() {
                         </span>
                       </div>
 
-                      <div className="mt-6 flex items-center justify-between gap-4 rounded-[1.25rem] border border-white/8 bg-white/[0.03] px-4 py-3">
-                        <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-white/66">
-                          {item.stack}
-                        </span>
-                        <div className="min-w-[8.5rem] text-right">
-                          <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40">
+                      <div className="mt-6 flex flex-col gap-3 rounded-[1.25rem] border border-white/8 bg-white/[0.03] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
+                          <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-white/66">
+                            {item.stack}
+                          </span>
+                          <a
+                            href={item.codeUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-3 inline-flex max-w-full items-center gap-2 text-[0.72rem] text-white/52 transition hover:text-cyan-100/80"
+                          >
+                            <span className="truncate">{`github.com/${item.owner}`}</span>
+                            <span className="text-white/28">/</span>
+                            <span className="truncate text-white/42">{item.repo}</span>
+                          </a>
+                        </div>
+                        <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">
+                          <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40 sm:text-right">
                             Ultimo push
                           </p>
-                          <p className="mt-1 text-sm font-medium text-cyan-100/78">
+                          <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
                             {repoUpdates[repoKey] ?? "sincronizando"}
                           </p>
                         </div>
@@ -899,6 +941,7 @@ export default function App() {
                           href={item.projectUrl}
                           target="_blank"
                           rel="noreferrer"
+                          onClick={(event) => handleProjectClick(event, item)}
                           className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px]"
                         >
                           Ver projeto
@@ -998,6 +1041,31 @@ export default function App() {
           <p>Conectando voce ao mundo digital com criatividade, tecnologia e paixao.</p>
         </div>
       </footer>
+
+      {isCurrentSiteDialogOpen ? (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[rgba(3,8,15,0.72)] px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,24,39,0.96),rgba(6,14,24,0.98))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.38)] sm:p-7">
+            <div className="rounded-full border border-emerald-400/18 bg-emerald-400/10 px-3 py-1 text-[0.68rem] uppercase tracking-[0.22em] text-emerald-200/88">
+              Navegacao atual
+            </div>
+            <h3 className="mt-5 font-display text-3xl tracking-tight text-white">
+              Voce ja esta no site atual.
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-white/64">
+              Este projeto e a propria pagina que voce esta navegando neste momento.
+            </p>
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsCurrentSiteDialogOpen(false)}
+                className="inline-flex min-h-[46px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px]"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

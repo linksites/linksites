@@ -15,6 +15,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: 'Roboto', Arial, sans-serif;
@@ -30,6 +34,11 @@ body {
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
+}
+
+.top-anchor {
+  position: absolute;
+  top: 0;
 }
 
 .skip-link {

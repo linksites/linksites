@@ -73,6 +73,11 @@ header {
   flex: 0 0 auto;
   filter: drop-shadow(0 0 6px #00f5ff66);
 }
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
 .menu-toggle {
   display: none;
   width: 48px;

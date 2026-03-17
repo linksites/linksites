@@ -161,7 +161,8 @@ const heroPoints = [
   "Experiencia responsiva",
 ];
 
-const REPO_UPDATE_FALLBACK = "sem resposta";
+const REPO_UPDATE_LOADING = "Consultando atualizacao...";
+const REPO_UPDATE_FALLBACK = "Atualizacao indisponivel";
 
 function formatRelativeTime(dateString) {
   const updatedAt = new Date(dateString);
@@ -205,6 +206,14 @@ function formatRelativeTime(dateString) {
 
   const years = Math.floor(diffMs / yearMs);
   return years === 1 ? "ha 1 ano" : `ha ${years} anos`;
+}
+
+function formatRepoUpdateStatus(dateString) {
+  if (!dateString) {
+    return REPO_UPDATE_FALLBACK;
+  }
+
+  return `Atualizado ${formatRelativeTime(dateString)}`;
 }
 
 function SectionTag({ children }) {
@@ -299,15 +308,21 @@ export default function App() {
   });
 
   useEffect(() => {
+    const controller = new AbortController();
     let active = true;
 
     async function loadRepoUpdates() {
-      try {
-        const responses = await Promise.all(
+      const responses = await Promise.allSettled(
           cases.map(async (item) => {
             const response = await fetch(
               `https://api.github.com/repos/${item.owner}/${item.repo}`,
-              { cache: "no-store" },
+              {
+                cache: "no-store",
+                signal: controller.signal,
+                headers: {
+                  Accept: "application/vnd.github+json",
+                },
+              },
             );
 
             if (!response.ok) {
@@ -318,43 +333,37 @@ export default function App() {
 
             return {
               key: `${item.owner}/${item.repo}`,
-              value: repo.pushed_at
-                ? formatRelativeTime(repo.pushed_at)
-                : REPO_UPDATE_FALLBACK,
+              value: formatRepoUpdateStatus(repo.pushed_at),
             };
           }),
-        );
+      );
 
-        if (!active) {
-          return;
-        }
-
-        const nextUpdates = {};
-
-        responses.forEach(({ key, value }) => {
-          nextUpdates[key] = value;
-        });
-
-        setRepoUpdates(nextUpdates);
-      } catch {
-        if (!active) {
-          return;
-        }
-
-        const fallback = {};
-
-        cases.forEach((item) => {
-          fallback[`${item.owner}/${item.repo}`] = REPO_UPDATE_FALLBACK;
-        });
-
-        setRepoUpdates(fallback);
+      if (!active) {
+        return;
       }
+
+      const nextUpdates = {};
+
+      responses.forEach((result, index) => {
+        const item = cases[index];
+        const key = `${item.owner}/${item.repo}`;
+
+        if (result.status === "fulfilled") {
+          nextUpdates[key] = result.value.value;
+          return;
+        }
+
+        nextUpdates[key] = REPO_UPDATE_FALLBACK;
+      });
+
+      setRepoUpdates(nextUpdates);
     }
 
     loadRepoUpdates();
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, []);
 
@@ -931,7 +940,7 @@ export default function App() {
                             Ultimo push
                           </p>
                           <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
-                            {repoUpdates[repoKey] ?? "sincronizando"}
+                            {repoUpdates[repoKey] ?? REPO_UPDATE_LOADING}
                           </p>
                         </div>
                       </div>

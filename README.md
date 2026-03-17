@@ -1,78 +1,58 @@
 # LinkSites
 
-Pagina institucional da LinkSites, startup do grupo Techlab Software focada em presenca digital, identidade de marca e solucoes web.
+Landing page institucional da LinkSites, agora em uma base moderna com React, Vite e Tailwind CSS.
 
-## Page institucional
+## Projeto
 
 - Site publicado: `https://linksites.github.io/linksites/`
 - Repositorio: `https://github.com/linksites/linksites`
+- Stack atual: `React + Vite + Tailwind CSS`
 - Deploy automatico via GitHub Pages
 
-## Sobre o projeto
+## Direcao atual
 
-A LinkSites apresenta uma home institucional voltada para:
+O projeto foi migrado da estrutura estatica original para uma base em React com foco em:
 
-- divulgacao de servicos digitais
-- posicionamento da startup no mercado
-- captacao de contatos via WhatsApp
-- demonstracao de presenca online com contador de visitantes
-- showcase visual de projetos com navegacao lateral
-
-O projeto foi construido como um site estatico, leve e simples de publicar.
+- identidade visual elegante e coerente com a marca LinkSites
+- paleta institucional em navy, azul e ciano
+- hero premium com composicao visual inspirada na logo
+- componentizacao e evolucao mais organizada da interface
+- base pronta para expandir em secoes, componentes e design system
 
 ## Recursos atuais
 
-- hero institucional com composicao visual inspirada na identidade da marca
-- menu superior com link de `Inicio`
-- logo clicavel que retorna ao topo
-- marca vetorial no header inspirada no globo conectado da LinkSites
-- header fixo no topo
-- menu hamburguer para mobile
-- layout responsivo para desktop, tablet e celular
-- secao de servicos
-- secao de diferenciais
-- secao de portfolio em formato `case show` lateral
-- cards de projetos com descricao comercial e links para projeto e codigo
-- navegacao lateral no portfolio com setas, indicadores de fluxo e dica de arraste
-- indicadores de fluxo lateral tambem na responsividade mobile
-- leitura em tempo real da ultima atualizacao dos repositorios via GitHub API
-- secao sobre a empresa
-- secao de contato com CTA para WhatsApp
-- contador visual de visitantes unicos por navegador
-
-## Identidade visual
-
-O topo do site foi atualizado para refletir melhor a linguagem visual da marca LinkSites.
-
-Hoje a home utiliza:
-
-- wordmark com destaque visual para `Sites`
-- simbolo vetorial no header inspirado na logo em formato de globo conectado
-- hero com composicao visual baseada em rede, orbitas e nodos luminosos
-- fundo com glow azul e ciano seguindo a paleta da marca
-- CTA secundario para levar do hero direto ao portfolio
-- badges de destaque para reforcar posicionamento premium e tecnologico
-
-## Portfolio atual
-
-O portfolio foi evoluido de uma grade simples para uma vitrine horizontal com foco em apresentacao comercial dos cases.
-
-Hoje a secao inclui:
-
-- cards largos com identidade visual propria por projeto
-- descricao de contexto e objetivo de negocio
-- exibicao da stack principal
-- status de publicacao
-- botao `Ver projeto`
-- botao `Ver codigo`
-- atualizacao automatica do ultimo push de cada repositorio
-- indicadores laterais suaves para reforcar a navegacao horizontal
+- app em React com entrada via Vite
+- Tailwind CSS integrado ao projeto
+- header responsivo com menu mobile
+- hero com CTA principal e CTA secundario
+- showcase inicial de servicos
+- secao de cases com cards premium
+- secao de processo
+- secao final de contato com CTA para WhatsApp
+- uso da logo real da LinkSites em `assets/logolinksites.png`
+- build de producao validado com `npm run build`
 
 ## Estrutura
 
-- [index.html](c:/Projeto/linksites/index.html): markup principal da pagina
-- [style.css](c:/Projeto/linksites/style.css): estilos visuais e responsividade
+- [index.html](c:/Projeto/linksites/index.html): shell HTML usada pelo Vite
+- [package.json](c:/Projeto/linksites/package.json): scripts e dependencias do projeto
+- [vite.config.js](c:/Projeto/linksites/vite.config.js): configuracao do Vite com React e Tailwind
+- [src/main.jsx](c:/Projeto/linksites/src/main.jsx): ponto de entrada da aplicacao React
+- [src/App.jsx](c:/Projeto/linksites/src/App.jsx): landing page principal em React
+- [src/index.css](c:/Projeto/linksites/src/index.css): estilos globais e configuracao visual com Tailwind
+- [assets/logolinksites.png](c:/Projeto/linksites/assets/logolinksites.png): logo da marca utilizada na interface
 - [.github/workflows/deploy-pages.yml](c:/Projeto/linksites/.github/workflows/deploy-pages.yml): workflow de deploy no GitHub Pages
+
+## Como rodar localmente
+
+1. instalar dependencias com `npm install`
+2. iniciar ambiente local com `npm run dev`
+3. abrir a URL mostrada pelo Vite no navegador
+
+## Como gerar build
+
+1. executar `npm run build`
+2. o resultado sera gerado na pasta `dist/`
 
 ## Como publicar
 
@@ -80,19 +60,20 @@ O deploy acontece automaticamente a cada push na branch `main`.
 
 Fluxo atual:
 
-1. editar os arquivos do site
-2. fazer commit
-3. enviar para `origin/main`
-4. aguardar o GitHub Pages atualizar a URL publicada
+1. editar os arquivos do app
+2. testar com `npm run build`
+3. fazer commit
+4. enviar para `origin/main`
+5. aguardar o GitHub Pages atualizar a URL publicada
 
 ## Proximos passos sugeridos
 
-1. adicionar thumbnails reais de cada projeto para fortalecer o efeito de vitrine
-2. criar um dataset unico de projetos em JavaScript para evitar repeticao de informacoes no HTML
-3. incluir filtros por categoria como `Institucional`, `Portfolio`, `Comercio` e `Landing Page`
-4. integrar os arquivos reais da logo e do banner da marca em `assets/`
-5. revisar textos com acentuacao para padronizar encoding UTF-8 em todo o projeto
-6. validar performance e acessibilidade da secao de portfolio em mobile
+1. separar a landing em componentes como `Navbar`, `Hero`, `Services`, `Cases` e `Contact`
+2. integrar a arte horizontal oficial da marca em `assets/`
+3. transformar os cases em dados reutilizaveis em vez de conteudo inline
+4. revisar os textos e a acentuacao para padronizar UTF-8
+5. adicionar animacoes discretas e mais refinadas, sem excessos
+6. preparar favicon, social preview e metadados completos da marca
 
 ## Contato
 
@@ -102,4 +83,4 @@ Fluxo atual:
 
 ## Visao da LinkSites
 
-Conhecer a tecnologia e entende-la e poder. A proposta da LinkSites e conectar clientes ao mundo digital com identidade, clareza e presenca profissional.
+A proposta da LinkSites e conectar clientes ao mundo digital com identidade, clareza, presenca profissional e uma experiencia visual premium.

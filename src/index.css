@@ -1,0 +1,66 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Outfit", sans-serif;
+}
+
+:root {
+  --bg-strong: #07101b;
+  --bg-soft: #0b1728;
+  --panel: #0d2136;
+  --panel-strong: #0d1a2d;
+  --text-primary: #edf7ff;
+  --text-muted: rgba(237, 247, 255, 0.68);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top, rgba(98, 240, 235, 0.1), transparent 24%),
+    linear-gradient(180deg, #08111d 0%, #091522 48%, #070f1a 100%);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.hero-orbit::before,
+.hero-orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid rgba(98, 240, 235, 0.14);
+  pointer-events: none;
+}
+
+.hero-orbit::before {
+  inset: 14% 18%;
+  transform: rotate(16deg);
+}
+
+.hero-orbit::after {
+  inset: 20% 12%;
+  transform: rotate(82deg) scaleX(0.62);
+}
+
+::selection {
+  background: rgba(98, 240, 235, 0.28);
+  color: white;
+}

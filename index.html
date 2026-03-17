@@ -1,108 +1,360 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LinkSites | Soluções Digitais Futuristas</title>
+  <title>LinkSites | Conexao Tecnologica com Identidade Digital</title>
+  <meta
+    name="description"
+    content="A LinkSites conecta empresas e pessoas ao mundo digital com estrategia, identidade, performance, automacao e experiencias web de alto impacto."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  >
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+  <div class="page-shell" aria-hidden="true">
+    <div class="page-shell-grid"></div>
+    <div class="page-shell-glow page-shell-glow-a"></div>
+    <div class="page-shell-glow page-shell-glow-b"></div>
+  </div>
+
+  <header class="site-header">
     <div class="container header-flex">
-      <img src="https://img.icons8.com/color/96/000000/internet--v2.png" alt="Logo LinkSites" class="logo">
-      <nav>
+      <a href="#topo" class="brand-mark">
+        <span class="brand-mark-icon">LS</span>
+        <span class="brand-mark-text">
+          <strong>LinkSites</strong>
+          <small>Startup Techlab Software</small>
+        </span>
+      </a>
+      <nav aria-label="Principal">
         <ul>
-          <li><a href="#servicos">Serviços</a></li>
-          <li><a href="#diferenciais">Diferenciais</a></li>
+          <li><a href="#manifesto">Manifesto</a></li>
+          <li><a href="#servicos">Servicos</a></li>
+          <li><a href="#stack">Stack</a></li>
+          <li><a href="#revolucao">Revolucao</a></li>
           <li><a href="#sobre">Sobre</a></li>
           <li><a href="#contato">Contato</a></li>
         </ul>
       </nav>
     </div>
   </header>
-  <section class="hero">
-    <div class="container">
-      <h1>LinkSites</h1>
-      <h2>O futuro da presença digital começa aqui</h2>
-      <p>Sites profissionais, modernos e inteligentes para pessoas e empresas visionárias.</p>
-      <a href="#contato" class="cta">Solicite seu projeto</a>
-    </div>
-  </section>
-  <section id="servicos" class="servicos">
-    <div class="container">
-      <h3>Serviços</h3>
-      <div class="cards">
-        <div class="card">
-          <h4>Sites Corporativos</h4>
-          <p>Desenvolvimento de sites institucionais, landing pages e portais empresariais com tecnologia de ponta.</p>
-        </div>
-        <div class="card">
-          <h4>Lojas Virtuais</h4>
-          <p>E-commerce completo, seguro e escalável para impulsionar suas vendas online.</p>
-        </div>
-        <div class="card">
-          <h4>SEO & Marketing</h4>
-          <p>Otimização para buscadores e estratégias digitais para você ser encontrado e crescer.</p>
-        </div>
-        <div class="card">
-          <h4>Hospedagem & Suporte</h4>
-          <p>Infraestrutura robusta, monitoramento e atendimento ágil para seu site nunca parar.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section id="diferenciais" class="diferenciais">
-    <div class="container">
-      <h3>Diferenciais</h3>
-      <ul>
-        <li>🔒 Segurança e performance de alto nível</li>
-        <li>⚡ Entrega rápida e processos inteligentes</li>
-        <li>🤝 Atendimento consultivo e personalizado</li>
-        <li>🚀 Soluções escaláveis e inovadoras</li>
-        <li>👨‍💻 Equipe Techlab: expertise e paixão por tecnologia</li>
-      </ul>
-    </div>
-  </section>
-  <section id="sobre" class="sobre">
-    <div class="container sobre-flex">
-      <div class="sobre-copy">
-        <h3>Sobre a LinkSites</h3>
-        <p>Somos uma startup do grupo <strong>Techlab Software</strong>, referência em soluções digitais. Nossa missão é transformar ideias em experiências digitais marcantes, com tecnologia de ponta, design futurista e foco total no resultado do cliente.</p>
-        <div class="visit-counter visit-counter--about" aria-live="polite">
-          <span class="visit-counter-kicker">Presença em crescimento</span>
-          <div class="visit-counter-screen">
-            <span class="visit-counter-status">Browser Unico</span>
-            <strong id="visit-count" class="visit-counter-number is-loading">Lendo...</strong>
+
+  <main id="topo">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Conexao tecnologica com direcao</span>
+          <h1>Conhecer a tecnologia e entende-la e poder.</h1>
+          <p class="hero-lead">
+            A LinkSites conecta nossos clientes ao mundo digital com identidade, arquitetura e performance.
+            Nao entregamos apenas um site: entregamos presenca, clareza tecnica e uma base pronta para evolucao.
+          </p>
+          <div class="hero-actions">
+            <a href="#contato" class="cta cta-primary">Solicitar projeto</a>
+            <a href="#stack" class="cta cta-secondary">Ver nossa engenharia</a>
           </div>
-          <span class="visit-counter-label">Visitantes unicos por navegador</span>
-          <span class="visit-counter-note">Cada navegador conta uma vez e depois apenas consulta o total</span>
+          <ul class="hero-tags">
+            <li>Brand systems digitais</li>
+            <li>Experiencias web de alta conversao</li>
+            <li>Automacao, dados e integracoes</li>
+          </ul>
+          <div class="hero-proof">
+            <article class="hero-proof-card">
+              <span class="hero-proof-label">Posicionamento</span>
+              <strong>Marca com identidade e narrativa clara</strong>
+            </article>
+            <article class="hero-proof-card">
+              <span class="hero-proof-label">Tecnologia</span>
+              <strong>Front-end responsivo, SEO e observabilidade</strong>
+            </article>
+            <article class="hero-proof-card">
+              <span class="hero-proof-label">Escala</span>
+              <strong>Arquitetura preparada para crescer junto</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-screen">
+            <div class="hero-screen-topbar">
+              <span>identity.sync</span>
+              <span>pipeline online</span>
+            </div>
+            <div class="hero-core">
+              <div class="hero-core-ring hero-core-ring-a"></div>
+              <div class="hero-core-ring hero-core-ring-b"></div>
+              <div class="hero-core-center">LinkSites</div>
+              <div class="hero-core-node hero-core-node-a">UX</div>
+              <div class="hero-core-node hero-core-node-b">SEO</div>
+              <div class="hero-core-node hero-core-node-c">Data</div>
+              <div class="hero-core-node hero-core-node-d">API</div>
+            </div>
+            <div class="hero-signal hero-signal-a">
+              <span class="hero-signal-label">Deploy</span>
+              <strong>Build pronto para producao</strong>
+              <small>Landing pages, websites e portais com rollout continuo</small>
+            </div>
+            <div class="hero-signal hero-signal-b">
+              <span class="hero-signal-label">Search</span>
+              <strong>Semantica, schema e velocidade</strong>
+              <small>Experiencia pensada para descoberta, leitura e conversao</small>
+            </div>
+            <div class="hero-signal hero-signal-c">
+              <span class="hero-signal-label">Automation</span>
+              <strong>WhatsApp, CRM, pixel e webhooks</strong>
+              <small>Integracao entre comunicacao, vendas e operacao</small>
+            </div>
+          </div>
         </div>
       </div>
-      <img src="https://img.icons8.com/color/96/000000/artificial-intelligence.png" alt="Futuro Digital" class="sobre-img">
-    </div>
-  </section>
-  <section id="contato" class="contato">
-    <div class="container">
-      <h3>Fale com a LinkSites</h3>
-      <p class="contato-texto">Atendimento direto pelo WhatsApp.</p>
-      <div class="contato-actions">
-        <a class="contato-btn" href="https://wa.me/5591982460001" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+    </section>
+
+    <section id="manifesto" class="manifesto section">
+      <div class="container manifesto-grid">
+        <div class="section-heading">
+          <span class="section-kicker">Manifesto</span>
+          <h2>Tecnologia nao e enfeite. E infraestrutura de poder para marcas que querem ser lembradas.</h2>
+        </div>
+        <div class="manifesto-copy">
+          <p>
+            Somos uma empresa tech que traduz ambicao em interfaces claras, sistemas confiaveis e identidade digital consistente.
+            Quando o cliente entende a propria operacao e enxerga a tecnologia como aliada, ele deixa de improvisar e passa a liderar.
+          </p>
+          <p>
+            Nossa proposta e simples: conectar negocio, narrativa e engenharia. O resultado e uma presenca digital viva,
+            com conteudo forte, base tecnica solida e espaco para automacao, dados e evolucao continua.
+          </p>
+        </div>
+        <div class="manifesto-panels">
+          <article class="manifesto-panel">
+            <span>01</span>
+            <h3>Identidade com direcao</h3>
+            <p>Design, tom de voz, estrutura de paginas e microcopias alinhados com o que a marca promete.</p>
+          </article>
+          <article class="manifesto-panel">
+            <span>02</span>
+            <h3>Arquitetura que sustenta</h3>
+            <p>Codigo limpo, componentes reutilizaveis, SEO tecnico e performance para escalar sem retrabalho.</p>
+          </article>
+          <article class="manifesto-panel">
+            <span>03</span>
+            <h3>Presenca com inteligencia</h3>
+            <p>Medicao, automacao e integracoes para transformar visitas em relacionamento, decisao e conversao.</p>
+          </article>
+        </div>
       </div>
-      <div class="contato-info">
-        <p><strong>E-mail:</strong> sergiosrdev@hotmail.com</p>
-        <p><strong>Localização:</strong> Belém, PA - Atendimento Global</p>
+    </section>
+
+    <section id="servicos" class="servicos section">
+      <div class="container">
+        <div class="section-heading section-heading--center">
+          <span class="section-kicker">Servicos</span>
+          <h2>Projetos digitais que combinam criatividade, engenharia e leitura de negocio.</h2>
+        </div>
+        <div class="cards cards--services">
+          <article class="card service-card">
+            <span class="card-chip">Web Presence</span>
+            <h3>Sites institucionais e paginas estrategicas</h3>
+            <p>Construimos home, paginas de servico, prova social e chamadas de acao com narrativa orientada a conversao.</p>
+            <ul>
+              <li>Arquitetura de informacao e copy de posicionamento</li>
+              <li>Layouts responsivos com identidade visual propria</li>
+              <li>Formularios, CTA e conexao com WhatsApp</li>
+            </ul>
+          </article>
+          <article class="card service-card">
+            <span class="card-chip">Performance</span>
+            <h3>SEO tecnico, velocidade e indexacao</h3>
+            <p>Organizamos semantica, headings, metadados e performance para o site nascer preparado para busca e leitura.</p>
+            <ul>
+              <li>HTML semantico e estrutura de conteudo clara</li>
+              <li>Core Web Vitals, compressao e assets otimizados</li>
+              <li>Titles, descriptions e schema alinhados com o negocio</li>
+            </ul>
+          </article>
+          <article class="card service-card">
+            <span class="card-chip">Commerce</span>
+            <h3>Vendas digitais e jornadas de conversao</h3>
+            <p>Da vitrine online ao checkout, desenhamos experiencias que aproximam produto, decisao e pagamento.</p>
+            <ul>
+              <li>Catalogos, landing pages e fluxos de oferta</li>
+              <li>Integracao com meios de pagamento e CRM</li>
+              <li>Eventos de conversao e acompanhamento comercial</li>
+            </ul>
+          </article>
+          <article class="card service-card">
+            <span class="card-chip">Automation</span>
+            <h3>Integracoes, automacoes e operacao conectada</h3>
+            <p>Ligamos site, atendimento e dados para reduzir gargalos e dar previsibilidade ao crescimento.</p>
+            <ul>
+              <li>Webhooks, APIs e paineis de captura</li>
+              <li>Notificacoes para equipe e cliente em tempo real</li>
+              <li>Fluxos com WhatsApp, analytics e rotinas de follow-up</li>
+            </ul>
+          </article>
+        </div>
       </div>
-      <div class="whatsapp-contato">
-        <strong>WhatsApp:</strong> <a href="https://wa.me/5591982460001" target="_blank" rel="noopener">+55 91 98246-0001</a>
+    </section>
+
+    <section id="stack" class="stack section">
+      <div class="container stack-grid">
+        <div class="section-heading">
+          <span class="section-kicker">Exemplos tecnicos</span>
+          <h2>Como a LinkSites transforma presenca digital em um sistema vivo.</h2>
+        </div>
+        <div class="stack-diagram">
+          <article class="stack-layer">
+            <span class="stack-layer-tag">Camada 1</span>
+            <h3>Interface e experiencia</h3>
+            <p>Design responsivo, hierarquia visual, componentes claros e conteudo orientado a leitura.</p>
+          </article>
+          <article class="stack-layer">
+            <span class="stack-layer-tag">Camada 2</span>
+            <h3>SEO e performance</h3>
+            <p>Semantica, metadata, carregamento eficiente, score tecnico e preparo para descoberta organica.</p>
+          </article>
+          <article class="stack-layer">
+            <span class="stack-layer-tag">Camada 3</span>
+            <h3>Dados e integracoes</h3>
+            <p>Captura de lead, eventos, pixel, CRM, WhatsApp e automacoes conectando marketing e operacao.</p>
+          </article>
+          <article class="stack-layer">
+            <span class="stack-layer-tag">Camada 4</span>
+            <h3>Evolucao continua</h3>
+            <p>Publicacao rapida, ajustes iterativos, observacao de comportamento e melhoria do funil digital.</p>
+          </article>
+        </div>
+        <div class="stack-terminal" aria-label="Exemplo tecnico de operacao">
+          <div class="stack-terminal-topbar">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <strong>linksites_pipeline.log</strong>
+          </div>
+          <div class="stack-terminal-body">
+            <p><span>$</span> mapear identidade -> estruturar proposta de valor -> publicar experiencia</p>
+            <p><span>$</span> conectar formulario + WhatsApp + analytics + acompanhamento comercial</p>
+            <p><span>$</span> monitorar navegacao -> ajustar copy -> elevar conversao</p>
+            <p><span>$</span> evoluir pagina para ecossistema: blog, portal, loja, automacao</p>
+          </div>
+        </div>
       </div>
-      <p class="creditos">LinkSites &copy; 2026 - Uma startup do grupo Techlab Software</p>
-    </div>
-  </section>
+    </section>
+
+    <section id="revolucao" class="revolucao section">
+      <div class="container">
+        <div class="section-heading section-heading--center">
+          <span class="section-kicker">Revolucao digital</span>
+          <h2>Do primeiro clique ao crescimento estruturado, guiamos a transicao do cliente para um digital mais inteligente.</h2>
+        </div>
+        <div class="revolucao-track">
+          <article class="revolucao-step">
+            <span class="revolucao-index">01</span>
+            <h3>Descoberta</h3>
+            <p>Entendemos objetivo, publico, diferenciais e a mensagem que precisa ser sentida no primeiro contato.</p>
+          </article>
+          <article class="revolucao-step">
+            <span class="revolucao-index">02</span>
+            <h3>Identidade digital</h3>
+            <p>Transformamos a marca em layout, linguagem, iconografia e estrutura de paginas coerentes.</p>
+          </article>
+          <article class="revolucao-step">
+            <span class="revolucao-index">03</span>
+            <h3>Engenharia da experiencia</h3>
+            <p>Entram performance, acessibilidade, SEO, responsividade e integracoes tecnicas de verdade.</p>
+          </article>
+          <article class="revolucao-step">
+            <span class="revolucao-index">04</span>
+            <h3>Expansao continua</h3>
+            <p>Com o portal no ar, ativamos melhorias, automacoes, analise de comportamento e novas frentes digitais.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre" class="sobre section">
+      <div class="container sobre-grid">
+        <div class="sobre-copy">
+          <div class="section-heading">
+            <span class="section-kicker">Sobre a startup</span>
+            <h2>Conectamos o cliente com o mundo digital sem perder a identidade que faz a marca ser unica.</h2>
+          </div>
+          <p>
+            A LinkSites nasce dentro do ecossistema da <strong>Techlab Software</strong> para construir pontes entre estrategia, design e engenharia.
+            Nosso foco e transformar tecnologia em clareza, autoridade e presenca percebida.
+          </p>
+          <p>
+            Para nos, revolucao digital nao e barulho. E capacidade real de entender a tecnologia, usar a tecnologia e crescer com ela.
+            Quando um negocio ganha identidade digital forte, ele passa a ser visto, lembrado e escolhido.
+          </p>
+          <div class="visit-counter visit-counter--about" aria-live="polite">
+            <span class="visit-counter-kicker">Presenca em crescimento</span>
+            <div class="visit-counter-screen">
+              <span class="visit-counter-status">Browser Unico</span>
+              <strong id="visit-count" class="visit-counter-number is-loading">Lendo...</strong>
+            </div>
+            <span class="visit-counter-label">Visitantes unicos por navegador</span>
+          </div>
+        </div>
+        <div class="sobre-visual" aria-hidden="true">
+          <div class="visual-card visual-card-main">
+            <span class="visual-card-label">Identity Engine</span>
+            <strong>Marca + conteudo + tecnologia + conversao</strong>
+          </div>
+          <div class="visual-orbit">
+            <div class="visual-orbit-center">Power</div>
+            <span class="visual-orbit-node visual-orbit-node-a">Brand</span>
+            <span class="visual-orbit-node visual-orbit-node-b">Code</span>
+            <span class="visual-orbit-node visual-orbit-node-c">Growth</span>
+            <span class="visual-orbit-node visual-orbit-node-d">Data</span>
+          </div>
+          <div class="visual-card visual-card-side">
+            <span class="visual-card-label">Exemplos</span>
+            <ul>
+              <li>Portal institucional com SEO e lead capture</li>
+              <li>Pagina comercial com analytics e WhatsApp</li>
+              <li>Fluxo conectado com CRM, pixel e automacao</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contato" class="contato section">
+      <div class="container contato-panel">
+        <div class="contato-copy">
+          <span class="section-kicker">Contato</span>
+          <h2>Se sua marca precisa de um portal vivo, estrategico e com identidade, vamos construir isso juntos.</h2>
+          <p>
+            Criamos experiencias que apresentam a empresa, provam autoridade, aceleram descoberta e preparam o negocio
+            para vender, atender e crescer no digital com muito mais seguranca.
+          </p>
+        </div>
+        <div class="contato-actions-wrap">
+          <a class="contato-btn" href="https://wa.me/5591982460001" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+          <div class="contato-info">
+            <p><strong>E-mail:</strong> sergiosrdev@hotmail.com</p>
+            <p><strong>Localizacao:</strong> Belem, PA - Atendimento global</p>
+            <p><strong>Especialidade:</strong> presencia digital, paginas estrategicas, automacao e performance</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <footer>
-    <div class="container">
-      <p>Conectando você ao mundo digital com criatividade, tecnologia e paixão.</p>
+    <div class="container footer-flex">
+      <p>LinkSites 2026 - Conectando tecnologia, identidade e crescimento no mesmo portal.</p>
+      <p>Uma startup do grupo Techlab Software.</p>
     </div>
   </footer>
+
   <script>
     (function () {
       var countElement = document.getElementById('visit-count');

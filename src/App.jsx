@@ -151,7 +151,7 @@ const cases = [
       "Portfolio pessoal em React com leitura objetiva, tom profissional e apresentacao visual mais premium.",
     stack: "React",
     projectUrl: "https://sergiosrdev.github.io/sradv-final-version/",
-    codeUrl: "https://github.com/sergiosrdev/sradv-final-version",
+    codeUrl: "https://github.com/linksites/sergiorodrigues",
     coverClass:
       "bg-[radial-gradient(circle_at_22%_18%,rgba(98,240,235,0.22),transparent_24%),radial-gradient(circle_at_76%_22%,rgba(59,130,246,0.2),transparent_26%),linear-gradient(145deg,#102543,#091421)]",
   },
@@ -889,6 +889,7 @@ export default function App() {
             >
               {cases.map((item, index) => {
                 const repoKey = `${item.owner}/${item.repo}`;
+                const updateSource = getUpdateRepoSource(item);
 
                 return (
                   <article
@@ -940,9 +941,9 @@ export default function App() {
                             rel="noreferrer"
                             className="mt-3 inline-flex max-w-full items-center gap-2 text-[0.72rem] text-white/52 transition hover:text-cyan-100/80"
                           >
-                            <span className="truncate">{`github.com/${item.owner}`}</span>
+                            <span className="truncate">{`github.com/${updateSource.owner}`}</span>
                             <span className="text-white/28">/</span>
-                            <span className="truncate text-white/42">{item.repo}</span>
+                            <span className="truncate text-white/42">{updateSource.repo}</span>
                           </a>
                         </div>
                         <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">

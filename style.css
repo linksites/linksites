@@ -328,6 +328,29 @@ main {
   color: var(--light);
 }
 
+.portfolio-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(0, 245, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(0, 245, 255, 0.08);
+  color: var(--primary);
+  text-decoration: none;
+  font-family: 'VT323', 'Orbitron', Arial, sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.portfolio-link:hover,
+.portfolio-link:focus-visible {
+  background: var(--primary);
+  color: var(--dark);
+  transform: translateY(-2px);
+}
+
 .sobre-flex {
   display: flex;
   flex-wrap: wrap;

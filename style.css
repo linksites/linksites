@@ -313,9 +313,21 @@ main {
   line-height: 0.95;
   letter-spacing: 0.18rem;
   color: #b9ff66;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
   text-shadow:
     0 0 10px rgba(185, 255, 102, 0.45),
     0 0 22px rgba(185, 255, 102, 0.18);
+}
+.visit-counter-number.is-loading {
+  font-size: clamp(1.2rem, 3.6vw, 1.7rem);
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+  color: rgba(185, 255, 102, 0.88);
+  text-shadow:
+    0 0 6px rgba(185, 255, 102, 0.2),
+    0 0 12px rgba(185, 255, 102, 0.08);
 }
 .visit-counter-label {
   display: block;

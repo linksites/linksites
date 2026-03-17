@@ -26,10 +26,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare static files
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Prepare Pages artifact
         run: |
-          mkdir -p dist
-          cp index.html style.css dist/
           touch dist/.nojekyll
 
       - name: Configure Pages

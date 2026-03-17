@@ -83,8 +83,16 @@
         <p class="portfolio-intro">Explore um portfolio pensado como vitrine: navegacao lateral, cards mais fortes e projetos apresentados com mais contexto de negocio.</p>
       </div>
       <div class="portfolio-carousel">
+        <div class="portfolio-flow-indicator portfolio-flow-indicator-left" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
         <button class="portfolio-nav portfolio-nav-prev" type="button" aria-label="Mostrar projetos anteriores">
-          <span aria-hidden="true">&#10094;</span>
+          <span class="portfolio-nav-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+          </span>
         </button>
         <div class="portfolio-track" tabindex="0" aria-label="Carrossel de projetos">
           <article class="portfolio-card" data-repo="linksites">
@@ -263,9 +271,18 @@
             </div>
           </article>
         </div>
+        <p class="portfolio-flow-caption">Use as setas ou arraste lateralmente para explorar os cases.</p>
         <button class="portfolio-nav portfolio-nav-next" type="button" aria-label="Mostrar proximos projetos">
-          <span aria-hidden="true">&#10095;</span>
+          <span class="portfolio-nav-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+          </span>
         </button>
+        <div class="portfolio-flow-indicator portfolio-flow-indicator-right" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
     </div>
   </section>
@@ -311,6 +328,7 @@
   </footer>
   <script>
     (function () {
+      var portfolioCarousel = document.querySelector('.portfolio-carousel');
       var portfolioTrack = document.querySelector('.portfolio-track');
       var portfolioCards = Array.prototype.slice.call(document.querySelectorAll('.portfolio-card[data-repo]'));
       var prevButton = document.querySelector('.portfolio-nav-prev');
@@ -383,6 +401,11 @@
         var maxScroll = Math.max(0, portfolioTrack.scrollWidth - portfolioTrack.clientWidth - 4);
         prevButton.disabled = portfolioTrack.scrollLeft <= 4;
         nextButton.disabled = portfolioTrack.scrollLeft >= maxScroll;
+
+        if (portfolioCarousel) {
+          portfolioCarousel.classList.toggle('is-at-start', prevButton.disabled);
+          portfolioCarousel.classList.toggle('is-at-end', nextButton.disabled);
+        }
       }
 
       function updateActivePortfolioCard() {

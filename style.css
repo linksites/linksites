@@ -321,8 +321,9 @@ main {
     0 0 22px rgba(185, 255, 102, 0.18);
 }
 .visit-counter-number.is-loading {
-  font-size: clamp(1.2rem, 3.6vw, 1.7rem);
-  letter-spacing: 0.08rem;
+  font-size: clamp(0.95rem, 2.1vw, 1.2rem);
+  letter-spacing: 0.04rem;
+  line-height: 1.05;
   text-transform: uppercase;
   color: rgba(185, 255, 102, 0.88);
   text-shadow:

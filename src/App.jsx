@@ -518,20 +518,32 @@ export default function App() {
             </div>
 
             <div className="relative flex items-center justify-center">
-              <div className="absolute inset-x-[6%] inset-y-[10%] rounded-[2rem] border border-cyan-300/10 bg-[linear-gradient(155deg,rgba(14,32,53,0.92),rgba(5,12,22,0.84))] shadow-[0_30px_70px_rgba(0,0,0,0.35)]" />
-              <div className="absolute inset-x-8 inset-y-8 rounded-[2rem] bg-[radial-gradient(circle_at_30%_25%,rgba(98,240,235,0.16),transparent_24%),radial-gradient(circle_at_72%_30%,rgba(59,130,246,0.18),transparent_26%),radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_55%)]" />
-              <div className="hero-orbit absolute inset-0" />
-              <div className="relative flex w-full max-w-[30rem] items-center justify-center px-10 py-12">
-                <div className="relative w-full">
-                  <img
-                    src={logo}
-                    alt="Marca LinkSites"
-                    className="mx-auto w-[82%] max-w-[20rem] object-contain drop-shadow-[0_0_36px_rgba(98,240,235,0.16)] lg:max-w-[21rem]"
-                  />
-                  <div className="absolute bottom-3 left-4 rounded-full border border-white/10 bg-[rgba(7,16,27,0.72)] px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/58 backdrop-blur">
+              <div className="absolute left-[12%] top-[10%] h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
+              <div className="absolute bottom-[10%] right-[10%] h-44 w-44 rounded-full bg-blue-500/10 blur-3xl" />
+              <div className="hero-orbit absolute inset-[8%]" />
+
+              <div className="relative flex w-full max-w-[30rem] flex-col items-center justify-center gap-6 px-6 py-6 sm:px-10">
+                <div className="relative flex h-[20rem] w-full max-w-[23rem] items-center justify-center sm:h-[24rem] sm:max-w-[25rem]">
+                  <div className="absolute inset-[10%] rounded-full border border-cyan-300/10 bg-[radial-gradient(circle,rgba(98,240,235,0.12),rgba(8,17,29,0)_68%)] blur-2xl" />
+                  <div className="absolute inset-[8%] rounded-[2.5rem] border border-white/6 bg-[linear-gradient(155deg,rgba(10,24,39,0.48),rgba(5,12,22,0.18))] shadow-[0_30px_80px_rgba(0,0,0,0.24)] backdrop-blur-sm" />
+                  <div className="absolute inset-[14%] rounded-full border border-cyan-300/12" />
+                  <div className="absolute inset-[18%] rounded-full border border-white/6" />
+
+                  <div className="relative h-[14.5rem] w-[14.5rem] overflow-hidden rounded-full border border-cyan-300/14 bg-[radial-gradient(circle_at_50%_35%,rgba(98,240,235,0.16),rgba(11,23,40,0.86)_68%)] shadow-[0_24px_70px_rgba(6,12,22,0.48)] sm:h-[17rem] sm:w-[17rem]">
+                    <img
+                      src={logo}
+                      alt="Globo da marca LinkSites"
+                      className="h-full w-full scale-[1.38] object-cover object-top opacity-95"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#09131f] via-[#09131f]/70 to-transparent" />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <div className="rounded-full border border-white/10 bg-[rgba(7,16,27,0.62)] px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/58 backdrop-blur">
                     Techlab Software
                   </div>
-                  <div className="absolute right-4 top-5 rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-2 text-xs uppercase tracking-[0.24em] text-cyan-100/88 backdrop-blur">
+                  <div className="rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-2 text-xs uppercase tracking-[0.24em] text-cyan-100/88 backdrop-blur">
                     Atendimento global
                   </div>
                 </div>

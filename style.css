@@ -72,6 +72,32 @@ header {
   width: 56px;
   filter: drop-shadow(0 0 6px #00f5ff66);
 }
+.menu-toggle {
+  display: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid rgba(0, 245, 255, 0.28);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(18, 23, 42, 0.94), rgba(11, 16, 29, 0.94));
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+.menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.menu-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
 nav ul {
   list-style: none;
   display: flex;
@@ -428,9 +454,57 @@ footer {
 
 @media (max-width: 700px) {
   body {
-    padding-top: 154px;
+    padding-top: 96px;
   }
-  .header-flex, .sobre-flex {
+  .header-flex {
+    position: relative;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+  .menu-toggle {
+    display: inline-flex;
+  }
+  header nav {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  }
+  header.menu-open nav {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  header nav ul {
+    flex-direction: column;
+    gap: 0;
+    padding: 0.55rem;
+    border: 1px solid rgba(0, 245, 255, 0.18);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(18, 23, 42, 0.98), rgba(11, 16, 29, 0.98));
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.28);
+  }
+  header nav a {
+    display: block;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+  }
+  header.menu-open .menu-toggle span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  header.menu-open .menu-toggle span:nth-child(2) {
+    opacity: 0;
+  }
+  header.menu-open .menu-toggle span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+  .sobre-flex {
     flex-direction: column;
     gap: 1.2rem;
     text-align: center;

@@ -13,18 +13,26 @@ const navItems = [
 
 const services = [
   {
+    icon: "🌐",
+    accent: "Presenca institucional",
     title: "Sites Corporativos",
     text: "Desenvolvimento de sites institucionais, landing pages e portais empresariais com tecnologia de ponta.",
   },
   {
+    icon: "🛒",
+    accent: "Venda digital",
     title: "Lojas Virtuais",
     text: "E-commerce completo, seguro e escalavel para impulsionar suas vendas online.",
   },
   {
+    icon: "📈",
+    accent: "Visibilidade online",
     title: "SEO & Marketing",
     text: "Otimizacao para buscadores e estrategias digitais para voce ser encontrado e crescer.",
   },
   {
+    icon: "🛡️",
+    accent: "Base e suporte",
     title: "Hospedagem & Suporte",
     text: "Infraestrutura robusta, monitoramento e atendimento agil para seu site nunca parar.",
   },
@@ -513,17 +521,17 @@ export default function App() {
               <div className="absolute inset-x-[6%] inset-y-[10%] rounded-[2rem] border border-cyan-300/10 bg-[linear-gradient(155deg,rgba(14,32,53,0.92),rgba(5,12,22,0.84))] shadow-[0_30px_70px_rgba(0,0,0,0.35)]" />
               <div className="absolute inset-x-8 inset-y-8 rounded-[2rem] bg-[radial-gradient(circle_at_30%_25%,rgba(98,240,235,0.16),transparent_24%),radial-gradient(circle_at_72%_30%,rgba(59,130,246,0.18),transparent_26%),radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_55%)]" />
               <div className="hero-orbit absolute inset-0" />
-              <div className="relative flex w-full max-w-[30rem] items-center justify-center px-8 py-10">
+              <div className="relative flex w-full max-w-[30rem] items-center justify-center px-10 py-12">
                 <div className="relative w-full">
                   <img
                     src={logo}
                     alt="Marca LinkSites"
-                    className="mx-auto w-full max-w-[24rem] drop-shadow-[0_0_40px_rgba(98,240,235,0.16)]"
+                    className="mx-auto w-[82%] max-w-[20rem] object-contain drop-shadow-[0_0_36px_rgba(98,240,235,0.16)] lg:max-w-[21rem]"
                   />
-                  <div className="absolute -bottom-3 left-3 rounded-full border border-white/10 bg-[rgba(7,16,27,0.72)] px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/58 backdrop-blur">
+                  <div className="absolute bottom-3 left-4 rounded-full border border-white/10 bg-[rgba(7,16,27,0.72)] px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/58 backdrop-blur">
                     Techlab Software
                   </div>
-                  <div className="absolute -right-2 top-8 rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-2 text-xs uppercase tracking-[0.24em] text-cyan-100/88 backdrop-blur">
+                  <div className="absolute right-4 top-5 rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-2 text-xs uppercase tracking-[0.24em] text-cyan-100/88 backdrop-blur">
                     Atendimento global
                   </div>
                 </div>
@@ -548,9 +556,17 @@ export default function App() {
             {services.map((service) => (
               <article
                 key={service.title}
-                className="rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-7 backdrop-blur-sm"
+                className="group relative overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-7 backdrop-blur-sm"
               >
-                <div className="mb-5 h-12 w-12 rounded-2xl bg-gradient-to-br from-cyan-300/22 to-blue-500/18 ring-1 ring-white/8" />
+                <span className="pointer-events-none absolute right-5 top-4 text-5xl opacity-[0.08] transition group-hover:opacity-[0.14]">
+                  {service.icon}
+                </span>
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300/22 to-blue-500/18 text-2xl ring-1 ring-white/8">
+                  {service.icon}
+                </div>
+                <p className="mb-3 text-[0.72rem] uppercase tracking-[0.22em] text-cyan-100/58">
+                  {service.accent}
+                </p>
                 <h3 className="font-display text-2xl text-white">{service.title}</h3>
                 <p className="mt-4 text-sm leading-7 text-white/62">{service.text}</p>
               </article>

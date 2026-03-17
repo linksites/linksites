@@ -30,7 +30,6 @@ body {
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
-  padding-top: 92px;
 }
 
 .skip-link {
@@ -52,12 +51,10 @@ body {
 }
 
 header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
   z-index: 1000;
+  backdrop-filter: blur(12px);
   background: linear-gradient(180deg, #12172a, #0b101d);
   box-shadow: 0 2px 0 #0ff1ce33, 0 6px 18px #0009;
   border-bottom: 2px solid #0ff1ce22;
@@ -66,10 +63,14 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.2rem 0;
+  gap: 1.2rem;
+  min-height: 88px;
+  padding: 0.9rem 0;
+  position: relative;
 }
 .logo {
   width: 56px;
+  flex: 0 0 auto;
   filter: drop-shadow(0 0 6px #00f5ff66);
 }
 .menu-toggle {
@@ -101,7 +102,8 @@ header {
 nav ul {
   list-style: none;
   display: flex;
-  gap: 2rem;
+  align-items: center;
+  gap: 1.35rem;
   margin: 0;
   padding: 0;
 }
@@ -110,7 +112,8 @@ nav a {
   text-decoration: none;
   font-weight: 700;
   font-family: 'VT323', 'Orbitron', Arial, sans-serif;
-  letter-spacing: 1px;
+  font-size: 1rem;
+  letter-spacing: 0.06rem;
   text-transform: uppercase;
   border-bottom: 2px solid transparent;
   transition: color 0.2s, border-color 0.2s;
@@ -130,22 +133,27 @@ nav a:focus-visible {
     linear-gradient(120deg, #0c1529 0%, #111a31 100%);
   color: #e9f7ff;
   text-align: center;
-  padding: 5rem 1rem 4rem 1rem;
+  padding: 4.5rem 1rem 3.75rem 1rem;
   border-bottom: 2px solid #00f5ff33;
   position: relative;
   overflow: hidden;
 }
 .hero h1 {
   font-family: 'VT323', 'Orbitron', Arial, sans-serif;
-  font-size: 3.4rem;
+  font-size: clamp(2.8rem, 7vw, 3.8rem);
   margin: 0 0 1rem 0;
   letter-spacing: 3px;
   text-shadow: 0 0 12px #00f5ff88;
 }
 .hero h2 {
-  font-size: 1.6rem;
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
   font-weight: 400;
   margin-bottom: 1.5rem;
+}
+.hero p {
+  max-width: 44rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 .hero .cta {
   display: inline-block;
@@ -176,7 +184,7 @@ nav a:focus-visible {
 .container {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 }
 
 main {
@@ -197,8 +205,8 @@ main {
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.5rem;
 }
 .card {
   background: linear-gradient(180deg, #12192b 0%, #0c1222 100%);
@@ -243,7 +251,7 @@ main {
   gap: 2.5rem;
 }
 .sobre-img {
-  width: 120px;
+  width: min(120px, 28vw);
   border-radius: 6px;
   box-shadow: 0 0 0 2px #00f5ff55, 0 8px 20px #0008;
   background: #0b0f1a;
@@ -452,21 +460,37 @@ footer {
   }
 }
 
-@media (max-width: 700px) {
-  body {
-    padding-top: 96px;
+@media (max-width: 960px) {
+  .header-flex {
+    min-height: 80px;
+  }
+  nav ul {
+    gap: 1rem;
+  }
+  nav a {
+    font-size: 0.92rem;
+  }
+  .servicos, .diferenciais, .sobre, .contato {
+    padding: 3.5rem 0 2.75rem 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .container {
+    padding: 0 1rem;
   }
   .header-flex {
-    position: relative;
-    gap: 1rem;
-    padding: 1rem 0;
+    min-height: 76px;
+    gap: 0.85rem;
+    padding: 0.8rem 0;
   }
   .menu-toggle {
     display: inline-flex;
+    margin-left: auto;
   }
   header nav {
     position: absolute;
-    top: calc(100% + 0.6rem);
+    top: calc(100% + 0.5rem);
     left: 0;
     right: 0;
     opacity: 0;
@@ -483,6 +507,7 @@ footer {
   }
   header nav ul {
     flex-direction: column;
+    align-items: stretch;
     gap: 0;
     padding: 0.55rem;
     border: 1px solid rgba(0, 245, 255, 0.18);
@@ -494,6 +519,7 @@ footer {
     display: block;
     padding: 0.85rem 1rem;
     border-radius: 10px;
+    border-bottom: 0;
   }
   header.menu-open .menu-toggle span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
@@ -504,13 +530,19 @@ footer {
   header.menu-open .menu-toggle span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
   }
+  .hero {
+    padding: 3.6rem 0.8rem 3rem;
+  }
+  .hero .cta {
+    width: min(100%, 320px);
+  }
+  .cards, .diferenciais ul {
+    grid-template-columns: 1fr;
+  }
   .sobre-flex {
     flex-direction: column;
     gap: 1.2rem;
     text-align: center;
-  }
-  .cards, .diferenciais ul {
-    grid-template-columns: 1fr;
   }
   .sobre-img {
     margin: 0 auto;
@@ -526,5 +558,36 @@ footer {
   }
   .visit-counter-note {
     max-width: none;
+  }
+  .contato-actions,
+  .contato-info,
+  .whatsapp-contato {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    width: 48px;
+  }
+  nav a {
+    font-size: 0.95rem;
+  }
+  .hero h1 {
+    letter-spacing: 2px;
+  }
+  .hero h2 {
+    margin-bottom: 1rem;
+  }
+  .hero .cta {
+    padding: 0.85rem 1.2rem;
+  }
+  .card,
+  .visit-counter {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .visit-counter-number {
+    letter-spacing: 0.08rem;
   }
 }

@@ -201,8 +201,20 @@
         });
       });
 
+      document.addEventListener('click', function (event) {
+        if (!header.contains(event.target)) {
+          setMenuState(false);
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          setMenuState(false);
+        }
+      });
+
       window.addEventListener('resize', function () {
-        if (window.innerWidth > 700) {
+        if (window.innerWidth > 760) {
           setMenuState(false);
         }
       });

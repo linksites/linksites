@@ -1,6 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import logo from "../assets/logolinksites.jpg";
+import heroLogo from "../assets/logoLS.png";
 
 const navItems = [
   { label: "Inicio", href: "#inicio" },
@@ -529,13 +530,12 @@ export default function App() {
                   <div className="absolute inset-[14%] rounded-full border border-cyan-300/12" />
                   <div className="absolute inset-[18%] rounded-full border border-white/6" />
 
-                  <div className="relative h-[14.5rem] w-[14.5rem] overflow-hidden rounded-full border border-cyan-300/14 bg-[radial-gradient(circle_at_50%_35%,rgba(98,240,235,0.16),rgba(11,23,40,0.86)_68%)] shadow-[0_24px_70px_rgba(6,12,22,0.48)] sm:h-[17rem] sm:w-[17rem]">
+                  <div className="relative flex h-[16rem] w-[16rem] items-center justify-center rounded-[2.2rem] border border-cyan-300/12 bg-[radial-gradient(circle_at_50%_30%,rgba(98,240,235,0.12),rgba(9,19,31,0.18)_55%,rgba(9,19,31,0)_78%)] shadow-[0_24px_70px_rgba(6,12,22,0.38)] sm:h-[19rem] sm:w-[19rem]">
                     <img
-                      src={logo}
-                      alt="Globo da marca LinkSites"
-                      className="h-full w-full scale-[1.38] object-cover object-top opacity-95"
+                      src={heroLogo}
+                      alt="Marca transparente da LinkSites"
+                      className="h-full w-full object-contain drop-shadow-[0_0_42px_rgba(98,240,235,0.2)]"
                     />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#09131f] via-[#09131f]/70 to-transparent" />
                   </div>
                 </div>
 

@@ -139,8 +139,8 @@ const cases = [
       "bg-[radial-gradient(circle_at_24%_18%,rgba(98,240,235,0.18),transparent_25%),radial-gradient(circle_at_80%_22%,rgba(29,78,216,0.22),transparent_28%),linear-gradient(145deg,#102038,#08111c)]",
   },
   {
-    owner: "liksites",
-    repo: "sergiorodrigues",
+    owner: "sergiosrdev",
+    repo: "sradv-final-version",
     label: "Portfolio React",
     eyebrow: "Portfolio / React",
     name: "Sergio Rodrigues",
@@ -148,8 +148,8 @@ const cases = [
     description:
       "Portfolio pessoal em React com leitura objetiva, tom profissional e apresentacao visual mais premium.",
     stack: "React",
-    projectUrl: "http://linksites.github.io/sergiorodrigues",
-    codeUrl: "https://github.com/liksites/sergiorodrigues",
+    projectUrl: "https://sergiosrdev.github.io/sradv-final-version/",
+    codeUrl: "https://github.com/sergiosrdev/sradv-final-version",
     coverClass:
       "bg-[radial-gradient(circle_at_22%_18%,rgba(98,240,235,0.22),transparent_24%),radial-gradient(circle_at_76%_22%,rgba(59,130,246,0.2),transparent_26%),linear-gradient(145deg,#102543,#091421)]",
   },

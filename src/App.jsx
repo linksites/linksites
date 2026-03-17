@@ -14,25 +14,25 @@ const navItems = [
 
 const services = [
   {
-    icon: "🌐",
+    icon: "globe",
     accent: "Presenca institucional",
     title: "Sites Corporativos",
     text: "Desenvolvimento de sites institucionais, landing pages e portais empresariais com tecnologia de ponta.",
   },
   {
-    icon: "🛒",
+    icon: "cart",
     accent: "Venda digital",
     title: "Lojas Virtuais",
     text: "E-commerce completo, seguro e escalavel para impulsionar suas vendas online.",
   },
   {
-    icon: "📈",
+    icon: "chart",
     accent: "Visibilidade online",
     title: "SEO & Marketing",
     text: "Otimizacao para buscadores e estrategias digitais para voce ser encontrado e crescer.",
   },
   {
-    icon: "🛡️",
+    icon: "shield",
     accent: "Base e suporte",
     title: "Hospedagem & Suporte",
     text: "Infraestrutura robusta, monitoramento e atendimento agil para seu site nunca parar.",
@@ -156,9 +156,9 @@ const cases = [
 ];
 
 const heroPoints = [
-  "✦ Identidade futurista",
-  "⌁ Rede visual premium",
-  "• Experiencia responsiva",
+  "Identidade futurista",
+  "Rede visual premium",
+  "Experiencia responsiva",
 ];
 
 function formatRelativeTime(dateString) {
@@ -166,7 +166,7 @@ function formatRelativeTime(dateString) {
   const diffMs = Date.now() - updatedAt.getTime();
 
   if (!Number.isFinite(updatedAt.getTime()) || diffMs < 0) {
-    return "Atualizacao recente";
+    return "agora";
   }
 
   const minuteMs = 60 * 1000;
@@ -178,39 +178,88 @@ function formatRelativeTime(dateString) {
 
   if (diffMs < hourMs) {
     const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
-    return minutes === 1 ? "Atualizado ha 1 minuto" : `Atualizado ha ${minutes} minutos`;
+    return minutes === 1 ? "ha 1 minuto" : `ha ${minutes} minutos`;
   }
 
   if (diffMs < dayMs) {
     const hours = Math.floor(diffMs / hourMs);
-    return hours === 1 ? "Atualizado ha 1 hora" : `Atualizado ha ${hours} horas`;
+    return hours === 1 ? "ha 1 hora" : `ha ${hours} horas`;
   }
 
   if (diffMs < weekMs) {
     const days = Math.floor(diffMs / dayMs);
-    return days === 1 ? "Atualizado ha 1 dia" : `Atualizado ha ${days} dias`;
+    return days === 1 ? "ha 1 dia" : `ha ${days} dias`;
   }
 
   if (diffMs < monthMs) {
     const weeks = Math.floor(diffMs / weekMs);
-    return weeks === 1 ? "Atualizado ha 1 semana" : `Atualizado ha ${weeks} semanas`;
+    return weeks === 1 ? "ha 1 semana" : `ha ${weeks} semanas`;
   }
 
   if (diffMs < yearMs) {
     const months = Math.floor(diffMs / monthMs);
-    return months === 1 ? "Atualizado ha 1 mes" : `Atualizado ha ${months} meses`;
+    return months === 1 ? "ha 1 mes" : `ha ${months} meses`;
   }
 
   const years = Math.floor(diffMs / yearMs);
-  return years === 1 ? "Atualizado ha 1 ano" : `Atualizado ha ${years} anos`;
+  return years === 1 ? "ha 1 ano" : `ha ${years} anos`;
 }
 
 function SectionTag({ children }) {
   return (
-    <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.22em] text-cyan-200/85">
-      <span className="mr-2 text-cyan-300/90">✦</span>
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.22em] text-cyan-200/85">
+      <span className="mr-2 inline-block h-2 w-2 rounded-full bg-cyan-300/90" />
       {children}
     </span>
+  );
+}
+
+function ServiceIcon({ name }) {
+  const commonProps = {
+    className: "h-6 w-6",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+    viewBox: "0 0 24 24",
+  };
+
+  if (name === "globe") {
+    return (
+      <svg {...commonProps}>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M4 12h16" />
+        <path d="M12 4a12 12 0 0 1 0 16" />
+        <path d="M12 4a12 12 0 0 0 0 16" />
+      </svg>
+    );
+  }
+
+  if (name === "cart") {
+    return (
+      <svg {...commonProps}>
+        <path d="M4 6h2l2 9h8l2-6H7" />
+        <circle cx="10" cy="18" r="1.5" />
+        <circle cx="17" cy="18" r="1.5" />
+      </svg>
+    );
+  }
+
+  if (name === "chart") {
+    return (
+      <svg {...commonProps}>
+        <path d="M5 18V9" />
+        <path d="M12 18V6" />
+        <path d="M19 18v-4" />
+        <path d="M4 18h16" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...commonProps}>
+      <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z" />
+      <path d="m9.5 12 1.8 1.8 3.5-3.8" />
+    </svg>
   );
 }
 
@@ -385,7 +434,9 @@ export default function App() {
       return;
     }
 
-    const amount = Math.max(340, Math.round(track.clientWidth * 0.86));
+    const firstCard = track.querySelector("[data-case-card='true']");
+    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 0;
+    const amount = Math.max(340, Math.round(cardWidth || track.clientWidth * 0.72));
     track.scrollBy({ left: amount * direction, behavior: "smooth" });
   }
 
@@ -570,11 +621,11 @@ export default function App() {
                 key={service.title}
                 className="group relative overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-7 backdrop-blur-sm"
               >
-                <span className="pointer-events-none absolute right-5 top-4 text-5xl opacity-[0.08] transition group-hover:opacity-[0.14]">
-                  {service.icon}
+                <span className="pointer-events-none absolute right-5 top-4 text-cyan-200/10 transition group-hover:text-cyan-200/16">
+                  <ServiceIcon name={service.icon} />
                 </span>
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300/22 to-blue-500/18 text-2xl ring-1 ring-white/8">
-                  {service.icon}
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300/22 to-blue-500/18 text-cyan-100 ring-1 ring-white/8">
+                  <ServiceIcon name={service.icon} />
                 </div>
                 <p className="mb-3 text-[0.72rem] uppercase tracking-[0.22em] text-cyan-100/58">
                   {service.accent}
@@ -631,11 +682,11 @@ export default function App() {
             </p>
           </div>
 
-          <div className="relative mt-12">
+          <div className="relative mt-12 overflow-hidden rounded-[2.4rem] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-20 bg-gradient-to-r from-[var(--bg-strong)] to-transparent lg:block" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-20 bg-gradient-to-l from-[var(--bg-strong)] to-transparent lg:block" />
 
-            <div className="mb-5 flex items-center justify-between gap-4">
+            <div className="mb-5 flex flex-col gap-4 lg:mb-7 lg:flex-row lg:items-center lg:justify-between">
               <p className="text-sm text-white/52">Use as setas ou arraste lateralmente para explorar os cases.</p>
               <div className="hidden items-center gap-3 md:flex">
                 <button
@@ -659,7 +710,7 @@ export default function App() {
 
             <div
               ref={trackRef}
-              className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2"
+              className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 lg:gap-7"
             >
               {cases.map((item) => {
                 const repoKey = `${item.owner}/${item.repo}`;
@@ -667,7 +718,8 @@ export default function App() {
                 return (
                   <article
                     key={repoKey}
-                    className="group min-w-[86%] snap-center overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,28,51,0.86),rgba(8,17,29,0.92))] transition hover:border-cyan-300/20 sm:min-w-[30rem] lg:min-w-[24rem]"
+                    data-case-card="true"
+                    className="group flex min-h-[34rem] min-w-[86%] snap-center flex-col overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,28,51,0.86),rgba(8,17,29,0.92))] transition hover:border-cyan-300/20 sm:min-w-[30rem] lg:min-w-[22.5rem] lg:max-w-[22.5rem] xl:min-w-[23.25rem] xl:max-w-[23.25rem]"
                   >
                     <div className={`relative h-56 overflow-hidden border-b border-white/6 ${item.coverClass}`}>
                       <div className="absolute inset-7 rounded-[1.4rem] border border-white/8" />
@@ -686,7 +738,7 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="p-7">
+                    <div className="flex flex-1 flex-col p-7">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-[0.72rem] uppercase tracking-[0.22em] text-cyan-100/62">
@@ -699,23 +751,28 @@ export default function App() {
                         </span>
                       </div>
 
-                      <div className="mt-6 flex items-center justify-between gap-3 rounded-[1.25rem] border border-white/8 bg-white/[0.03] px-4 py-3">
+                      <div className="mt-6 flex items-center justify-between gap-4 rounded-[1.25rem] border border-white/8 bg-white/[0.03] px-4 py-3">
                         <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-white/66">
                           {item.stack}
                         </span>
-                        <span className="text-right text-xs leading-5 text-white/52">
-                          {"⌁ "}{repoUpdates[repoKey] ?? "Sincronizando GitHub"}
-                        </span>
+                        <div className="min-w-[8.5rem] text-right">
+                          <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40">
+                            Ultimo push
+                          </p>
+                          <p className="mt-1 text-sm font-medium text-cyan-100/78">
+                            {repoUpdates[repoKey] ?? "sincronizando"}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="mt-6 flex flex-wrap gap-3">
+                      <div className="mt-auto flex flex-wrap gap-3 pt-6">
                         <a
                           href={item.projectUrl}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px]"
                         >
-                          ↗ Ver projeto
+                          Ver projeto
                         </a>
                         <a
                           href={item.codeUrl}
@@ -723,7 +780,7 @@ export default function App() {
                           rel="noreferrer"
                           className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white/80 transition hover:border-cyan-300/30 hover:text-cyan-100"
                         >
-                          ⌁ Ver codigo
+                          Ver codigo
                         </a>
                       </div>
                     </div>
@@ -752,7 +809,7 @@ export default function App() {
               <SectionTag>Presenca em crescimento</SectionTag>
               <div className="mt-6 rounded-[1.8rem] border border-white/8 bg-[rgba(5,11,20,0.55)] p-6">
                 <div className="text-[0.72rem] uppercase tracking-[0.26em] text-white/42">
-                  ✦ Leitura exclusiva
+                  Leitura exclusiva
                 </div>
                 <strong className="mt-4 block font-display text-5xl tracking-tight text-cyan-200">
                   {visitCount}
@@ -815,3 +872,5 @@ export default function App() {
     </div>
   );
 }
+
+

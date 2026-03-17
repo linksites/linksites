@@ -15,7 +15,7 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 
 - identidade visual elegante e coerente com a marca LinkSites
 - paleta institucional em navy, azul e ciano
-- hero premium com composicao visual inspirada na logo
+- hero premium com composicao visual refinada e marca transparente integrada ao layout
 - conteudo textual institucional restaurado na nova interface
 - componentizacao e evolucao mais organizada da interface
 - base pronta para expandir em secoes, componentes e design system
@@ -25,14 +25,16 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 - app em React com entrada via Vite
 - Tailwind CSS integrado ao projeto
 - header responsivo com menu mobile
-- hero com CTA principal e CTA secundario
+- hero com CTA principal e CTA secundario, usando a arte transparente da marca em `assets/logoLS.png`
 - secao de servicos com o conteudo institucional da LinkSites
+- cards de servicos com ilustracoes relacionadas a cada oferta
 - secao de diferenciais
 - portfolio lateral com cases reais, links de projeto/codigo e leitura da ultima atualizacao no GitHub
 - secao sobre com contador de visitantes unicos por navegador
 - secao final de contato com WhatsApp, e-mail e localizacao
 - microdetalhes visuais com simbolos discretos para reforcar o tom criativo sem perder elegancia
 - uso da logo real da LinkSites em `assets/logolinksites.jpg`
+- uso da arte transparente da marca em `assets/logoLS.png` na composicao principal do hero
 - build de producao validado com `npm run build`
 
 ## Estrutura
@@ -43,7 +45,8 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 - [src/main.jsx](c:/Projeto/linksites/src/main.jsx): ponto de entrada da aplicacao React
 - [src/App.jsx](c:/Projeto/linksites/src/App.jsx): landing page principal em React
 - [src/index.css](c:/Projeto/linksites/src/index.css): estilos globais e configuracao visual com Tailwind
-- [assets/logolinksites.jpg](c:/Projeto/linksites/assets/logolinksites.jpg): logo da marca utilizada na interface
+- [assets/logolinksites.jpg](c:/Projeto/linksites/assets/logolinksites.jpg): logo da marca usada no header
+- [assets/logoLS.png](c:/Projeto/linksites/assets/logoLS.png): arte transparente usada na composicao principal do hero
 - [.github/workflows/deploy-pages.yml](c:/Projeto/linksites/.github/workflows/deploy-pages.yml): workflow de deploy no GitHub Pages
 
 ## Como rodar localmente
@@ -72,10 +75,10 @@ Fluxo atual:
 ## Proximos passos sugeridos
 
 1. separar a landing em componentes como `Navbar`, `Hero`, `Services`, `Cases` e `Contact`
-2. integrar a arte horizontal oficial da marca em `assets/`
+2. integrar tambem a arte horizontal oficial da marca em `assets/`
 3. transformar os cases e os diferenciais em dados reutilizaveis em vez de conteudo inline
 4. revisar os textos e a acentuacao para padronizar UTF-8
-5. refinar ainda mais os simbolos e microdetalhes visuais sem perder sobriedade
+5. refinar ainda mais o hero e os microdetalhes visuais sem perder sobriedade
 6. preparar favicon, social preview e metadados completos da marca
 
 ## Contato

@@ -139,10 +139,8 @@ const cases = [
       "bg-[radial-gradient(circle_at_24%_18%,rgba(98,240,235,0.18),transparent_25%),radial-gradient(circle_at_80%_22%,rgba(29,78,216,0.22),transparent_28%),linear-gradient(145deg,#102038,#08111c)]",
   },
   {
-    owner: "sergiosrdev",
-    repo: "sradv-final-version",
-    updateOwner: "linksites",
-    updateRepo: "sergiorodrigues",
+    owner: "linksites",
+    repo: "sergiorodrigues",
     label: "Portfolio React",
     eyebrow: "Portfolio / React",
     name: "Sergio Rodrigues",
@@ -150,7 +148,7 @@ const cases = [
     description:
       "Portfolio pessoal em React com leitura objetiva, tom profissional e apresentacao visual mais premium.",
     stack: "React",
-    projectUrl: "https://sergiosrdev.github.io/sradv-final-version/",
+    projectUrl: "https://linksites.github.io/sergiorodrigues/",
     codeUrl: "https://github.com/linksites/sergiorodrigues",
     coverClass:
       "bg-[radial-gradient(circle_at_22%_18%,rgba(98,240,235,0.22),transparent_24%),radial-gradient(circle_at_76%_22%,rgba(59,130,246,0.2),transparent_26%),linear-gradient(145deg,#102543,#091421)]",
@@ -216,13 +214,6 @@ function formatRepoUpdateStatus(dateString) {
   }
 
   return `Atualizado ${formatRelativeTime(dateString)}`;
-}
-
-function getUpdateRepoSource(item) {
-  return {
-    owner: item.updateOwner ?? item.owner,
-    repo: item.updateRepo ?? item.repo,
-  };
 }
 
 function SectionTag({ children }) {
@@ -322,10 +313,9 @@ export default function App() {
 
     async function loadRepoUpdates() {
       const responses = await Promise.allSettled(
-          cases.map(async (item) => {
-            const source = getUpdateRepoSource(item);
+        cases.map(async (item) => {
             const response = await fetch(
-              `https://api.github.com/repos/${source.owner}/${source.repo}`,
+              `https://api.github.com/repos/${item.owner}/${item.repo}`,
               {
                 cache: "no-store",
                 signal: controller.signal,
@@ -345,7 +335,7 @@ export default function App() {
               key: `${item.owner}/${item.repo}`,
               value: formatRepoUpdateStatus(repo.pushed_at),
             };
-          }),
+        }),
       );
 
       if (!active) {
@@ -529,6 +519,10 @@ export default function App() {
     const track = trackRef.current;
 
     if (!track || event.pointerType !== "mouse") {
+      return;
+    }
+
+    if (event.target.closest("a, button")) {
       return;
     }
 
@@ -889,7 +883,6 @@ export default function App() {
             >
               {cases.map((item, index) => {
                 const repoKey = `${item.owner}/${item.repo}`;
-                const updateSource = getUpdateRepoSource(item);
 
                 return (
                   <article
@@ -941,9 +934,9 @@ export default function App() {
                             rel="noreferrer"
                             className="mt-3 inline-flex max-w-full items-center gap-2 text-[0.72rem] text-white/52 transition hover:text-cyan-100/80"
                           >
-                            <span className="truncate">{`github.com/${updateSource.owner}`}</span>
+                            <span className="truncate">{`github.com/${item.owner}`}</span>
                             <span className="text-white/28">/</span>
-                            <span className="truncate text-white/42">{updateSource.repo}</span>
+                            <span className="truncate text-white/42">{item.repo}</span>
                           </a>
                         </div>
                         <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">

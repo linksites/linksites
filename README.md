@@ -22,9 +22,10 @@ O projeto foi construido como um site estatico, leve e simples de publicar.
 
 ## Recursos atuais
 
-- hero institucional com chamada principal
+- hero institucional com composicao visual inspirada na identidade da marca
 - menu superior com link de `Inicio`
 - logo clicavel que retorna ao topo
+- marca vetorial no header inspirada no globo conectado da LinkSites
 - header fixo no topo
 - menu hamburguer para mobile
 - layout responsivo para desktop, tablet e celular
@@ -38,6 +39,19 @@ O projeto foi construido como um site estatico, leve e simples de publicar.
 - secao sobre a empresa
 - secao de contato com CTA para WhatsApp
 - contador visual de visitantes unicos por navegador
+
+## Identidade visual
+
+O topo do site foi atualizado para refletir melhor a linguagem visual da marca LinkSites.
+
+Hoje a home utiliza:
+
+- wordmark com destaque visual para `Sites`
+- simbolo vetorial no header inspirado na logo em formato de globo conectado
+- hero com composicao visual baseada em rede, orbitas e nodos luminosos
+- fundo com glow azul e ciano seguindo a paleta da marca
+- CTA secundario para levar do hero direto ao portfolio
+- badges de destaque para reforcar posicionamento premium e tecnologico
 
 ## Portfolio atual
 
@@ -76,8 +90,9 @@ Fluxo atual:
 1. adicionar thumbnails reais de cada projeto para fortalecer o efeito de vitrine
 2. criar um dataset unico de projetos em JavaScript para evitar repeticao de informacoes no HTML
 3. incluir filtros por categoria como `Institucional`, `Portfolio`, `Comercio` e `Landing Page`
-4. revisar textos com acentuacao para padronizar encoding UTF-8 em todo o projeto
-5. validar performance e acessibilidade da secao de portfolio em mobile
+4. integrar os arquivos reais da logo e do banner da marca em `assets/`
+5. revisar textos com acentuacao para padronizar encoding UTF-8 em todo o projeto
+6. validar performance e acessibilidade da secao de portfolio em mobile
 
 ## Contato
 

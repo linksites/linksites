@@ -25,6 +25,10 @@
       <h1>LinkSites</h1>
       <h2>O futuro da presença digital começa aqui</h2>
       <p>Sites profissionais, modernos e inteligentes para pessoas e empresas visionárias.</p>
+      <div class="visit-counter" aria-live="polite">
+        <span class="visit-counter-label">Acessos na home</span>
+        <strong id="visit-count" class="visit-counter-value">Carregando...</strong>
+      </div>
       <a href="#contato" class="cta">Solicite seu projeto</a>
     </div>
   </section>
@@ -94,5 +98,33 @@
       <p>Conectando você ao mundo digital com criatividade, tecnologia e paixão.</p>
     </div>
   </footer>
+  <script>
+    (function () {
+      var countElement = document.getElementById('visit-count');
+
+      if (!countElement) {
+        return;
+      }
+
+      fetch('https://api.countapi.xyz/hit/linksites.github.io/home')
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('counter_unavailable');
+          }
+
+          return response.json();
+        })
+        .then(function (data) {
+          if (typeof data.value !== 'number') {
+            throw new Error('invalid_counter_value');
+          }
+
+          countElement.textContent = data.value.toLocaleString('pt-BR');
+        })
+        .catch(function () {
+          countElement.textContent = 'Indisponivel';
+        });
+    })();
+  </script>
 </body>
 </html>

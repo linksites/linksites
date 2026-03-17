@@ -75,72 +75,197 @@
   </section>
   <section id="portfolio" class="portfolio">
     <div class="container">
-      <h3>Portfolio</h3>
-      <p class="portfolio-intro">Projetos recentes da nossa esteira digital, mostrando variedade de stacks, entregas e atualizacoes continuas.</p>
-      <div class="cards portfolio-grid">
-        <article class="card portfolio-card" data-repo="linksites">
-          <div class="portfolio-top">
-            <h4>linksites</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">CSS</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="https://linksites.github.io/linksites" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
-        <article class="card portfolio-card" data-repo="almeida-cunha">
-          <div class="portfolio-top">
-            <h4>almeida-cunha</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">HTML</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="https://linksites.github.io/almeida-cunha" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
-        <article class="card portfolio-card" data-repo="danilo-souza">
-          <div class="portfolio-top">
-            <h4>danilo-souza</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">JavaScript</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="https://linksites.github.io/danilo-souza" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
-        <article class="card portfolio-card" data-repo="gomes-de-deus">
-          <div class="portfolio-top">
-            <h4>gomes-de-deus</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">HTML</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="https://linksites.github.io/gomes-de-deus" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
-        <article class="card portfolio-card" data-repo="frigorificocarneboa">
-          <div class="portfolio-top">
-            <h4>frigorificocarneboa</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">CSS</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="https://linksites.github.io/frigorificocarneboa" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
-        <article class="card portfolio-card" data-repo="arcadenoe">
-          <div class="portfolio-top">
-            <h4>arcadenoe</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">CSS</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="https://linksites.github.io/arcadenoe" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
-        <article class="card portfolio-card" data-repo="sergiorodrigues">
-          <div class="portfolio-top">
-            <h4>sergiorodrigues</h4>
-            <span class="portfolio-visibility">Public</span>
-          </div>
-          <p class="portfolio-stack">React</p>
-          <p class="portfolio-update">Consultando atualizacao...</p>
-          <a class="portfolio-link" href="http://linksites.github.io/sergiorodrigues" target="_blank" rel="noopener">Abrir projeto</a>
-        </article>
+      <div class="portfolio-heading">
+        <div>
+          <span class="portfolio-kicker">Showcase digital</span>
+          <h3>Projetos em Destaque</h3>
+        </div>
+        <p class="portfolio-intro">Explore um portfolio pensado como vitrine: navegacao lateral, cards mais fortes e projetos apresentados com mais contexto de negocio.</p>
+      </div>
+      <div class="portfolio-carousel">
+        <button class="portfolio-nav portfolio-nav-prev" type="button" aria-label="Mostrar projetos anteriores">
+          <span aria-hidden="true">&#10094;</span>
+        </button>
+        <div class="portfolio-track" tabindex="0" aria-label="Carrossel de projetos">
+          <article class="portfolio-card" data-repo="linksites">
+            <div class="portfolio-cover portfolio-cover--brand">
+              <span class="portfolio-category">Startup digital</span>
+              <strong class="portfolio-cover-title">LinkSites</strong>
+              <p class="portfolio-cover-note">Presenca online futurista com oferta clara, prova de valor e CTA direto.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Institucional / Showcase</p>
+                  <h4>LinkSites Experience</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Landing page institucional com foco em autoridade, servicos, prova visual e conversao para atendimento imediato.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">CSS</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="https://linksites.github.io/linksites" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/linksites/linksites" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+          <article class="portfolio-card" data-repo="almeida-cunha">
+            <div class="portfolio-cover portfolio-cover--legal">
+              <span class="portfolio-category">Marca profissional</span>
+              <strong class="portfolio-cover-title">Almeida Cunha</strong>
+              <p class="portfolio-cover-note">Presenca digital elegante para transmitir clareza, confianca e posicionamento.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Site institucional / Marca</p>
+                  <h4>Almeida Cunha</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Projeto institucional pensado para apresentar servicos com leitura limpa, acabamento premium e contato descomplicado.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">HTML</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="https://linksites.github.io/almeida-cunha" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/linksites/almeida-cunha" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+          <article class="portfolio-card" data-repo="danilo-souza">
+            <div class="portfolio-cover portfolio-cover--creator">
+              <span class="portfolio-category">Portfolio pessoal</span>
+              <strong class="portfolio-cover-title">Danilo Souza</strong>
+              <p class="portfolio-cover-note">Narrativa pessoal com visual moderno e destaque para pontos fortes.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Portfolio / Apresentacao</p>
+                  <h4>Danilo Souza</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Portfolio pessoal com leitura rapida, hierarquia clara e elementos visuais voltados para apresentar identidade e competencias.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">JavaScript</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="https://linksites.github.io/danilo-souza" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/linksites/danilo-souza" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+          <article class="portfolio-card" data-repo="gomes-de-deus">
+            <div class="portfolio-cover portfolio-cover--classic">
+              <span class="portfolio-category">Site institucional</span>
+              <strong class="portfolio-cover-title">Gomes de Deus</strong>
+              <p class="portfolio-cover-note">Visual sobrio e confiavel para fortalecer presenca e facilitar conversao.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Institucional / Autoridade</p>
+                  <h4>Gomes de Deus</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Pagina de apresentacao estruturada para comunicar valor, reforcar a marca e manter a jornada de contato simples.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">HTML</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="https://linksites.github.io/gomes-de-deus" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/linksites/gomes-de-deus" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+          <article class="portfolio-card" data-repo="frigorificocarneboa">
+            <div class="portfolio-cover portfolio-cover--food">
+              <span class="portfolio-category">Comercio alimentar</span>
+              <strong class="portfolio-cover-title">Carne Boa</strong>
+              <p class="portfolio-cover-note">Catalogo digital com apelo comercial e destaque para produto.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Catalogo / Conversao</p>
+                  <h4>Frigorifico Carne Boa</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Projeto com foco em mostrar produtos, reforcar confianca comercial e encurtar o caminho ate o atendimento.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">CSS</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="https://linksites.github.io/frigorificocarneboa" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/linksites/frigorificocarneboa" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+          <article class="portfolio-card" data-repo="arcadenoe">
+            <div class="portfolio-cover portfolio-cover--theme">
+              <span class="portfolio-category">Projeto tematico</span>
+              <strong class="portfolio-cover-title">Arca de Noe</strong>
+              <p class="portfolio-cover-note">Experiencia visual mais conceitual, com identidade forte e atmosfera propria.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Landing page / Identidade</p>
+                  <h4>Arca de Noe</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Layout com presenca visual marcante, construido para dar personalidade a marca sem perder legibilidade e impacto.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">CSS</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="https://linksites.github.io/arcadenoe" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/linksites/arcadenoe" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+          <article class="portfolio-card" data-repo="sergiorodrigues">
+            <div class="portfolio-cover portfolio-cover--react">
+              <span class="portfolio-category">Portfolio React</span>
+              <strong class="portfolio-cover-title">Sergio Rodrigues</strong>
+              <p class="portfolio-cover-note">Interface moderna, direta e pronta para destacar trajetoria e projetos.</p>
+            </div>
+            <div class="portfolio-card-body">
+              <div class="portfolio-top">
+                <div>
+                  <p class="portfolio-eyebrow">Portfolio / React</p>
+                  <h4>Sergio Rodrigues</h4>
+                </div>
+                <span class="portfolio-visibility">Ao vivo</span>
+              </div>
+              <p class="portfolio-description">Portfolio pessoal em React com leitura objetiva, tom profissional e apresentacao visual mais premium.</p>
+              <div class="portfolio-meta">
+                <span class="portfolio-stack">React</span>
+                <p class="portfolio-update">Ultimo push no GitHub</p>
+              </div>
+              <div class="portfolio-actions">
+                <a class="portfolio-link" href="http://linksites.github.io/sergiorodrigues" target="_blank" rel="noopener">Ver projeto</a>
+                <a class="portfolio-link portfolio-link-secondary" href="https://github.com/liksites/sergiorodrigues" target="_blank" rel="noopener">Ver codigo</a>
+              </div>
+            </div>
+          </article>
+        </div>
+        <button class="portfolio-nav portfolio-nav-next" type="button" aria-label="Mostrar proximos projetos">
+          <span aria-hidden="true">&#10095;</span>
+        </button>
       </div>
     </div>
   </section>
@@ -152,8 +277,8 @@
         <div class="visit-counter visit-counter--about" aria-live="polite">
           <span class="visit-counter-kicker">Presença em crescimento</span>
           <div class="visit-counter-screen">
-            <span class="visit-counter-status">Browser Unico</span>
-            <strong id="visit-count" class="visit-counter-number is-loading">Lendo...</strong>
+            <span class="visit-counter-status">Leitura exclusiva</span>
+            <strong id="visit-count" class="visit-counter-number is-loading">Sincronizando</strong>
           </div>
           <span class="visit-counter-label">Visitantes unicos por navegador</span>
           <span class="visit-counter-note">Cada navegador conta uma vez e depois apenas consulta o total</span>
@@ -186,7 +311,10 @@
   </footer>
   <script>
     (function () {
-      var portfolioCards = document.querySelectorAll('.portfolio-card[data-repo]');
+      var portfolioTrack = document.querySelector('.portfolio-track');
+      var portfolioCards = Array.prototype.slice.call(document.querySelectorAll('.portfolio-card[data-repo]'));
+      var prevButton = document.querySelector('.portfolio-nav-prev');
+      var nextButton = document.querySelector('.portfolio-nav-next');
       var repoOwner = 'linksites';
 
       function formatRelativeTime(dateString) {
@@ -233,8 +361,58 @@
         return years === 1 ? 'Atualizado ha 1 ano' : 'Atualizado ha ' + years + ' anos';
       }
 
-      if (portfolioCards.length) {
-        fetch('https://api.github.com/users/' + repoOwner + '/repos?per_page=100&sort=updated')
+      function getScrollAmount() {
+        if (!portfolioTrack) {
+          return 0;
+        }
+
+        if (portfolioCards.length > 1) {
+          var firstCardRect = portfolioCards[0].getBoundingClientRect();
+          var secondCardRect = portfolioCards[1].getBoundingClientRect();
+          return Math.max(320, Math.round(secondCardRect.left - firstCardRect.left));
+        }
+
+        return Math.max(320, Math.round(portfolioTrack.clientWidth * 0.92));
+      }
+
+      function updatePortfolioNav() {
+        if (!portfolioTrack || !prevButton || !nextButton) {
+          return;
+        }
+
+        var maxScroll = Math.max(0, portfolioTrack.scrollWidth - portfolioTrack.clientWidth - 4);
+        prevButton.disabled = portfolioTrack.scrollLeft <= 4;
+        nextButton.disabled = portfolioTrack.scrollLeft >= maxScroll;
+      }
+
+      function updateActivePortfolioCard() {
+        if (!portfolioTrack || !portfolioCards.length) {
+          return;
+        }
+
+        var trackRect = portfolioTrack.getBoundingClientRect();
+        var trackCenter = trackRect.left + trackRect.width / 2;
+        var activeCard = portfolioCards[0];
+        var shortestDistance = Number.POSITIVE_INFINITY;
+
+        portfolioCards.forEach(function (card) {
+          var cardRect = card.getBoundingClientRect();
+          var cardCenter = cardRect.left + cardRect.width / 2;
+          var distance = Math.abs(trackCenter - cardCenter);
+
+          if (distance < shortestDistance) {
+            shortestDistance = distance;
+            activeCard = card;
+          }
+        });
+
+        portfolioCards.forEach(function (card) {
+          card.classList.toggle('is-active', card === activeCard);
+        });
+      }
+
+      function updatePortfolioTimes() {
+        return fetch('https://api.github.com/users/' + repoOwner + '/repos?per_page=100&sort=updated')
           .then(function (response) {
             if (!response.ok) {
               throw new Error('portfolio_unavailable');
@@ -259,7 +437,7 @@
               }
 
               if (!repo || !repo.pushed_at) {
-                updateElement.textContent = 'Atualizacao indisponivel';
+                updateElement.textContent = 'Atualizacao GitHub indisponivel';
                 return;
               }
 
@@ -271,10 +449,49 @@
               var updateElement = card.querySelector('.portfolio-update');
 
               if (updateElement) {
-                updateElement.textContent = 'Atualizacao indisponivel';
+                updateElement.textContent = 'Atualizacao GitHub indisponivel';
               }
             });
           });
+      }
+
+      if (portfolioTrack && prevButton && nextButton) {
+        prevButton.addEventListener('click', function () {
+          portfolioTrack.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+        });
+
+        nextButton.addEventListener('click', function () {
+          portfolioTrack.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+        });
+
+        portfolioTrack.addEventListener('scroll', function () {
+          updatePortfolioNav();
+          updateActivePortfolioCard();
+        }, { passive: true });
+
+        portfolioTrack.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            portfolioTrack.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+          }
+
+          if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            portfolioTrack.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+          }
+        });
+
+        window.addEventListener('resize', function () {
+          updatePortfolioNav();
+          updateActivePortfolioCard();
+        });
+
+        updatePortfolioNav();
+        updateActivePortfolioCard();
+      }
+
+      if (portfolioCards.length) {
+        updatePortfolioTimes();
       }
     })();
 

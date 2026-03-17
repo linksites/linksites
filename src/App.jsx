@@ -267,14 +267,16 @@ function Chevron({ direction }) {
   const rotateClass = direction === "left" ? "rotate-180" : "";
 
   return (
-    <span
+    <svg
       aria-hidden="true"
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/6 text-cyan-100/90 backdrop-blur transition hover:border-cyan-300/30 hover:bg-cyan-300/10 ${rotateClass}`}
+      viewBox="0 0 24 24"
+      className={`h-4 w-4 ${rotateClass}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
     >
-      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M8 5l8 7-8 7" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
+      <path d="M8 5l8 7-8 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -804,26 +806,25 @@ export default function App() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-20 bg-gradient-to-r from-[var(--bg-strong)] to-transparent lg:block" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-20 bg-gradient-to-l from-[var(--bg-strong)] to-transparent lg:block" />
 
+            <button
+              type="button"
+              aria-label="Ver projetos anteriores"
+              className={`showcase-nav showcase-nav-left hidden lg:flex ${canScrollPrev ? "" : "pointer-events-none opacity-30"}`}
+              onClick={() => scrollCases(-1)}
+            >
+              <Chevron direction="left" />
+            </button>
+            <button
+              type="button"
+              aria-label="Ver proximos projetos"
+              className={`showcase-nav showcase-nav-right hidden lg:flex ${canScrollNext ? "" : "pointer-events-none opacity-30"}`}
+              onClick={() => scrollCases(1)}
+            >
+              <Chevron direction="right" />
+            </button>
+
             <div className="mb-5 flex flex-col gap-4 lg:mb-7 lg:flex-row lg:items-center lg:justify-between">
               <p className="text-sm text-white/52">Use as setas ou arraste lateralmente para explorar os cases.</p>
-              <div className="hidden items-center gap-3 md:flex">
-                <button
-                  type="button"
-                  aria-label="Ver projetos anteriores"
-                  className={`transition ${canScrollPrev ? "opacity-100" : "pointer-events-none opacity-35"}`}
-                  onClick={() => scrollCases(-1)}
-                >
-                  <Chevron direction="left" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Ver proximos projetos"
-                  className={`transition ${canScrollNext ? "opacity-100" : "pointer-events-none opacity-35"}`}
-                  onClick={() => scrollCases(1)}
-                >
-                  <Chevron direction="right" />
-                </button>
-              </div>
             </div>
 
             <div
@@ -873,8 +874,9 @@ export default function App() {
                           </p>
                           <h3 className="mt-2 font-display text-3xl text-white">{item.name}</h3>
                         </div>
-                        <span className="rounded-full border border-cyan-300/14 bg-cyan-300/10 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-cyan-100/88">
-                          Ao vivo
+                        <span className="status-live rounded-full border border-emerald-400/24 bg-emerald-400/10 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-emerald-200">
+                          <span className="status-live-dot" />
+                          Online
                         </span>
                       </div>
 

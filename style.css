@@ -205,10 +205,10 @@ main {
   display: block;
 }
 
-.servicos, .diferenciais, .sobre, .contato {
+.servicos, .diferenciais, .portfolio, .sobre, .contato {
   padding: 4rem 0 3rem 0;
 }
-.servicos h3, .diferenciais h3, .sobre h3, .contato h3 {
+.servicos h3, .diferenciais h3, .portfolio h3, .sobre h3, .contato h3 {
   font-family: 'VT323', 'Orbitron', Arial, sans-serif;
   color: var(--primary);
   font-size: 2.2rem;
@@ -256,6 +256,76 @@ main {
   border-radius: 6px;
   font-size: 1.1rem;
   box-shadow: inset 0 0 0 1px #00f5ff22, 0 4px 12px #0006;
+}
+
+.portfolio-intro {
+  max-width: 42rem;
+  margin: -0.5rem 0 2rem 0;
+  color: var(--light);
+}
+
+.portfolio-grid {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.portfolio-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.portfolio-card::after {
+  content: '';
+  position: absolute;
+  inset: auto -18% -30% auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 245, 255, 0.14), transparent 70%);
+  pointer-events: none;
+}
+
+.portfolio-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.portfolio-top h4 {
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+}
+
+.portfolio-visibility {
+  flex: 0 0 auto;
+  padding: 0.28rem 0.58rem;
+  border: 1px solid rgba(123, 255, 0, 0.28);
+  border-radius: 999px;
+  color: var(--accent);
+  background: rgba(123, 255, 0, 0.08);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.portfolio-stack {
+  display: inline-block;
+  margin: 0 0 0.6rem 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(0, 245, 255, 0.08);
+  border: 1px solid rgba(0, 245, 255, 0.18);
+  color: var(--primary);
+  font-family: 'VT323', 'Orbitron', Arial, sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.portfolio-update {
+  margin: 0;
+  color: var(--light);
 }
 
 .sobre-flex {
@@ -484,7 +554,7 @@ footer {
   nav a {
     font-size: 0.92rem;
   }
-  .servicos, .diferenciais, .sobre, .contato {
+  .servicos, .diferenciais, .portfolio, .sobre, .contato {
     padding: 3.5rem 0 2.75rem 0;
   }
 }
@@ -553,6 +623,9 @@ footer {
   .cards, .diferenciais ul {
     grid-template-columns: 1fr;
   }
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
   .sobre-flex {
     flex-direction: column;
     gap: 1.2rem;
@@ -600,6 +673,10 @@ footer {
   .visit-counter {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+  .portfolio-top {
+    flex-direction: column;
+    align-items: flex-start;
   }
   .visit-counter-number {
     letter-spacing: 0.08rem;

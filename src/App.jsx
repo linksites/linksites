@@ -285,6 +285,13 @@ export default function App() {
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
   const trackRef = useRef(null);
+  const dragStateRef = useRef({
+    isPointerDown: false,
+    moved: false,
+    pointerId: null,
+    startX: 0,
+    startScrollLeft: 0,
+  });
 
   useEffect(() => {
     let active = true;
@@ -465,6 +472,86 @@ export default function App() {
     const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 0;
     const amount = Math.max(340, Math.round(cardWidth || track.clientWidth * 0.72));
     track.scrollBy({ left: amount * direction, behavior: "smooth" });
+  }
+
+  function handleTrackPointerDown(event) {
+    const track = trackRef.current;
+
+    if (!track || event.pointerType !== "mouse") {
+      return;
+    }
+
+    dragStateRef.current = {
+      isPointerDown: true,
+      moved: false,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startScrollLeft: track.scrollLeft,
+    };
+
+    track.classList.add("is-dragging");
+    track.setPointerCapture(event.pointerId);
+  }
+
+  function handleTrackPointerMove(event) {
+    const track = trackRef.current;
+    const dragState = dragStateRef.current;
+
+    if (!track || !dragState.isPointerDown || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - dragState.startX;
+
+    if (Math.abs(deltaX) > 6) {
+      dragStateRef.current.moved = true;
+    }
+
+    track.scrollLeft = dragState.startScrollLeft - deltaX;
+  }
+
+  function handleTrackPointerUp(event) {
+    const track = trackRef.current;
+    const dragState = dragStateRef.current;
+
+    if (!track || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    dragStateRef.current.isPointerDown = false;
+    dragStateRef.current.pointerId = null;
+
+    track.classList.remove("is-dragging");
+
+    if (track.hasPointerCapture(event.pointerId)) {
+      track.releasePointerCapture(event.pointerId);
+    }
+
+    window.setTimeout(() => {
+      dragStateRef.current.moved = false;
+    }, 0);
+  }
+
+  function handleTrackClickCapture(event) {
+    if (dragStateRef.current.moved) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  function handleTrackWheel(event) {
+    const track = trackRef.current;
+
+    if (!track || window.innerWidth < 1024) {
+      return;
+    }
+
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+      return;
+    }
+
+    event.preventDefault();
+    track.scrollLeft += event.deltaY;
   }
 
   return (
@@ -741,7 +828,14 @@ export default function App() {
 
             <div
               ref={trackRef}
-              className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 lg:gap-7"
+              className="showcase-track hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 lg:gap-7"
+              onClickCapture={handleTrackClickCapture}
+              onPointerDown={handleTrackPointerDown}
+              onPointerMove={handleTrackPointerMove}
+              onPointerUp={handleTrackPointerUp}
+              onPointerCancel={handleTrackPointerUp}
+              onPointerLeave={handleTrackPointerUp}
+              onWheel={handleTrackWheel}
             >
               {cases.map((item, index) => {
                 const repoKey = `${item.owner}/${item.repo}`;

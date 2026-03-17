@@ -65,6 +65,15 @@ a {
   display: none;
 }
 
+.showcase-track {
+  cursor: grab;
+}
+
+.showcase-track.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
 .hero-orbit::before,
 .hero-orbit::after {
   content: "";

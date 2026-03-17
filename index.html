@@ -78,67 +78,67 @@
       <h3>Portfolio</h3>
       <p class="portfolio-intro">Projetos recentes da nossa esteira digital, mostrando variedade de stacks, entregas e atualizacoes continuas.</p>
       <div class="cards portfolio-grid">
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="linksites">
           <div class="portfolio-top">
             <h4>linksites</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">CSS</p>
-          <p class="portfolio-update">Updated 5 minutes ago</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="https://linksites.github.io/linksites" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="almeida-cunha">
           <div class="portfolio-top">
             <h4>almeida-cunha</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">HTML</p>
-          <p class="portfolio-update">Updated 1 hour ago</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="https://linksites.github.io/almeida-cunha" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="danilo-souza">
           <div class="portfolio-top">
             <h4>danilo-souza</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">JavaScript</p>
-          <p class="portfolio-update">Updated 3 hours ago</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="https://linksites.github.io/danilo-souza" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="gomes-de-deus">
           <div class="portfolio-top">
             <h4>gomes-de-deus</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">HTML</p>
-          <p class="portfolio-update">Updated 8 hours ago</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="https://linksites.github.io/gomes-de-deus" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="frigorificocarneboa">
           <div class="portfolio-top">
             <h4>frigorificocarneboa</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">CSS</p>
-          <p class="portfolio-update">Updated 10 hours ago</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="https://linksites.github.io/frigorificocarneboa" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="arcadenoe">
           <div class="portfolio-top">
             <h4>arcadenoe</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">CSS</p>
-          <p class="portfolio-update">Updated 12 hours ago</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="https://linksites.github.io/arcadenoe" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
-        <article class="card portfolio-card">
+        <article class="card portfolio-card" data-repo="sergiorodrigues">
           <div class="portfolio-top">
             <h4>sergiorodrigues</h4>
             <span class="portfolio-visibility">Public</span>
           </div>
           <p class="portfolio-stack">React</p>
-          <p class="portfolio-update">Novo projeto</p>
+          <p class="portfolio-update">Consultando atualizacao...</p>
           <a class="portfolio-link" href="http://linksites.github.io/sergiorodrigues" target="_blank" rel="noopener">Abrir projeto</a>
         </article>
       </div>
@@ -185,6 +185,99 @@
     </div>
   </footer>
   <script>
+    (function () {
+      var portfolioCards = document.querySelectorAll('.portfolio-card[data-repo]');
+      var repoOwner = 'linksites';
+
+      function formatRelativeTime(dateString) {
+        var updatedAt = new Date(dateString);
+        var diffMs = Date.now() - updatedAt.getTime();
+
+        if (!Number.isFinite(updatedAt.getTime()) || diffMs < 0) {
+          return 'Atualizacao recente';
+        }
+
+        var minuteMs = 60 * 1000;
+        var hourMs = 60 * minuteMs;
+        var dayMs = 24 * hourMs;
+        var weekMs = 7 * dayMs;
+        var monthMs = 30 * dayMs;
+        var yearMs = 365 * dayMs;
+
+        if (diffMs < hourMs) {
+          var minutes = Math.max(1, Math.floor(diffMs / minuteMs));
+          return minutes === 1 ? 'Atualizado ha 1 minuto' : 'Atualizado ha ' + minutes + ' minutos';
+        }
+
+        if (diffMs < dayMs) {
+          var hours = Math.floor(diffMs / hourMs);
+          return hours === 1 ? 'Atualizado ha 1 hora' : 'Atualizado ha ' + hours + ' horas';
+        }
+
+        if (diffMs < weekMs) {
+          var days = Math.floor(diffMs / dayMs);
+          return days === 1 ? 'Atualizado ha 1 dia' : 'Atualizado ha ' + days + ' dias';
+        }
+
+        if (diffMs < monthMs) {
+          var weeks = Math.floor(diffMs / weekMs);
+          return weeks === 1 ? 'Atualizado ha 1 semana' : 'Atualizado ha ' + weeks + ' semanas';
+        }
+
+        if (diffMs < yearMs) {
+          var months = Math.floor(diffMs / monthMs);
+          return months === 1 ? 'Atualizado ha 1 mes' : 'Atualizado ha ' + months + ' meses';
+        }
+
+        var years = Math.floor(diffMs / yearMs);
+        return years === 1 ? 'Atualizado ha 1 ano' : 'Atualizado ha ' + years + ' anos';
+      }
+
+      if (portfolioCards.length) {
+        fetch('https://api.github.com/users/' + repoOwner + '/repos?per_page=100&sort=updated')
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('portfolio_unavailable');
+            }
+
+            return response.json();
+          })
+          .then(function (repos) {
+            var repoMap = {};
+
+            repos.forEach(function (repo) {
+              repoMap[repo.name] = repo;
+            });
+
+            portfolioCards.forEach(function (card) {
+              var repoName = card.getAttribute('data-repo');
+              var updateElement = card.querySelector('.portfolio-update');
+              var repo = repoMap[repoName];
+
+              if (!updateElement) {
+                return;
+              }
+
+              if (!repo || !repo.pushed_at) {
+                updateElement.textContent = 'Atualizacao indisponivel';
+                return;
+              }
+
+              updateElement.textContent = formatRelativeTime(repo.pushed_at);
+            });
+          })
+          .catch(function () {
+            portfolioCards.forEach(function (card) {
+              var updateElement = card.querySelector('.portfolio-update');
+
+              if (updateElement) {
+                updateElement.textContent = 'Atualizacao indisponivel';
+              }
+            });
+          });
+      }
+    })();
+
     (function () {
       var countElement = document.getElementById('visit-count');
       var apiBase = 'https://countapi.mileshilliard.com/api/v1';

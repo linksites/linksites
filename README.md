@@ -16,6 +16,7 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 - identidade visual elegante e coerente com a marca LinkSites
 - paleta institucional em navy, azul e ciano
 - hero premium com composicao visual inspirada na logo
+- conteudo textual institucional restaurado na nova interface
 - componentizacao e evolucao mais organizada da interface
 - base pronta para expandir em secoes, componentes e design system
 
@@ -25,10 +26,12 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 - Tailwind CSS integrado ao projeto
 - header responsivo com menu mobile
 - hero com CTA principal e CTA secundario
-- showcase inicial de servicos
-- secao de cases com cards premium
-- secao de processo
-- secao final de contato com CTA para WhatsApp
+- secao de servicos com o conteudo institucional da LinkSites
+- secao de diferenciais
+- portfolio lateral com cases reais, links de projeto/codigo e leitura da ultima atualizacao no GitHub
+- secao sobre com contador de visitantes unicos por navegador
+- secao final de contato com WhatsApp, e-mail e localizacao
+- microdetalhes visuais com simbolos discretos para reforcar o tom criativo sem perder elegancia
 - uso da logo real da LinkSites em `assets/logolinksites.jpg`
 - build de producao validado com `npm run build`
 
@@ -70,9 +73,9 @@ Fluxo atual:
 
 1. separar a landing em componentes como `Navbar`, `Hero`, `Services`, `Cases` e `Contact`
 2. integrar a arte horizontal oficial da marca em `assets/`
-3. transformar os cases em dados reutilizaveis em vez de conteudo inline
+3. transformar os cases e os diferenciais em dados reutilizaveis em vez de conteudo inline
 4. revisar os textos e a acentuacao para padronizar UTF-8
-5. adicionar animacoes discretas e mais refinadas, sem excessos
+5. refinar ainda mais os simbolos e microdetalhes visuais sem perder sobriedade
 6. preparar favicon, social preview e metadados completos da marca
 
 ## Contato

@@ -1065,7 +1065,11 @@ footer {
     display: none;
   }
   .portfolio-flow-indicator {
-    display: none;
+    display: flex;
+    top: auto;
+    bottom: 5.4rem;
+    opacity: 0.34;
+    transform: none;
   }
   .portfolio-nav {
     display: none;
@@ -1079,6 +1083,18 @@ footer {
   .portfolio-card {
     flex-basis: min(84vw, 340px);
     min-height: 440px;
+  }
+  .portfolio-flow-indicator-left {
+    left: 0.4rem;
+  }
+  .portfolio-flow-indicator-right {
+    right: 0.4rem;
+  }
+  .portfolio-flow-indicator span {
+    width: 0.62rem;
+    height: 0.62rem;
+    border-top-width: 1.5px;
+    border-right-width: 1.5px;
   }
   .sobre-flex {
     flex-direction: column;
@@ -1133,6 +1149,17 @@ footer {
   }
   .portfolio-card-body {
     padding: 1.15rem;
+  }
+  .portfolio-flow-indicator {
+    bottom: 5.9rem;
+    opacity: 0.28;
+  }
+  .portfolio-flow-caption {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
   .portfolio-top {
     flex-direction: column;

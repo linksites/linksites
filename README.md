@@ -29,7 +29,7 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 - secao de cases com cards premium
 - secao de processo
 - secao final de contato com CTA para WhatsApp
-- uso da logo real da LinkSites em `assets/logolinksites.png`
+- uso da logo real da LinkSites em `assets/logolinksites.jpg`
 - build de producao validado com `npm run build`
 
 ## Estrutura
@@ -40,7 +40,7 @@ O projeto foi migrado da estrutura estatica original para uma base em React com 
 - [src/main.jsx](c:/Projeto/linksites/src/main.jsx): ponto de entrada da aplicacao React
 - [src/App.jsx](c:/Projeto/linksites/src/App.jsx): landing page principal em React
 - [src/index.css](c:/Projeto/linksites/src/index.css): estilos globais e configuracao visual com Tailwind
-- [assets/logolinksites.png](c:/Projeto/linksites/assets/logolinksites.png): logo da marca utilizada na interface
+- [assets/logolinksites.jpg](c:/Projeto/linksites/assets/logolinksites.jpg): logo da marca utilizada na interface
 - [.github/workflows/deploy-pages.yml](c:/Projeto/linksites/.github/workflows/deploy-pages.yml): workflow de deploy no GitHub Pages
 
 ## Como rodar localmente
@@ -84,3 +84,4 @@ Fluxo atual:
 ## Visao da LinkSites
 
 A proposta da LinkSites e conectar clientes ao mundo digital com identidade, clareza, presenca profissional e uma experiencia visual premium.
+

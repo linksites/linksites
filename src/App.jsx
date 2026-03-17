@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logo from "../assets/logolinksites.png";
+import logo from "../assets/logolinksites.jpg";
 
 const navItems = [
   { label: "Inicio", href: "#inicio" },
@@ -357,4 +357,5 @@ export default function App() {
     </div>
   );
 }
+
 

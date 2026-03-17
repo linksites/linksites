@@ -288,21 +288,28 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    const owners = [...new Set(cases.map((item) => item.owner))];
 
     async function loadRepoUpdates() {
       try {
         const responses = await Promise.all(
-          owners.map(async (owner) => {
+          cases.map(async (item) => {
             const response = await fetch(
-              `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated`,
+              `https://api.github.com/repos/${item.owner}/${item.repo}`,
+              { cache: "no-store" },
             );
 
             if (!response.ok) {
               throw new Error("repo_unavailable");
             }
 
-            return { owner, repos: await response.json() };
+            const repo = await response.json();
+
+            return {
+              key: `${item.owner}/${item.repo}`,
+              value: repo.pushed_at
+                ? formatRelativeTime(repo.pushed_at)
+                : "GitHub indisponivel",
+            };
           }),
         );
 
@@ -312,12 +319,8 @@ export default function App() {
 
         const nextUpdates = {};
 
-        responses.forEach(({ owner, repos }) => {
-          repos.forEach((repo) => {
-            nextUpdates[`${owner}/${repo.name}`] = repo.pushed_at
-              ? formatRelativeTime(repo.pushed_at)
-              : "Atualizacao GitHub indisponivel";
-          });
+        responses.forEach(({ key, value }) => {
+          nextUpdates[key] = value;
         });
 
         setRepoUpdates(nextUpdates);
@@ -329,7 +332,7 @@ export default function App() {
         const fallback = {};
 
         cases.forEach((item) => {
-          fallback[`${item.owner}/${item.repo}`] = "Atualizacao GitHub indisponivel";
+          fallback[`${item.owner}/${item.repo}`] = "GitHub indisponivel";
         });
 
         setRepoUpdates(fallback);
@@ -341,6 +344,30 @@ export default function App() {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll("[data-reveal]"));
+
+    if (!elements.length) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.16, rootMargin: "0px 0px -8% 0px" },
+    );
+
+    elements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -529,7 +556,7 @@ export default function App() {
       <main id="inicio">
         <section className="relative overflow-hidden">
           <div className="mx-auto grid max-w-7xl gap-14 px-4 pb-20 pt-16 sm:px-6 md:pt-24 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:pb-28">
-            <div className="max-w-2xl">
+            <div className="max-w-2xl" data-reveal="">
               <SectionTag>Identidade conectada</SectionTag>
               <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
                 O futuro da presenca digital comeca aqui.
@@ -569,7 +596,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center" data-reveal="" style={{ "--reveal-delay": "120ms" }}>
               <div className="absolute left-[12%] top-[10%] h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
               <div className="absolute bottom-[10%] right-[10%] h-44 w-44 rounded-full bg-blue-500/10 blur-3xl" />
               <div className="hero-orbit absolute inset-[8%]" />
@@ -604,7 +631,7 @@ export default function App() {
         </section>
 
         <section id="servicos" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
+          <div className="max-w-2xl" data-reveal="">
             <SectionTag>Servicos</SectionTag>
             <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
               Solucoes digitais para marcas que querem crescer com clareza.
@@ -616,9 +643,11 @@ export default function App() {
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <article
                 key={service.title}
+                data-reveal=""
+                style={{ "--reveal-delay": `${index * 80}ms` }}
                 className="group relative overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-7 backdrop-blur-sm"
               >
                 <span className="pointer-events-none absolute right-5 top-4 text-cyan-200/10 transition group-hover:text-cyan-200/16">
@@ -640,7 +669,7 @@ export default function App() {
         <section id="diferenciais" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="overflow-hidden rounded-[2.25rem] border border-white/8 bg-[linear-gradient(135deg,rgba(9,20,35,0.88),rgba(12,29,49,0.9))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
             <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-              <div className="max-w-xl">
+              <div className="max-w-xl" data-reveal="">
                 <SectionTag>Diferenciais</SectionTag>
                 <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
                   Estrutura premium com base solida, rapida e inteligente.
@@ -655,6 +684,8 @@ export default function App() {
                 {diferentials.map((item, index) => (
                   <div
                     key={item}
+                    data-reveal=""
+                    style={{ "--reveal-delay": `${index * 70}ms` }}
                     className="flex items-start gap-4 rounded-[1.5rem] border border-white/8 bg-white/[0.04] p-5"
                   >
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300/22 to-blue-500/20 font-display text-lg text-cyan-100">
@@ -670,7 +701,7 @@ export default function App() {
 
         <section id="portfolio" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
+            <div className="max-w-2xl" data-reveal="">
               <SectionTag>Showcase digital</SectionTag>
               <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
                 Projetos em destaque com o conteudo real da LinkSites.
@@ -712,13 +743,15 @@ export default function App() {
               ref={trackRef}
               className="hide-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 lg:gap-7"
             >
-              {cases.map((item) => {
+              {cases.map((item, index) => {
                 const repoKey = `${item.owner}/${item.repo}`;
 
                 return (
                   <article
                     key={repoKey}
                     data-case-card="true"
+                    data-reveal=""
+                    style={{ "--reveal-delay": `${(index % 4) * 80}ms` }}
                     className="group flex min-h-[34rem] min-w-[86%] snap-center flex-col overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,28,51,0.86),rgba(8,17,29,0.92))] transition hover:border-cyan-300/20 sm:min-w-[30rem] lg:min-w-[22.5rem] lg:max-w-[22.5rem] xl:min-w-[23.25rem] xl:max-w-[23.25rem]"
                   >
                     <div className={`relative h-56 overflow-hidden border-b border-white/6 ${item.coverClass}`}>
@@ -793,7 +826,7 @@ export default function App() {
 
         <section id="sobre" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[1fr_0.82fr]">
-            <div className="rounded-[2.25rem] border border-white/8 bg-[linear-gradient(145deg,rgba(9,20,35,0.88),rgba(12,29,49,0.84))] p-8 sm:p-10">
+            <div className="rounded-[2.25rem] border border-white/8 bg-[linear-gradient(145deg,rgba(9,20,35,0.88),rgba(12,29,49,0.84))] p-8 sm:p-10" data-reveal="">
               <SectionTag>Sobre a LinkSites</SectionTag>
               <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
                 Tecnologia, design futurista e foco total no resultado do cliente.
@@ -805,7 +838,7 @@ export default function App() {
               </p>
             </div>
 
-              <div className="rounded-[2.25rem] border border-cyan-300/10 bg-[linear-gradient(145deg,rgba(8,17,29,0.94),rgba(12,29,49,0.92))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] sm:p-10">
+              <div className="rounded-[2.25rem] border border-cyan-300/10 bg-[linear-gradient(145deg,rgba(8,17,29,0.94),rgba(12,29,49,0.92))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] sm:p-10" data-reveal="" style={{ "--reveal-delay": "120ms" }}>
               <SectionTag>Presenca em crescimento</SectionTag>
               <div className="mt-6 rounded-[1.8rem] border border-white/8 bg-[rgba(5,11,20,0.55)] p-6">
                 <div className="text-[0.72rem] uppercase tracking-[0.26em] text-white/42">
@@ -823,7 +856,7 @@ export default function App() {
         </section>
 
         <section id="contato" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="overflow-hidden rounded-[2.25rem] border border-cyan-300/10 bg-[linear-gradient(135deg,rgba(9,20,35,0.96),rgba(12,29,49,0.94))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-10 lg:p-12">
+          <div className="overflow-hidden rounded-[2.25rem] border border-cyan-300/10 bg-[linear-gradient(135deg,rgba(9,20,35,0.96),rgba(12,29,49,0.94))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-10 lg:p-12" data-reveal="">
             <SectionTag>Contato</SectionTag>
             <div className="mt-5 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
               <div className="max-w-3xl">
@@ -847,14 +880,14 @@ export default function App() {
               </div>
 
               <div className="min-w-[18rem] rounded-[1.8rem] border border-white/8 bg-[rgba(6,12,22,0.44)] p-6">
-                <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/42">• WhatsApp</div>
+                <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/42">WhatsApp</div>
                 <a
                   href="https://wa.me/5591982460001"
                   target="_blank"
                   rel="noreferrer"
                   className="mt-4 inline-flex min-h-[54px] w-full items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(74,222,255,0.18)] transition hover:translate-y-[-1px]"
                 >
-                  ↗ Chamar no WhatsApp
+                  Chamar no WhatsApp
                 </a>
                 <p className="mt-4 text-sm leading-7 text-white/60">+55 91 98246-0001</p>
               </div>
@@ -872,5 +905,6 @@ export default function App() {
     </div>
   );
 }
+
 
 

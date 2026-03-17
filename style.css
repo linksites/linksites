@@ -306,16 +306,16 @@ main {
   box-shadow: 0 0 8px rgba(185, 255, 102, 0.8);
   transform: translateY(-50%);
 }
-.visit-counter-badge {
+.visit-counter-number {
   display: block;
-  width: min(100%, 340px);
-  height: auto;
-  border-radius: 8px;
-  filter:
-    saturate(1.1)
-    contrast(1.18)
-    drop-shadow(0 0 18px rgba(185, 255, 102, 0.18))
-    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.28));
+  font-family: 'VT323', 'Orbitron', Arial, sans-serif;
+  font-size: clamp(2.8rem, 7vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: 0.18rem;
+  color: #b9ff66;
+  text-shadow:
+    0 0 10px rgba(185, 255, 102, 0.45),
+    0 0 22px rgba(185, 255, 102, 0.18);
 }
 .visit-counter-label {
   display: block;
@@ -426,10 +426,6 @@ footer {
   }
   .visit-counter-screen {
     padding: 1rem 0.85rem 0.85rem;
-  }
-  .visit-counter-badge {
-    margin-left: auto;
-    margin-right: auto;
   }
   .visit-counter-note {
     max-width: none;

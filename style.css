@@ -256,13 +256,11 @@ main {
   text-transform: uppercase;
   background: rgba(123, 255, 0, 0.08);
 }
-.visit-counter-value {
+.visit-counter-badge {
   display: block;
-  font-family: 'VT323', 'Orbitron', Arial, sans-serif;
-  font-size: 3.6rem;
-  line-height: 0.95;
-  color: #f4fffd;
-  text-shadow: 0 0 16px rgba(0, 245, 255, 0.24);
+  width: min(100%, 320px);
+  height: auto;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.28));
 }
 .visit-counter-label {
   display: block;
@@ -371,8 +369,9 @@ footer {
     padding: 1.2rem;
     text-align: center;
   }
-  .visit-counter-value {
-    font-size: 3rem;
+  .visit-counter-badge {
+    margin-left: auto;
+    margin-right: auto;
   }
   .visit-counter-note {
     max-width: none;

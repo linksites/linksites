@@ -70,9 +70,13 @@
         <p>Somos uma startup do grupo <strong>Techlab Software</strong>, referência em soluções digitais. Nossa missão é transformar ideias em experiências digitais marcantes, com tecnologia de ponta, design futurista e foco total no resultado do cliente.</p>
         <div class="visit-counter visit-counter--about" aria-live="polite">
           <span class="visit-counter-kicker">Presença em crescimento</span>
-          <strong id="visit-count" class="visit-counter-value">Carregando...</strong>
-          <span class="visit-counter-label">Visitantes únicos estimados</span>
-          <span class="visit-counter-note">Contado uma vez por navegador</span>
+          <img
+            class="visit-counter-badge"
+            src="https://api.visitorbadge.io/api/combined?path=https%3A%2F%2Flinksites.github.io%2Flinksites%2F&label=VISITANTES&labelColor=%230d1529&countColor=%2300f5ff&style=flat-square&labelStyle=upper"
+            alt="Contador público de visitantes da LinkSites"
+          >
+          <span class="visit-counter-label">Contador público de visitantes</span>
+          <span class="visit-counter-note">Atualizado por um serviço externo compatível com sites estáticos</span>
         </div>
       </div>
       <img src="https://img.icons8.com/color/96/000000/artificial-intelligence.png" alt="Futuro Digital" class="sobre-img">
@@ -100,52 +104,5 @@
       <p>Conectando você ao mundo digital com criatividade, tecnologia e paixão.</p>
     </div>
   </footer>
-  <script>
-    (function () {
-      var countElement = document.getElementById('visit-count');
-      var endpointBase = 'https://api.countapi.xyz';
-      var namespace = 'linksites.github.io';
-      var key = 'home-unique-visitors';
-      var storageKey = 'linksites-home-unique-visitor-v1';
-      var hasVisited = false;
-
-      if (!countElement) {
-        return;
-      }
-
-      try {
-        hasVisited = window.localStorage.getItem(storageKey) === '1';
-      } catch (error) {
-        hasVisited = false;
-      }
-
-      fetch(endpointBase + '/' + (hasVisited ? 'get' : 'hit') + '/' + namespace + '/' + key)
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error('counter_unavailable');
-          }
-
-          return response.json();
-        })
-        .then(function (data) {
-          if (typeof data.value !== 'number') {
-            throw new Error('invalid_counter_value');
-          }
-
-          if (!hasVisited) {
-            try {
-              window.localStorage.setItem(storageKey, '1');
-            } catch (error) {
-              // Storage may be unavailable in some browsers or privacy modes.
-            }
-          }
-
-          countElement.textContent = data.value.toLocaleString('pt-BR');
-        })
-        .catch(function () {
-          countElement.textContent = 'Indisponivel';
-        });
-    })();
-  </script>
 </body>
 </html>

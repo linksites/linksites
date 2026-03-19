@@ -178,6 +178,79 @@ const heroPoints = [
 
 const REPO_UPDATE_LOADING = "Consultando atualização...";
 const REPO_UPDATE_FALLBACK = "Atualização indisponível";
+const githubRepoGroups = cases.reduce((groups, item) => {
+  const existingRepos = groups[item.owner] ?? [];
+
+  if (!existingRepos.includes(item.repo)) {
+    groups[item.owner] = [...existingRepos, item.repo];
+  }
+
+  return groups;
+}, {});
+
+function createRepoUpdateMap(defaultValue = null) {
+  return cases.reduce((repoUpdates, item) => {
+    repoUpdates[`${item.owner}/${item.repo}`] = defaultValue;
+    return repoUpdates;
+  }, {});
+}
+
+function normalizeRepoUpdates(rawUpdates = {}) {
+  const normalizedUpdates = createRepoUpdateMap();
+
+  cases.forEach((item) => {
+    const key = `${item.owner}/${item.repo}`;
+    normalizedUpdates[key] = rawUpdates[key] ?? null;
+  });
+
+  return normalizedUpdates;
+}
+
+async function fetchLiveRepoUpdates(signal) {
+  const ownerEntries = Object.entries(githubRepoGroups);
+  const repoUpdatesByOwner = await Promise.all(
+    ownerEntries.map(async ([owner, repos]) => {
+      const response = await fetch(`https://api.github.com/users/${owner}/repos?per_page=100&type=owner`, {
+        cache: "no-store",
+        signal,
+        headers: {
+          Accept: "application/vnd.github+json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`github_repos_unavailable:${owner}`);
+      }
+
+      const payload = await response.json();
+      const repoSet = new Set(repos);
+
+      return payload.reduce((ownerUpdates, repo) => {
+        if (repoSet.has(repo.name)) {
+          ownerUpdates[`${owner}/${repo.name}`] = repo.pushed_at ?? null;
+        }
+
+        return ownerUpdates;
+      }, {});
+    }),
+  );
+
+  return normalizeRepoUpdates(Object.assign({}, ...repoUpdatesByOwner));
+}
+
+async function fetchSnapshotRepoUpdates(repoUpdatesUrl, signal) {
+  const response = await fetch(repoUpdatesUrl, {
+    cache: "no-store",
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error("repo_updates_unavailable");
+  }
+
+  const payload = await response.json();
+  return normalizeRepoUpdates(payload?.repos);
+}
 
 function getRelativeTimeState(dateString, now = Date.now()) {
   const updatedAt = new Date(dateString);
@@ -480,41 +553,31 @@ export default function App() {
 
     async function loadRepoUpdates() {
       try {
-        const response = await fetch(repoUpdatesUrl, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
+        const liveUpdates = await fetchLiveRepoUpdates(controller.signal);
 
-        if (!response.ok) {
-          throw new Error("repo_updates_unavailable");
+        if (active) {
+          setRepoUpdateDates(liveUpdates);
         }
 
-        const payload = await response.json();
+        return;
+      } catch (liveError) {
+        if (!active || liveError.name === "AbortError") {
+          return;
+        }
+      }
 
-        if (!active) {
+      try {
+        const snapshotUpdates = await fetchSnapshotRepoUpdates(repoUpdatesUrl, controller.signal);
+
+        if (active) {
+          setRepoUpdateDates(snapshotUpdates);
+        }
+      } catch (snapshotError) {
+        if (!active || snapshotError.name === "AbortError") {
           return;
         }
 
-        const nextUpdates = {};
-
-        cases.forEach((item) => {
-          const key = `${item.owner}/${item.repo}`;
-          nextUpdates[key] = payload?.repos?.[key] ?? null;
-        });
-
-        setRepoUpdateDates(nextUpdates);
-      } catch (error) {
-        if (!active || error.name === "AbortError") {
-          return;
-        }
-
-        const fallbackUpdates = {};
-
-        cases.forEach((item) => {
-          fallbackUpdates[`${item.owner}/${item.repo}`] = null;
-        });
-
-        setRepoUpdateDates(fallbackUpdates);
+        setRepoUpdateDates(createRepoUpdateMap());
       }
     }
 

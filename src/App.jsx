@@ -476,53 +476,46 @@ export default function App() {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
+    const repoUpdatesUrl = `${import.meta.env.BASE_URL}repo-updates.json`;
 
     async function loadRepoUpdates() {
-      const responses = await Promise.allSettled(
-        cases.map(async (item) => {
-            const response = await fetch(
-              `https://api.github.com/repos/${item.owner}/${item.repo}`,
-              {
-                cache: "no-store",
-                signal: controller.signal,
-                headers: {
-                  Accept: "application/vnd.github+json",
-                },
-              },
-            );
+      try {
+        const response = await fetch(repoUpdatesUrl, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
 
-            if (!response.ok) {
-              throw new Error("repo_unavailable");
-            }
+        if (!response.ok) {
+          throw new Error("repo_updates_unavailable");
+        }
 
-            const repo = await response.json();
+        const payload = await response.json();
 
-            return {
-              key: `${item.owner}/${item.repo}`,
-              value: repo.pushed_at || null,
-            };
-        }),
-      );
-
-      if (!active) {
-        return;
-      }
-
-      const nextUpdates = {};
-
-      responses.forEach((result, index) => {
-        const item = cases[index];
-        const key = `${item.owner}/${item.repo}`;
-
-        if (result.status === "fulfilled") {
-          nextUpdates[key] = result.value.value;
+        if (!active) {
           return;
         }
 
-        nextUpdates[key] = null;
-      });
+        const nextUpdates = {};
 
-      setRepoUpdateDates(nextUpdates);
+        cases.forEach((item) => {
+          const key = `${item.owner}/${item.repo}`;
+          nextUpdates[key] = payload?.repos?.[key] ?? null;
+        });
+
+        setRepoUpdateDates(nextUpdates);
+      } catch (error) {
+        if (!active || error.name === "AbortError") {
+          return;
+        }
+
+        const fallbackUpdates = {};
+
+        cases.forEach((item) => {
+          fallbackUpdates[`${item.owner}/${item.repo}`] = null;
+        });
+
+        setRepoUpdateDates(fallbackUpdates);
+      }
     }
 
     loadRepoUpdates();

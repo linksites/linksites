@@ -6,8 +6,6 @@
 </a>
 </p>
 
-<p align="center"><strong>LinkSites</strong></p>
-
 > 🚀 Presenca digital premium para marcas que querem autoridade, clareza e conversao.
 
 A **LinkSites** e uma startup focada em transformar posicionamento digital em experiencia visual de alto nivel. Este projeto representa a landing page institucional da marca em uma base moderna, performatica e pronta para evolucao.

@@ -35,7 +35,7 @@ Mais do que uma landing page, este repositorio funciona como vitrine de posicion
 - **Secao de servicos** com foco em sites corporativos, lojas virtuais, SEO e suporte
 - **Diferenciais competitivos** apresentados com leitura objetiva e hierarquia forte
 - **Cases reais em showcase horizontal** com links de projeto e codigo
-- **Atualizacao automatica dos repositorios** via leitura de `pushed_at` na API do GitHub
+- **Cards de portfolio com ultimo push ao vivo** via API do GitHub, com fallback local em `repo-updates.json`
 - **Contador de visitantes unicos por navegador** para reforco de presenca e prova de tracao
 - **Contato direto por WhatsApp** com caminho curto para conversao
 
@@ -69,10 +69,15 @@ O projeto foi estruturado para manter velocidade de entrega sem abrir mao de org
 - `React` para composicao da interface
 - `Vite` para ambiente rapido de desenvolvimento e build
 - `Tailwind CSS` para consistencia visual e produtividade
-- dados de showcase centralizados em `src/App.jsx`
+- secoes extraidas em componentes reutilizaveis dentro de `src/components/sections`
+- card de portfolio isolado em `src/components/CaseCard.jsx`
+- dados dos cases separados em `src/data/cases.js`
+- consulta ao GitHub em tempo real para exibir o `pushed_at` dos repositorios dos cards
+- fallback estatico gerado em `public/repo-updates.json` pelo script `npm run sync:repo-updates`
+- camada SEO com canonical, Open Graph, Twitter Cards, JSON-LD, `robots.txt`, `sitemap.xml` e `site.webmanifest`
 - deploy continuo com workflow em `.github/workflows/deploy-pages.yml`
 
-Essa base permite iterar rapidamente em layout, conteudo, portfolio e expansao futura para componentes separados ou design system.
+Essa base permite iterar rapidamente em layout, conteudo, portfolio e expansao futura para design system, conteudo externo e automacoes de publicacao.
 
 ## 🛠️ Como Rodar Localmente
 
@@ -86,6 +91,7 @@ Depois, abra a URL exibida pelo Vite no navegador.
 ## 📦 Build de Producao
 
 ```bash
+npm run sync:repo-updates
 npm run build
 ```
 
@@ -98,10 +104,11 @@ O deploy acontece automaticamente a cada push na branch `main`.
 Fluxo atual:
 
 1. editar os arquivos do projeto
-2. validar com `npm run build`
-3. fazer commit
-4. enviar para `origin/main`
-5. aguardar a publicacao no GitHub Pages
+2. sincronizar o snapshot de fallback com `npm run sync:repo-updates`
+3. validar com `npm run build`
+4. fazer commit
+5. enviar para `origin/main`
+6. aguardar a publicacao no GitHub Pages
 
 ## 📁 Estrutura Essencial
 
@@ -110,7 +117,15 @@ Fluxo atual:
 |-- assets/
 |   |-- logoLS.png
 |   `-- logolinksites.jpg
+|-- public/
+|   |-- favicon.svg
+|   |-- og-cover.svg
+|   `-- repo-updates.json
+|-- scripts/
+|   `-- sync-repo-updates.mjs
 |-- src/
+|   |-- components/
+|   |-- data/
 |   |-- App.jsx
 |   |-- index.css
 |   `-- main.jsx
@@ -126,11 +141,11 @@ Fluxo atual:
 
 Evolucoes naturais para a proxima fase do projeto:
 
-- extrair as secoes em componentes reutilizaveis
-- mover os dados dos cases para uma camada isolada
-- padronizar metadados e estrategias de SEO com mais profundidade
-- adicionar favicon, social preview e configuracoes de Open Graph
+- extrair `navItems`, `services`, `differentials` e `heroPoints` para a camada `src/data/`
+- criar uma estrategia de SEO por pagina/projeto para quando o portfolio ganhar rotas proprias
+- gerar assets sociais em PNG para melhorar compatibilidade de preview fora do SVG
 - fortalecer a documentacao de design, estrutura e operacao
+- adicionar validacao automatica para build, metadados e links do portfolio no CI
 
 ## 🤝 Contato
 

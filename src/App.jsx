@@ -151,7 +151,7 @@ const cases = [
     projectUrl: "https://linksites.github.io/democrata/",
     codeUrl: "https://github.com/linksites/democrata",
     coverClass:
-      "bg-[radial-gradient(circle_at_24%_18%,rgba(251,191,36,0.18),transparent_24%),radial-gradient(circle_at_76%_26%,rgba(239,68,68,0.18),transparent_28%),linear-gradient(145deg,#2b160f,#120b12)]",
+      "bg-[radial-gradient(circle_at_24%_18%,rgba(98,240,235,0.18),transparent_25%),radial-gradient(circle_at_76%_24%,rgba(59,130,246,0.2),transparent_28%),linear-gradient(145deg,#10233d,#09131f)]",
   },
   {
     owner: "linksites",

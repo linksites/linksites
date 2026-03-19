@@ -4,10 +4,10 @@ import logo from "../assets/logolinksites.jpg";
 import heroLogo from "../assets/logoLS.png";
 
 const navItems = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Servicos", href: "#servicos" },
+  { label: "Início", href: "#inicio" },
+  { label: "Serviços", href: "#servicos" },
   { label: "Diferenciais", href: "#diferenciais" },
-  { label: "Portfolio", href: "#portfolio" },
+  { label: "Portfólio", href: "#portfolio" },
   { label: "Sobre", href: "#sobre" },
   { label: "Contato", href: "#contato" },
 ];
@@ -15,7 +15,7 @@ const navItems = [
 const services = [
   {
     icon: "globe",
-    accent: "Presenca institucional",
+    accent: "Presença institucional",
     title: "Sites Corporativos",
     text: "Desenvolvimento de sites institucionais, landing pages e portais empresariais com tecnologia de ponta.",
   },
@@ -23,28 +23,28 @@ const services = [
     icon: "cart",
     accent: "Venda digital",
     title: "Lojas Virtuais",
-    text: "E-commerce completo, seguro e escalavel para impulsionar suas vendas online.",
+    text: "E-commerce completo, seguro e escalável para impulsionar suas vendas online.",
   },
   {
     icon: "chart",
     accent: "Visibilidade online",
     title: "SEO & Marketing",
-    text: "Otimizacao para buscadores e estrategias digitais para voce ser encontrado e crescer.",
+    text: "Otimização para buscadores e estratégias digitais para você ser encontrado e crescer.",
   },
   {
     icon: "shield",
     accent: "Base e suporte",
     title: "Hospedagem & Suporte",
-    text: "Infraestrutura robusta, monitoramento e atendimento agil para seu site nunca parar.",
+    text: "Infraestrutura robusta, monitoramento e atendimento ágil para seu site nunca parar.",
   },
 ];
 
 const diferentials = [
-  "Seguranca e performance de alto nivel",
-  "Entrega rapida e processos inteligentes",
+  "Segurança e performance de alto nível",
+  "Entrega rápida e processos inteligentes",
   "Atendimento consultivo e personalizado",
-  "Solucoes escalaveis e inovadoras",
-  "Equipe Techlab: expertise e paixao por tecnologia",
+  "Soluções escaláveis e inovadoras",
+  "Equipe Techlab: expertise e paixão por tecnologia",
 ];
 
 const cases = [
@@ -56,7 +56,7 @@ const cases = [
     name: "LinkSites Experience",
     coverTitle: "LinkSites",
     description:
-      "Landing page institucional com foco em autoridade, servicos, prova visual e conversao para atendimento imediato.",
+      "Landing page institucional com foco em autoridade, serviços, prova visual e conversão para atendimento imediato.",
     stack: "React",
     projectUrl: "https://linksites.github.io/linksites/",
     codeUrl: "https://github.com/linksites/linksites",
@@ -71,7 +71,7 @@ const cases = [
     name: "Almeida Cunha",
     coverTitle: "Almeida Cunha",
     description:
-      "Projeto institucional pensado para apresentar servicos com leitura limpa, acabamento premium e contato descomplicado.",
+      "Projeto institucional pensado para apresentar serviços com leitura limpa, acabamento premium e contato descomplicado.",
     stack: "HTML",
     projectUrl: "https://linksites.github.io/almeida-cunha",
     codeUrl: "https://github.com/linksites/almeida-cunha",
@@ -81,12 +81,12 @@ const cases = [
   {
     owner: "linksites",
     repo: "danilo-souza",
-    label: "Portfolio pessoal",
-    eyebrow: "Portfolio / Apresentacao",
+    label: "Portfólio pessoal",
+    eyebrow: "Portfólio / Apresentação",
     name: "Danilo Souza",
     coverTitle: "Danilo Souza",
     description:
-      "Portfolio pessoal com leitura rapida, hierarquia clara e elementos visuais voltados para apresentar identidade e competencias.",
+      "Portfólio pessoal com leitura rápida, hierarquia clara e elementos visuais voltados para apresentar identidade e competências.",
     stack: "JavaScript",
     projectUrl: "https://linksites.github.io/danilo-souza",
     codeUrl: "https://github.com/linksites/danilo-souza",
@@ -101,7 +101,7 @@ const cases = [
     name: "Gomes de Deus",
     coverTitle: "Gomes de Deus",
     description:
-      "Pagina de apresentacao estruturada para comunicar valor, reforcar a marca e manter a jornada de contato simples.",
+      "Página de apresentação estruturada para comunicar valor, reforçar a marca e manter a jornada de contato simples.",
     stack: "HTML",
     projectUrl: "https://linksites.github.io/gomes-de-deus",
     codeUrl: "https://github.com/linksites/gomes-de-deus",
@@ -111,12 +111,12 @@ const cases = [
   {
     owner: "linksites",
     repo: "frigorificocarneboa",
-    label: "Comercio alimentar",
-    eyebrow: "Catalogo / Conversao",
-    name: "Frigorifico Carne Boa",
+    label: "Comércio alimentar",
+    eyebrow: "Catálogo / Conversão",
+    name: "Frigorífico Carne Boa",
     coverTitle: "Carne Boa",
     description:
-      "Projeto com foco em mostrar produtos, reforcar confianca comercial e encurtar o caminho ate o atendimento.",
+      "Projeto com foco em mostrar produtos, reforçar confiança comercial e encurtar o caminho até o atendimento.",
     stack: "CSS",
     projectUrl: "https://linksites.github.io/frigorificocarneboa",
     codeUrl: "https://github.com/linksites/frigorificocarneboa",
@@ -126,12 +126,12 @@ const cases = [
   {
     owner: "linksites",
     repo: "arcadenoe",
-    label: "Projeto tematico",
+    label: "Projeto temático",
     eyebrow: "Landing page / Identidade",
-    name: "Arca de Noe",
-    coverTitle: "Arca de Noe",
+    name: "Arca de Noé",
+    coverTitle: "Arca de Noé",
     description:
-      "Layout com presenca visual marcante, construido para dar personalidade a marca sem perder legibilidade e impacto.",
+      "Layout com presença visual marcante, construído para dar personalidade à marca sem perder legibilidade e impacto.",
     stack: "CSS",
     projectUrl: "https://linksites.github.io/arcadenoe",
     codeUrl: "https://github.com/linksites/arcadenoe",
@@ -142,11 +142,11 @@ const cases = [
     owner: "linksites",
     repo: "democrata",
     label: "Gastronomia & lifestyle",
-    eyebrow: "Landing page / Experiencia",
+    eyebrow: "Landing page / Experiência",
     name: "Democrata",
     coverTitle: "Democrata",
     description:
-      "Landing page premium com identidade forte para unir burger artesanal, pub noturno e barbearia em uma unica experiencia.",
+      "Landing page premium com identidade forte para unir burger artesanal, pub noturno e barbearia em uma única experiência.",
     stack: "CSS",
     projectUrl: "https://linksites.github.io/democrata/",
     codeUrl: "https://github.com/linksites/democrata",
@@ -156,12 +156,12 @@ const cases = [
   {
     owner: "linksites",
     repo: "sergiorodrigues",
-    label: "Portfolio React",
-    eyebrow: "Portfolio / React",
+    label: "Portfólio React",
+    eyebrow: "Portfólio / React",
     name: "Sergio Rodrigues",
     coverTitle: "Sergio Rodrigues",
     description:
-      "Portfolio pessoal em React com leitura objetiva, tom profissional e apresentacao visual mais premium.",
+      "Portfólio pessoal em React com leitura objetiva, tom profissional e apresentação visual mais premium.",
     stack: "React",
     projectUrl: "https://linksites.github.io/sergiorodrigues/",
     codeUrl: "https://github.com/linksites/sergiorodrigues",
@@ -173,11 +173,11 @@ const cases = [
 const heroPoints = [
   "Identidade futurista",
   "Rede visual premium",
-  "Experiencia responsiva",
+  "Experiência responsiva",
 ];
 
-const REPO_UPDATE_LOADING = "Consultando atualizacao...";
-const REPO_UPDATE_FALLBACK = "Atualizacao indisponivel";
+const REPO_UPDATE_LOADING = "Consultando atualização...";
+const REPO_UPDATE_FALLBACK = "Atualização indisponível";
 
 function formatRelativeTime(dateString) {
   const updatedAt = new Date(dateString);
@@ -196,31 +196,31 @@ function formatRelativeTime(dateString) {
 
   if (diffMs < hourMs) {
     const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
-    return minutes === 1 ? "ha 1 minuto" : `ha ${minutes} minutos`;
+    return minutes === 1 ? "há 1 minuto" : `há ${minutes} minutos`;
   }
 
   if (diffMs < dayMs) {
     const hours = Math.floor(diffMs / hourMs);
-    return hours === 1 ? "ha 1 hora" : `ha ${hours} horas`;
+    return hours === 1 ? "há 1 hora" : `há ${hours} horas`;
   }
 
   if (diffMs < weekMs) {
     const days = Math.floor(diffMs / dayMs);
-    return days === 1 ? "ha 1 dia" : `ha ${days} dias`;
+    return days === 1 ? "há 1 dia" : `há ${days} dias`;
   }
 
   if (diffMs < monthMs) {
     const weeks = Math.floor(diffMs / weekMs);
-    return weeks === 1 ? "ha 1 semana" : `ha ${weeks} semanas`;
+    return weeks === 1 ? "há 1 semana" : `há ${weeks} semanas`;
   }
 
   if (diffMs < yearMs) {
     const months = Math.floor(diffMs / monthMs);
-    return months === 1 ? "ha 1 mes" : `ha ${months} meses`;
+    return months === 1 ? "há 1 mês" : `há ${months} meses`;
   }
 
   const years = Math.floor(diffMs / yearMs);
-  return years === 1 ? "ha 1 ano" : `ha ${years} anos`;
+  return years === 1 ? "há 1 ano" : `há ${years} anos`;
 }
 
 function formatRepoUpdateStatus(dateString) {
@@ -635,7 +635,7 @@ export default function App() {
                 Link<span className="text-cyan-300">Sites</span>
               </div>
               <div className="text-[0.65rem] uppercase tracking-[0.28em] text-white/45">
-                Solucoes digitais futuristas
+                Soluções digitais futuristas
               </div>
             </div>
           </a>
@@ -706,10 +706,10 @@ export default function App() {
             <div className="max-w-2xl" data-reveal="">
               <SectionTag>Identidade conectada</SectionTag>
               <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
-                O futuro da presenca digital comeca aqui.
+                O futuro da presença digital começa aqui.
               </h1>
               <h2 className="mt-5 max-w-2xl text-2xl font-medium tracking-tight text-cyan-100 sm:text-3xl">
-                Sites profissionais, modernos e inteligentes para pessoas e empresas visionarias.
+                Sites profissionais, modernos e inteligentes para pessoas e empresas visionárias.
               </h2>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-white/68">
                 Mantivemos a nova base em React e Tailwind, mas trouxemos de volta a mensagem da LinkSites:
@@ -779,12 +779,12 @@ export default function App() {
 
         <section id="servicos" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="max-w-2xl" data-reveal="">
-            <SectionTag>Servicos</SectionTag>
+            <SectionTag>Serviços</SectionTag>
             <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
-              Solucoes digitais para marcas que querem crescer com clareza.
+              Soluções digitais para marcas que querem crescer com clareza.
             </h2>
             <p className="mt-4 text-lg leading-8 text-white/62">
-              A nova interface continua elegante, mas agora com o conteudo institucional completo da LinkSites
+              A nova interface continua elegante, mas agora com o conteúdo institucional completo da LinkSites
               e uma oferta muito mais fiel ao que a empresa entrega.
             </p>
           </div>
@@ -819,11 +819,11 @@ export default function App() {
               <div className="max-w-xl" data-reveal="">
                 <SectionTag>Diferenciais</SectionTag>
                 <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
-                  Estrutura premium com base solida, rapida e inteligente.
+                  Estrutura premium com base sólida, rápida e inteligente.
                 </h2>
                 <p className="mt-4 text-lg leading-8 text-white/62">
                   O que fazia sentido na mensagem original continua aqui: performance, atendimento consultivo,
-                  velocidade e uma postura profissional do inicio ao fim.
+                  velocidade e uma postura profissional do início ao fim.
                 </p>
               </div>
 
@@ -851,12 +851,12 @@ export default function App() {
             <div className="max-w-2xl" data-reveal="">
               <SectionTag>Showcase digital</SectionTag>
               <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
-                Projetos em destaque com o conteudo real da LinkSites.
+                Projetos em destaque com o conteúdo real da LinkSites.
               </h2>
             </div>
             <p className="max-w-xl text-base leading-7 text-white/60">
-              O portfolio volta com os projetos publicados, descricoes de negocio, links de projeto e codigo,
-              alem da ultima atualizacao puxada em tempo real do GitHub.
+              O portfólio volta com os projetos publicados, descrições de negócio, links de projeto e código,
+              além da última atualização puxada em tempo real do GitHub.
             </p>
           </div>
 
@@ -874,7 +874,7 @@ export default function App() {
             </button>
             <button
               type="button"
-              aria-label="Ver proximos projetos"
+              aria-label="Ver próximos projetos"
               className={`showcase-nav showcase-nav-right hidden lg:flex ${canScrollNext ? "" : "pointer-events-none opacity-30"}`}
               onClick={() => scrollCases(1)}
             >
@@ -956,7 +956,7 @@ export default function App() {
                         </div>
                         <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">
                           <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40 sm:text-right">
-                            Ultimo push
+                            Último push
                           </p>
                           <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
                             {repoUpdates[repoKey] ?? REPO_UPDATE_LOADING}
@@ -980,7 +980,7 @@ export default function App() {
                           rel="noreferrer"
                           className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white/80 transition hover:border-cyan-300/30 hover:text-cyan-100"
                         >
-                          Ver codigo
+                          Ver código
                         </a>
                       </div>
                     </div>
@@ -999,14 +999,14 @@ export default function App() {
                 Tecnologia, design futurista e foco total no resultado do cliente.
               </h2>
               <p className="mt-5 text-lg leading-8 text-white/66">
-                Somos uma startup do grupo <strong>Techlab Software</strong>, referencia em solucoes digitais.
-                Nossa missao e transformar ideias em experiencias digitais marcantes, com tecnologia de ponta,
+                Somos uma startup do grupo <strong>Techlab Software</strong>, referência em soluções digitais.
+                Nossa missão é transformar ideias em experiências digitais marcantes, com tecnologia de ponta,
                 design futurista e foco total no resultado do cliente.
               </p>
             </div>
 
               <div className="rounded-[2.25rem] border border-cyan-300/10 bg-[linear-gradient(145deg,rgba(8,17,29,0.94),rgba(12,29,49,0.92))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] sm:p-10" data-reveal="" style={{ "--reveal-delay": "120ms" }}>
-              <SectionTag>Presenca em crescimento</SectionTag>
+              <SectionTag>Presença em crescimento</SectionTag>
               <div className="mt-6 rounded-[1.8rem] border border-white/8 bg-[rgba(5,11,20,0.55)] p-6">
                 <div className="text-[0.72rem] uppercase tracking-[0.26em] text-white/42">
                   Leitura exclusiva
@@ -1015,7 +1015,7 @@ export default function App() {
                   {visitCount}
                 </strong>
                 <p className="mt-4 text-sm leading-7 text-white/60">
-                  Visitantes unicos por navegador. Cada navegador conta uma vez e depois apenas consulta o total.
+                  Visitantes únicos por navegador. Cada navegador conta uma vez e depois apenas consulta o total.
                 </p>
               </div>
             </div>
@@ -1032,7 +1032,7 @@ export default function App() {
                 </h2>
                 <p className="mt-4 text-lg leading-8 text-white/62">
                   Atendimento direto pelo WhatsApp, com estrutura pronta para transformar sua ideia em uma
-                  experiencia digital marcante e profissional.
+                  experiência digital marcante e profissional.
                 </p>
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
                   <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.04] p-5">
@@ -1040,8 +1040,8 @@ export default function App() {
                     <p className="mt-3 text-base text-white/80">sergiosrdev@hotmail.com</p>
                   </div>
                   <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.04] p-5">
-                    <div className="text-[0.72rem] uppercase tracking-[0.22em] text-white/42">Localizacao</div>
-                    <p className="mt-3 text-base text-white/80">Belem, PA - Atendimento Global</p>
+                    <div className="text-[0.72rem] uppercase tracking-[0.22em] text-white/42">Localização</div>
+                    <p className="mt-3 text-base text-white/80">Belém, PA - Atendimento Global</p>
                   </div>
                 </div>
               </div>
@@ -1066,7 +1066,7 @@ export default function App() {
       <footer className="border-t border-white/8 py-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 text-sm text-white/52 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <p>LinkSites 2026 - Uma startup do grupo Techlab Software</p>
-          <p>Conectando voce ao mundo digital com criatividade, tecnologia e paixao.</p>
+          <p>Conectando você ao mundo digital com criatividade, tecnologia e paixão.</p>
         </div>
       </footer>
 
@@ -1074,13 +1074,13 @@ export default function App() {
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[rgba(3,8,15,0.72)] px-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,24,39,0.96),rgba(6,14,24,0.98))] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.38)] sm:p-7">
             <div className="rounded-full border border-emerald-400/18 bg-emerald-400/10 px-3 py-1 text-[0.68rem] uppercase tracking-[0.22em] text-emerald-200/88">
-              Navegacao atual
+              Navegação atual
             </div>
             <h3 className="mt-5 font-display text-3xl tracking-tight text-white">
-              Voce ja esta no site atual.
+              Você já está no site atual.
             </h3>
             <p className="mt-3 text-sm leading-7 text-white/64">
-              Este projeto e a propria pagina que voce esta navegando neste momento.
+              Este projeto é a própria página que você está navegando neste momento.
             </p>
             <div className="mt-6 flex justify-end">
               <button

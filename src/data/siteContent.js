@@ -118,12 +118,13 @@ export const siteContent = {
       growthTag: "Presença em crescimento",
       growthText: "visitantes acompanhando a evolução da vitrine para produto.",
       featuredLabel: "Recomendado",
+      priceLoading: "Calculando...",
       items: [
         {
           name: "Grátis",
           badge: "Entrada",
           description: "Para validar sua presença digital com uma página enxuta e pronta para compartilhar.",
-          price: "R$ 0",
+          amountBrl: 0,
           detail: "durante o MVP",
           features: [
             "1 página pública",
@@ -137,7 +138,7 @@ export const siteContent = {
           name: "Pro",
           badge: "Mais pedido",
           description: "Para profissionais e criadores que querem mais identidade, flexibilidade e autoridade visual.",
-          price: "R$ 29",
+          amountBrl: 29,
           detail: "/mês",
           features: [
             "Links e seções expandidas",
@@ -152,7 +153,7 @@ export const siteContent = {
           name: "Business",
           badge: "Escala",
           description: "Para operações locais e equipes que precisam de mais páginas, domínio próprio e estrutura comercial.",
-          price: "R$ 79",
+          amountBrl: 79,
           detail: "/mês",
           features: [
             "Múltiplas páginas por marca",
@@ -336,12 +337,13 @@ export const siteContent = {
       growthTag: "Growing presence",
       growthText: "visitors following the journey from showcase to product.",
       featuredLabel: "Recommended",
+      priceLoading: "Calculating...",
       items: [
         {
           name: "Free",
           badge: "Entry",
           description: "To validate your digital presence with a lean page that is ready to share.",
-          price: "$0",
+          amountBrl: 0,
           detail: "during MVP",
           features: [
             "1 public page",
@@ -355,7 +357,7 @@ export const siteContent = {
           name: "Pro",
           badge: "Most popular",
           description: "For professionals and creators who want more identity, flexibility, and visual authority.",
-          price: "$29",
+          amountBrl: 29,
           detail: "/month",
           features: [
             "Expanded links and sections",
@@ -370,7 +372,7 @@ export const siteContent = {
           name: "Business",
           badge: "Scale",
           description: "For local operations and teams that need more pages, custom domains, and commercial structure.",
-          price: "$79",
+          amountBrl: 79,
           detail: "/month",
           features: [
             "Multiple pages per brand",

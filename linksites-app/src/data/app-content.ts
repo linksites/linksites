@@ -64,6 +64,7 @@ export const appContent: Record<AppLocale, {
     eyebrow: string;
     title: string;
     description: string;
+    editorDescription: string;
     sessionLabel: string;
     sessionAuthenticated: string;
     sessionFallback: string;
@@ -85,13 +86,21 @@ export const appContent: Record<AppLocale, {
       username: string;
       bio: string;
       links: string;
+      theme: string;
+      visibility: string;
     };
+    themeOptions: Record<string, string>;
+    visibilityDraft: string;
+    visibilityPublished: string;
+    saveButton: string;
+    mockReadonly: string;
     linkActive: string;
     linkInactive: string;
     emptyLinks: string;
     nextStep: string;
     pendingProfileName: string;
     pendingProfileBio: string;
+    feedback: Record<string, string>;
   };
   publicProfile: {
     backHome: string;
@@ -204,6 +213,7 @@ export const appContent: Record<AppLocale, {
       title: "Bem-vindo de volta, {name}",
       description:
         "Sua conta agora esta conectada a camada de produto. Este dashboard ja reflete a sessao real e pode evoluir para edicao, analytics, planos e controles de publicacao.",
+      editorDescription: "Atualize os dados centrais da sua pagina e salve direto no banco real.",
       sessionLabel: "Sessao",
       sessionAuthenticated: "Autenticado",
       sessionFallback: "Modo mock",
@@ -225,7 +235,17 @@ export const appContent: Record<AppLocale, {
         username: "Username",
         bio: "Bio",
         links: "Links",
+        theme: "Tema visual",
+        visibility: "Publicacao",
       },
+      themeOptions: {
+        "midnight-grid": "Midnight Grid",
+        "sunset-signal": "Sunset Signal",
+      },
+      visibilityDraft: "Manter como rascunho",
+      visibilityPublished: "Publicar pagina",
+      saveButton: "Salvar perfil",
+      mockReadonly: "O modo mock nao salva alteracoes. Conecte o Supabase para editar o perfil real.",
       linkActive: "Ativo",
       linkInactive: "Inativo",
       emptyLinks: "Ainda nao existem links. A proxima fase vai permitir criar e editar tudo direto deste dashboard.",
@@ -234,6 +254,15 @@ export const appContent: Record<AppLocale, {
       pendingProfileName: "Novo criador",
       pendingProfileBio:
         "Sua conta esta autenticada, mas o registro do perfil ainda precisa ser criado ou vinculado corretamente no banco de dados.",
+      feedback: {
+        profile_saved: "Perfil salvo com sucesso.",
+        profile_save_failed: "Nao foi possivel salvar o perfil agora.",
+        username_taken: "Esse username ja esta em uso. Tente outro.",
+        invalid_username: "Use um username entre 3 e 32 caracteres com letras minusculas, numeros e hifens.",
+        invalid_display_name: "Informe um nome de exibicao para salvar o perfil.",
+        unauthorized: "Entre novamente para continuar editando seu perfil.",
+        mock_mode_readonly: "O modo mock nao permite salvar alteracoes reais.",
+      },
     },
     publicProfile: {
       backHome: "Voltar para o app",
@@ -347,6 +376,7 @@ export const appContent: Record<AppLocale, {
       title: "Welcome back, {name}",
       description:
         "Your account is now connected to the product layer. This dashboard already reflects real session state and can grow into editing, analytics, plans, and publishing controls.",
+      editorDescription: "Update the core details of your page and save them directly to the real database.",
       sessionLabel: "Session",
       sessionAuthenticated: "Authenticated",
       sessionFallback: "Mock mode",
@@ -368,7 +398,17 @@ export const appContent: Record<AppLocale, {
         username: "Username",
         bio: "Bio",
         links: "Links",
+        theme: "Visual theme",
+        visibility: "Visibility",
       },
+      themeOptions: {
+        "midnight-grid": "Midnight Grid",
+        "sunset-signal": "Sunset Signal",
+      },
+      visibilityDraft: "Keep as draft",
+      visibilityPublished: "Publish page",
+      saveButton: "Save profile",
+      mockReadonly: "Mock mode does not save changes. Connect Supabase to edit the real profile.",
       linkActive: "Active",
       linkInactive: "Inactive",
       emptyLinks: "No links yet. The next phase will let users create and edit them directly from this dashboard.",
@@ -377,6 +417,15 @@ export const appContent: Record<AppLocale, {
       pendingProfileName: "New creator",
       pendingProfileBio:
         "Your account is authenticated, but your profile record still needs to be created or linked correctly in the database.",
+      feedback: {
+        profile_saved: "Profile saved successfully.",
+        profile_save_failed: "We could not save your profile right now.",
+        username_taken: "That username is already taken. Try another one.",
+        invalid_username: "Use a username between 3 and 32 characters with lowercase letters, numbers, and hyphens.",
+        invalid_display_name: "Enter a display name before saving the profile.",
+        unauthorized: "Sign in again to keep editing your profile.",
+        mock_mode_readonly: "Mock mode does not allow saving real changes.",
+      },
     },
     publicProfile: {
       backHome: "Back to app",

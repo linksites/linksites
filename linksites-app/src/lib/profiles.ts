@@ -45,7 +45,7 @@ function mapProfile(profile: ProfileRow, links: LinkRow[]): ProfileWithLinks {
   };
 }
 
-function normalizeUsernameSeed(value: string) {
+export function normalizeUsernameInput(value: string) {
   const normalized = value
     .toLowerCase()
     .normalize("NFD")
@@ -97,7 +97,7 @@ export async function ensureProfileForUser(user: User): Promise<ProfileWithLinks
   }
 
   const supabase = await createSupabaseServerClient();
-  const baseUsername = normalizeUsernameSeed(
+  const baseUsername = normalizeUsernameInput(
     user.user_metadata?.username ||
       user.user_metadata?.user_name ||
       user.email?.split("@")[0] ||

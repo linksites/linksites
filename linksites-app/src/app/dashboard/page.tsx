@@ -1,14 +1,47 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+import { updateProfile } from "@/app/dashboard/actions";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProfilePreview } from "@/components/profile-preview";
 import { appContent } from "@/data/app-content";
 import { getServerLocale } from "@/lib/locale-server";
+import { themeCatalog } from "@/lib/mock-data";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getCurrentViewer } from "@/lib/viewer";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams: Promise<{
+    error?: string;
+    message?: string;
+  }>;
+};
+
+function Notice({ tone, children }: { tone: "error" | "info"; children: ReactNode }) {
+  return (
+    <div
+      className={`rounded-2xl border px-4 py-3 text-sm ${
+        tone === "error"
+          ? "border-rose-400/24 bg-rose-400/10 text-rose-100"
+          : "border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function resolveFeedback(copy: Record<string, string>, value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  return copy[value] ?? value;
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const params = await searchParams;
   const locale = await getServerLocale();
   const content = appContent[locale];
   const viewer = await getCurrentViewer();
@@ -33,9 +66,8 @@ export default async function DashboardPage() {
           links: [],
         });
   const editorFields = [
-    { label: content.dashboard.fields.displayName, value: profile.displayName },
-    { label: content.dashboard.fields.username, value: profile.username },
-    { label: content.dashboard.fields.bio, value: profile.bio },
+    { label: content.dashboard.fields.displayName, name: "displayName", value: profile.displayName },
+    { label: content.dashboard.fields.username, name: "username", value: profile.username },
   ];
   const dashboardTitle = content.dashboard.title.replace("{name}", profile.displayName);
   const publishedDescription = content.dashboard.profilePublishedDescription.replace("{username}", profile.username);
@@ -115,18 +147,94 @@ export default async function DashboardPage() {
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {editorFields.map((field) => (
-                  <label key={field.label} className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">{field.label}</span>
-                    <input
-                      readOnly
-                      value={field.value}
-                      className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none"
-                    />
-                  </label>
-                ))}
+              <p className="mt-4 text-sm leading-7 text-white/62">{content.dashboard.editorDescription}</p>
+
+              <div className="mt-6 space-y-3">
+                {params.error ? (
+                  <Notice tone="error">{resolveFeedback(content.dashboard.feedback, params.error)}</Notice>
+                ) : null}
+                {params.message ? (
+                  <Notice tone="info">{resolveFeedback(content.dashboard.feedback, params.message)}</Notice>
+                ) : null}
+                {usingMockData ? <Notice tone="info">{content.dashboard.mockReadonly}</Notice> : null}
               </div>
+
+              <form action={updateProfile} className="mt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {editorFields.map((field) => (
+                    <label key={field.label} className="flex flex-col gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">{field.label}</span>
+                      <input
+                        name={field.name}
+                        defaultValue={field.value}
+                        disabled={usingMockData}
+                        className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                      />
+                    </label>
+                  ))}
+
+                  <label className="flex flex-col gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                      {content.dashboard.fields.theme}
+                    </span>
+                    <select
+                      name="themeSlug"
+                      defaultValue={profile.themeSlug}
+                      disabled={usingMockData}
+                      className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {Object.keys(themeCatalog).map((themeSlug) => (
+                        <option key={themeSlug} value={themeSlug} className="bg-slate-950 text-white">
+                          {
+                            content.dashboard.themeOptions[
+                              themeSlug as keyof typeof content.dashboard.themeOptions
+                            ]
+                          }
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="flex flex-col gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                      {content.dashboard.fields.visibility}
+                    </span>
+                    <select
+                      name="isPublished"
+                      defaultValue={String(profile.isPublished)}
+                      disabled={usingMockData}
+                      className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="false" className="bg-slate-950 text-white">
+                        {content.dashboard.visibilityDraft}
+                      </option>
+                      <option value="true" className="bg-slate-950 text-white">
+                        {content.dashboard.visibilityPublished}
+                      </option>
+                    </select>
+                  </label>
+                </div>
+
+                <label className="mt-4 flex flex-col gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                    {content.dashboard.fields.bio}
+                  </span>
+                  <textarea
+                    name="bio"
+                    defaultValue={profile.bio}
+                    rows={5}
+                    disabled={usingMockData}
+                    className="rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+                </label>
+
+                <button
+                  disabled={usingMockData}
+                  className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] px-6 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                >
+                  {content.dashboard.saveButton}
+                </button>
+              </form>
 
               <div className="mt-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">{content.dashboard.fields.links}</div>

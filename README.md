@@ -126,11 +126,11 @@ Fluxo atual:
 
 Evolucoes naturais para a proxima fase do projeto:
 
-- extrair secoes em componentes reutilizaveis
-- mover dados dos cases para uma camada isolada
-- padronizar ainda mais metadados e SEO
-- adicionar favicon, social preview e Open Graph
-- fortalecer documentacao de design e operacao
+- extrair as secoes em componentes reutilizaveis
+- mover os dados dos cases para uma camada isolada
+- padronizar metadados e estrategias de SEO com mais profundidade
+- adicionar favicon, social preview e configuracoes de Open Graph
+- fortalecer a documentacao de design, estrutura e operacao
 
 ## 🤝 Contato
 

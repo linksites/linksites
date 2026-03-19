@@ -179,12 +179,16 @@ const heroPoints = [
 const REPO_UPDATE_LOADING = "Consultando atualização...";
 const REPO_UPDATE_FALLBACK = "Atualização indisponível";
 
-function formatRelativeTime(dateString, now = Date.now()) {
+function getRelativeTimeState(dateString, now = Date.now()) {
   const updatedAt = new Date(dateString);
-  const diffMs = now - updatedAt.getTime();
+  const updatedAtMs = updatedAt.getTime();
+  const diffMs = now - updatedAtMs;
 
-  if (!Number.isFinite(updatedAt.getTime()) || diffMs < 0) {
-    return "agora";
+  if (!Number.isFinite(updatedAtMs) || diffMs < 0) {
+    return {
+      label: "agora",
+      nextUpdateInMs: 60 * 1000,
+    };
   }
 
   const minuteMs = 60 * 1000;
@@ -193,34 +197,60 @@ function formatRelativeTime(dateString, now = Date.now()) {
   const weekMs = 7 * dayMs;
   const monthMs = 30 * dayMs;
   const yearMs = 365 * dayMs;
+  const getNextBoundary = (unitMs) => {
+    const remainder = diffMs % unitMs;
+    return Math.max(1000, remainder === 0 ? unitMs : unitMs - remainder);
+  };
 
   if (diffMs < hourMs) {
     const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
-    return minutes === 1 ? "há 1 minuto" : `há ${minutes} minutos`;
+    return {
+      label: minutes === 1 ? "há 1 minuto" : `há ${minutes} minutos`,
+      nextUpdateInMs: getNextBoundary(minuteMs),
+    };
   }
 
   if (diffMs < dayMs) {
     const hours = Math.floor(diffMs / hourMs);
-    return hours === 1 ? "há 1 hora" : `há ${hours} horas`;
+    return {
+      label: hours === 1 ? "há 1 hora" : `há ${hours} horas`,
+      nextUpdateInMs: getNextBoundary(hourMs),
+    };
   }
 
   if (diffMs < weekMs) {
     const days = Math.floor(diffMs / dayMs);
-    return days === 1 ? "há 1 dia" : `há ${days} dias`;
+    return {
+      label: days === 1 ? "há 1 dia" : `há ${days} dias`,
+      nextUpdateInMs: getNextBoundary(dayMs),
+    };
   }
 
   if (diffMs < monthMs) {
     const weeks = Math.floor(diffMs / weekMs);
-    return weeks === 1 ? "há 1 semana" : `há ${weeks} semanas`;
+    return {
+      label: weeks === 1 ? "há 1 semana" : `há ${weeks} semanas`,
+      nextUpdateInMs: getNextBoundary(weekMs),
+    };
   }
 
   if (diffMs < yearMs) {
     const months = Math.floor(diffMs / monthMs);
-    return months === 1 ? "há 1 mês" : `há ${months} meses`;
+    return {
+      label: months === 1 ? "há 1 mês" : `há ${months} meses`,
+      nextUpdateInMs: getNextBoundary(monthMs),
+    };
   }
 
   const years = Math.floor(diffMs / yearMs);
-  return years === 1 ? "há 1 ano" : `há ${years} anos`;
+  return {
+    label: years === 1 ? "há 1 ano" : `há ${years} anos`,
+    nextUpdateInMs: getNextBoundary(yearMs),
+  };
+}
+
+function formatRelativeTime(dateString, now = Date.now()) {
+  return getRelativeTimeState(dateString, now).label;
 }
 
 function formatRepoUpdateStatus(dateString, now) {
@@ -229,6 +259,33 @@ function formatRepoUpdateStatus(dateString, now) {
   }
 
   return `Atualizado ${formatRelativeTime(dateString, now)}`;
+}
+
+function useRelativeRepoUpdateLabel(dateString) {
+  const [label, setLabel] = useState(() => formatRepoUpdateStatus(dateString));
+
+  useEffect(() => {
+    if (!dateString) {
+      setLabel(REPO_UPDATE_FALLBACK);
+      return undefined;
+    }
+
+    let timeoutId;
+
+    const updateLabel = () => {
+      const { label: relativeLabel, nextUpdateInMs } = getRelativeTimeState(dateString, Date.now());
+      setLabel(`Atualizado ${relativeLabel}`);
+      timeoutId = window.setTimeout(updateLabel, nextUpdateInMs);
+    };
+
+    updateLabel();
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [dateString]);
+
+  return label;
 }
 
 function SectionTag({ children }) {
@@ -306,6 +363,100 @@ function Chevron({ direction }) {
   );
 }
 
+function CaseCard({ item, index, repoDate, onProjectClick }) {
+  const repoKey = `${item.owner}/${item.repo}`;
+  const repoUpdateLabel = useRelativeRepoUpdateLabel(repoDate);
+  const isRepoUpdateLoading = repoDate === undefined;
+
+  return (
+    <article
+      key={repoKey}
+      data-case-card="true"
+      data-reveal=""
+      style={{ "--reveal-delay": `${(index % 4) * 80}ms` }}
+      className="group flex min-h-[34rem] min-w-[86%] snap-center flex-col overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,28,51,0.86),rgba(8,17,29,0.92))] transition hover:border-cyan-300/20 sm:min-w-[30rem] lg:min-w-[22.5rem] lg:max-w-[22.5rem] xl:min-w-[23.25rem] xl:max-w-[23.25rem]"
+    >
+      <div className={`relative h-56 overflow-hidden border-b border-white/6 ${item.coverClass}`}>
+        <div className="absolute inset-7 rounded-[1.4rem] border border-white/8" />
+        <div className="absolute inset-x-10 top-10 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent" />
+        <div className="absolute inset-y-10 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-cyan-300/30 to-transparent" />
+        <div className="absolute left-8 top-8 rounded-full border border-white/12 bg-[rgba(7,16,27,0.4)] px-3 py-1 text-[0.65rem] uppercase tracking-[0.22em] text-white/62 backdrop-blur">
+          {item.label}
+        </div>
+        <div className="absolute bottom-8 left-8 right-8">
+          <strong className="font-display text-3xl tracking-tight text-white">
+            {item.coverTitle}
+          </strong>
+          <p className="mt-2 max-w-[18rem] text-sm leading-6 text-white/64">
+            {item.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[0.72rem] uppercase tracking-[0.22em] text-cyan-100/62">
+              {item.eyebrow}
+            </p>
+            <h3 className="mt-2 font-display text-3xl text-white">{item.name}</h3>
+          </div>
+          <span className="status-live rounded-full border border-emerald-400/24 bg-emerald-400/10 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-emerald-200">
+            <span className="status-live-dot" />
+            Online
+          </span>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3 rounded-[1.25rem] border border-white/8 bg-white/[0.03] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-white/66">
+              {item.stack}
+            </span>
+            <a
+              href={item.codeUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex max-w-full items-center gap-2 text-[0.72rem] text-white/52 transition hover:text-cyan-100/80"
+            >
+              <span className="truncate">{`github.com/${item.owner}`}</span>
+              <span className="text-white/28">/</span>
+              <span className="truncate text-white/42">{item.repo}</span>
+            </a>
+          </div>
+          <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">
+            <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40 sm:text-right">
+              Último push
+            </p>
+            <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
+              {isRepoUpdateLoading ? REPO_UPDATE_LOADING : repoUpdateLabel}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-auto flex flex-wrap gap-3 pt-6">
+          <a
+            href={item.projectUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(event) => onProjectClick(event, item)}
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px]"
+          >
+            Ver projeto
+          </a>
+          <a
+            href={item.codeUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white/80 transition hover:border-cyan-300/30 hover:text-cyan-100"
+          >
+            Ver código
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [repoUpdateDates, setRepoUpdateDates] = useState({});
@@ -313,7 +464,6 @@ export default function App() {
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
   const [isCurrentSiteDialogOpen, setIsCurrentSiteDialogOpen] = useState(false);
-  const [timeTick, setTimeTick] = useState(() => Date.now());
   const trackRef = useRef(null);
   const dragStateRef = useRef({
     isPointerDown: false,
@@ -380,16 +530,6 @@ export default function App() {
     return () => {
       active = false;
       controller.abort();
-    };
-  }, []);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setTimeTick(Date.now());
-    }, 60 * 1000);
-
-    return () => {
-      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -909,94 +1049,15 @@ export default function App() {
             >
               {cases.map((item, index) => {
                 const repoKey = `${item.owner}/${item.repo}`;
-                const repoUpdateLabel = formatRepoUpdateStatus(repoUpdateDates[repoKey], timeTick);
 
                 return (
-                  <article
+                  <CaseCard
                     key={repoKey}
-                    data-case-card="true"
-                    data-reveal=""
-                    style={{ "--reveal-delay": `${(index % 4) * 80}ms` }}
-                    className="group flex min-h-[34rem] min-w-[86%] snap-center flex-col overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(13,28,51,0.86),rgba(8,17,29,0.92))] transition hover:border-cyan-300/20 sm:min-w-[30rem] lg:min-w-[22.5rem] lg:max-w-[22.5rem] xl:min-w-[23.25rem] xl:max-w-[23.25rem]"
-                  >
-                    <div className={`relative h-56 overflow-hidden border-b border-white/6 ${item.coverClass}`}>
-                      <div className="absolute inset-7 rounded-[1.4rem] border border-white/8" />
-                      <div className="absolute inset-x-10 top-10 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent" />
-                      <div className="absolute inset-y-10 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-cyan-300/30 to-transparent" />
-                      <div className="absolute left-8 top-8 rounded-full border border-white/12 bg-[rgba(7,16,27,0.4)] px-3 py-1 text-[0.65rem] uppercase tracking-[0.22em] text-white/62 backdrop-blur">
-                        {item.label}
-                      </div>
-                      <div className="absolute bottom-8 left-8 right-8">
-                        <strong className="font-display text-3xl tracking-tight text-white">
-                          {item.coverTitle}
-                        </strong>
-                        <p className="mt-2 max-w-[18rem] text-sm leading-6 text-white/64">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-1 flex-col p-7">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-[0.72rem] uppercase tracking-[0.22em] text-cyan-100/62">
-                            {item.eyebrow}
-                          </p>
-                          <h3 className="mt-2 font-display text-3xl text-white">{item.name}</h3>
-                        </div>
-                        <span className="status-live rounded-full border border-emerald-400/24 bg-emerald-400/10 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-emerald-200">
-                          <span className="status-live-dot" />
-                          Online
-                        </span>
-                      </div>
-
-                      <div className="mt-6 flex flex-col gap-3 rounded-[1.25rem] border border-white/8 bg-white/[0.03] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="min-w-0">
-                          <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-white/66">
-                            {item.stack}
-                          </span>
-                          <a
-                            href={item.codeUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-3 inline-flex max-w-full items-center gap-2 text-[0.72rem] text-white/52 transition hover:text-cyan-100/80"
-                          >
-                            <span className="truncate">{`github.com/${item.owner}`}</span>
-                            <span className="text-white/28">/</span>
-                            <span className="truncate text-white/42">{item.repo}</span>
-                          </a>
-                        </div>
-                        <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">
-                          <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40 sm:text-right">
-                            Último push
-                          </p>
-                          <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
-                            {repoUpdateDates[repoKey] === undefined ? REPO_UPDATE_LOADING : repoUpdateLabel}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-auto flex flex-wrap gap-3 pt-6">
-                        <a
-                          href={item.projectUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(event) => handleProjectClick(event, item)}
-                          className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px]"
-                        >
-                          Ver projeto
-                        </a>
-                        <a
-                          href={item.codeUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white/80 transition hover:border-cyan-300/30 hover:text-cyan-100"
-                        >
-                          Ver código
-                        </a>
-                      </div>
-                    </div>
-                  </article>
+                    item={item}
+                    index={index}
+                    repoDate={repoUpdateDates[repoKey]}
+                    onProjectClick={handleProjectClick}
+                  />
                 );
               })}
             </div>

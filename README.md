@@ -1,6 +1,10 @@
 # LinkSites
 
-![LinkSites Logo](assets/logolinksites.jpg)
+<p align="center">
+  <img src="assets/logoLS.png" alt="LinkSites" width="180" />
+</p>
+
+<p align="center"><strong>LinkSites</strong></p>
 
 > 🚀 Presenca digital premium para marcas que querem autoridade, clareza e conversao.
 

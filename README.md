@@ -1,7 +1,9 @@
 # LinkSites
 
 <p align="center">
-  <img src="assets/logoLS.png" alt="LinkSites" width="180" />
+  <a href="https://linksites.github.io/linksites" target="_blank" title="Acessar LinkSites">
+  <img src="assets/logoLS.png" alt="Logo LinkSites - Acesse nossa plataforma" width="180" />
+</a>
 </p>
 
 <p align="center"><strong>LinkSites</strong></p>

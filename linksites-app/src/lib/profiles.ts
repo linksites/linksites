@@ -44,6 +44,35 @@ function mapProfile(profile: ProfileRow, links: LinkRow[]): ProfileWithLinks {
   };
 }
 
+export const getProfileByUserId = cache(async (userId: string): Promise<ProfileWithLinks | null> => {
+  if (!hasSupabaseEnv()) {
+    return demoProfile;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, bio, avatar_url, theme_slug, is_published")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    return null;
+  }
+
+  const { data: links, error: linksError } = await supabase
+    .from("links")
+    .select("id, title, url, position, is_active")
+    .eq("profile_id", profile.id)
+    .order("position", { ascending: true });
+
+  if (linksError) {
+    return mapProfile(profile as ProfileRow, []);
+  }
+
+  return mapProfile(profile as ProfileRow, (links ?? []) as LinkRow[]);
+});
+
 export const getPublicProfileByUsername = cache(async (username: string): Promise<ProfileWithLinks | null> => {
   if (!hasSupabaseEnv()) {
     return username === demoProfile.username ? demoProfile : null;

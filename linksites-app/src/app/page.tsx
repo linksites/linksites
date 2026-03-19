@@ -3,6 +3,7 @@ import { ProfilePreview } from "@/components/profile-preview";
 import { SectionHeading } from "@/components/section-heading";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
+import { getCurrentViewer } from "@/lib/viewer";
 
 const featureList = [
   {
@@ -26,8 +27,9 @@ const milestones = [
   "Analytics and click tracking",
 ];
 
-export default function Home() {
+export default async function Home() {
   const envReady = hasSupabaseEnv();
+  const viewer = await getCurrentViewer();
 
   return (
     <div className="page-shell">
@@ -39,8 +41,25 @@ export default function Home() {
             </div>
             <p className="mt-2 text-sm text-white/56">SaaS layer for creator pages and premium mini sites.</p>
           </div>
-          <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.26em] text-white/56">
-            {envReady ? "Supabase connected" : "Mock mode"}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.26em] text-white/56">
+              {envReady ? "Supabase connected" : "Mock mode"}
+            </div>
+            {viewer.user ? (
+              <Link
+                href="/dashboard"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/24 bg-cyan-300/10 px-5 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
+              >
+                Continue to dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/5 px-5 py-2 text-sm font-medium text-white/80 transition hover:border-cyan-300/24 hover:text-cyan-100"
+              >
+                Sign in
+              </Link>
+            )}
           </div>
         </header>
 
@@ -59,10 +78,10 @@ export default function Home() {
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/dashboard"
+                href={viewer.user ? "/dashboard" : "/login"}
                 className="inline-flex min-h-13 items-center justify-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] px-6 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-px"
               >
-                Open MVP dashboard
+                {viewer.user ? "Open creator dashboard" : "Create account"}
               </Link>
               <Link
                 href="/u/demo"
@@ -83,7 +102,7 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center lg:justify-end">
-            <ProfilePreview profile={demoProfile} />
+            <ProfilePreview profile={viewer.profile ?? demoProfile} />
           </div>
         </section>
 

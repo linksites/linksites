@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   revalidatePath("/", "layout");
 
-  return NextResponse.redirect(new URL("/login?message=Signed out successfully.", request.url), {
+  return NextResponse.redirect(new URL("/login?message=signed_out", request.url), {
     status: 302,
   });
 }

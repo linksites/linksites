@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { LanguageToggle } from "@/components/language-toggle";
 import { ProfilePreview } from "@/components/profile-preview";
+import { appContent } from "@/data/app-content";
+import { getServerLocale } from "@/lib/locale-server";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getCurrentViewer } from "@/lib/viewer";
 
 export default async function DashboardPage() {
+  const locale = await getServerLocale();
+  const content = appContent[locale];
   const viewer = await getCurrentViewer();
   const usingMockData = !hasSupabaseEnv() || viewer.isMock;
 
   if (!usingMockData && !viewer.user) {
-    redirect("/login?message=Sign in to access your creator dashboard.");
+    redirect("/login?message=sign_in_required");
   }
 
   const profile =
@@ -20,44 +25,48 @@ export default async function DashboardPage() {
       : {
           id: "pending-profile",
           username: viewer.user?.email?.split("@")[0] ?? "new-user",
-          displayName: viewer.user?.email?.split("@")[0] ?? "New creator",
-          bio: "Your account is authenticated, but your profile record still needs to be created or linked in the database.",
+          displayName: viewer.user?.email?.split("@")[0] ?? content.dashboard.pendingProfileName,
+          bio: content.dashboard.pendingProfileBio,
           avatarUrl: null,
           themeSlug: "midnight-grid" as const,
           isPublished: false,
           links: [],
         });
   const editorFields = [
-    { label: "Display name", value: profile.displayName },
-    { label: "Username", value: profile.username },
-    { label: "Bio", value: profile.bio },
+    { label: content.dashboard.fields.displayName, value: profile.displayName },
+    { label: content.dashboard.fields.username, value: profile.username },
+    { label: content.dashboard.fields.bio, value: profile.bio },
   ];
+  const dashboardTitle = content.dashboard.title.replace("{name}", profile.displayName);
+  const publishedDescription = content.dashboard.profilePublishedDescription.replace("{username}", profile.username);
 
   return (
     <div className="page-shell min-h-screen">
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[var(--accent)]">Dashboard MVP</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[var(--accent)]">{content.dashboard.eyebrow}</p>
             <h1 className="mt-3 font-[var(--font-display)] text-4xl font-semibold tracking-tight text-white">
-              Welcome back, {profile.displayName}
+              {dashboardTitle}
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/64">
-              Your account is now connected to the product layer. This dashboard already reflects real session state
-              and can grow into editing, analytics, plans, and publishing controls.
-            </p>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/64">{content.dashboard.description}</p>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageToggle
+              locale={locale}
+              label={content.shared.languageLabel}
+              locales={content.shared.locales}
+            />
             <Link
               href="/"
               className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/4 px-5 py-2 text-sm text-white/78"
             >
-              Back to app home
+              {content.shared.backHome}
             </Link>
             <form action="/auth/signout" method="post">
               <button className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-5 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px">
-                Sign out
+                {content.shared.signOut}
               </button>
             </form>
           </div>
@@ -67,40 +76,42 @@ export default async function DashboardPage() {
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
-                <div className="text-xs uppercase tracking-[0.24em] text-white/42">Session</div>
-                <p className="mt-3 text-lg font-semibold text-white">{viewer.user ? "Authenticated" : "Mock mode"}</p>
+                <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.sessionLabel}</div>
+                <p className="mt-3 text-lg font-semibold text-white">
+                  {viewer.user ? content.dashboard.sessionAuthenticated : content.dashboard.sessionFallback}
+                </p>
                 <p className="mt-2 text-sm leading-7 text-white/58">
-                  {viewer.user?.email ?? "Using the local fallback account while Supabase is unavailable."}
+                  {viewer.user?.email ?? content.dashboard.sessionFallbackDescription}
                 </p>
               </div>
               <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
-                <div className="text-xs uppercase tracking-[0.24em] text-white/42">Profile status</div>
-                <p className="mt-3 text-lg font-semibold text-white">{profile.isPublished ? "Published" : "Draft"}</p>
+                <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.profileStatusLabel}</div>
+                <p className="mt-3 text-lg font-semibold text-white">
+                  {profile.isPublished ? content.dashboard.profilePublished : content.dashboard.profileDraft}
+                </p>
                 <p className="mt-2 text-sm leading-7 text-white/58">
-                  {profile.isPublished
-                    ? `Your public page can already be visited at /u/${profile.username}.`
-                    : "Publish this profile when you want the public page to go live."}
+                  {profile.isPublished ? publishedDescription : content.dashboard.profileDraftDescription}
                 </p>
               </div>
               <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
-                <div className="text-xs uppercase tracking-[0.24em] text-white/42">Unlocked</div>
-                <p className="mt-3 text-lg font-semibold text-white">{profile.links.length} active services</p>
-                <p className="mt-2 text-sm leading-7 text-white/58">
-                  Public profile, link stack, visual theme, and protected dashboard access are already connected.
+                <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.unlockedLabel}</div>
+                <p className="mt-3 text-lg font-semibold text-white">
+                  {profile.links.length} {content.dashboard.unlockedSuffix}
                 </p>
+                <p className="mt-2 text-sm leading-7 text-white/58">{content.dashboard.unlockedDescription}</p>
               </div>
             </div>
 
             <div className="rounded-[2rem] border border-white/8 bg-[var(--panel)] p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.24em] text-white/42">Creator identity</div>
+                  <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.identityLabel}</div>
                   <h2 className="mt-2 font-[var(--font-display)] text-2xl font-semibold text-white">
-                    Profile information from your account
+                    {content.dashboard.identityTitle}
                   </h2>
                 </div>
                 <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[var(--accent)]">
-                  {usingMockData ? "Fallback data" : "Live from Supabase"}
+                  {usingMockData ? content.dashboard.identityFallback : content.dashboard.identityLive}
                 </div>
               </div>
 
@@ -118,7 +129,7 @@ export default async function DashboardPage() {
               </div>
 
               <div className="mt-6">
-                <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">Links</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">{content.dashboard.fields.links}</div>
                 <div className="mt-4 space-y-3">
                   {profile.links.length ? (
                     profile.links.map((link, index) => (
@@ -133,29 +144,26 @@ export default async function DashboardPage() {
                           <p className="mt-1 text-xs text-white/54">{link.url}</p>
                         </div>
                         <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.22em] text-[var(--accent)]">
-                          {link.isActive ? "Active" : "Inactive"}
+                          {link.isActive ? content.dashboard.linkActive : content.dashboard.linkInactive}
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="rounded-[1.4rem] border border-dashed border-white/12 bg-white/3 px-4 py-5 text-sm leading-7 text-white/58">
-                      No links yet. The next phase will let users create and edit them directly from this dashboard.
+                      {content.dashboard.emptyLinks}
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="mt-6 rounded-[1.6rem] border border-dashed border-white/12 bg-white/3 p-5">
-                <p className="text-sm leading-7 text-white/62">
-                  Next implementation step: replace this read-only state with editable profile and link actions, then
-                  add save feedback and onboarding progress.
-                </p>
+                <p className="text-sm leading-7 text-white/62">{content.dashboard.nextStep}</p>
               </div>
             </div>
           </div>
 
           <div className="flex justify-center lg:justify-end">
-            <ProfilePreview profile={profile} compact />
+            <ProfilePreview profile={profile} compact locale={locale} />
           </div>
         </section>
       </main>

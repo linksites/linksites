@@ -1,10 +1,13 @@
 import clsx from "clsx";
+import { appContent } from "@/data/app-content";
+import type { AppLocale } from "@/lib/locale";
 import { themeCatalog } from "@/lib/mock-data";
 import type { ProfileWithLinks } from "@/lib/types";
 
 type ProfilePreviewProps = {
   profile: ProfileWithLinks;
   compact?: boolean;
+  locale?: AppLocale;
 };
 
 function getInitials(name: string) {
@@ -15,8 +18,9 @@ function getInitials(name: string) {
     .join("");
 }
 
-export function ProfilePreview({ profile, compact = false }: ProfilePreviewProps) {
+export function ProfilePreview({ profile, compact = false, locale = "ptBR" }: ProfilePreviewProps) {
   const theme = themeCatalog[profile.themeSlug];
+  const content = appContent[locale];
 
   return (
     <section
@@ -54,7 +58,7 @@ export function ProfilePreview({ profile, compact = false }: ProfilePreviewProps
               style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
             >
               <span>{link.title}</span>
-              <span className="text-[var(--accent)]">Open</span>
+              <span className="text-[var(--accent)]">{content.shared.previewOpen}</span>
             </a>
           ))}
         </div>

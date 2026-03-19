@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   }
 
   redirectTo.pathname = "/login";
-  redirectTo.searchParams.set("error", "We could not verify that email link.");
+  redirectTo.searchParams.set("error", "verify_link_failed");
 
   return NextResponse.redirect(redirectTo);
 }

@@ -14,7 +14,7 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "").trim();
 
   if (!email || !password) {
-    redirect(buildMessageUrl("/login", "error", "Enter your email and password to continue."));
+    redirect(buildMessageUrl("/login", "error", "missing_credentials"));
   }
 
   const supabase = await createSupabaseServerClient();
@@ -24,7 +24,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect(buildMessageUrl("/login", "error", error.message));
+    redirect(buildMessageUrl("/login", "error", "could_not_sign_in"));
   }
 
   revalidatePath("/", "layout");
@@ -38,7 +38,7 @@ export async function signup(formData: FormData) {
   const origin = headerStore.get("origin") ?? "http://localhost:3000";
 
   if (!email || !password) {
-    redirect(buildMessageUrl("/login", "error", "Enter your email and password to create your account."));
+    redirect(buildMessageUrl("/login", "error", "missing_signup_credentials"));
   }
 
   const supabase = await createSupabaseServerClient();
@@ -51,11 +51,11 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    redirect(buildMessageUrl("/login", "error", error.message));
+    redirect(buildMessageUrl("/login", "error", "could_not_sign_up"));
   }
 
   revalidatePath("/", "layout");
-  redirect(buildMessageUrl("/login", "message", "Check your email to confirm your account."));
+  redirect(buildMessageUrl("/login", "message", "check_email"));
 }
 
 export async function magicLink(formData: FormData) {
@@ -64,7 +64,7 @@ export async function magicLink(formData: FormData) {
   const origin = headerStore.get("origin") ?? "http://localhost:3000";
 
   if (!email) {
-    redirect(buildMessageUrl("/login", "error", "Enter your email to receive a magic link."));
+    redirect(buildMessageUrl("/login", "error", "missing_magic_email"));
   }
 
   const supabase = await createSupabaseServerClient();
@@ -76,8 +76,8 @@ export async function magicLink(formData: FormData) {
   });
 
   if (error) {
-    redirect(buildMessageUrl("/login", "error", error.message));
+    redirect(buildMessageUrl("/login", "error", "could_not_send_magic_link"));
   }
 
-  redirect(buildMessageUrl("/login", "message", "Magic link sent. Check your inbox."));
+  redirect(buildMessageUrl("/login", "message", "magic_link_sent"));
 }

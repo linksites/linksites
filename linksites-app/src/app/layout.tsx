@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { appContent } from "@/data/app-content";
+import { getServerLocale } from "@/lib/locale-server";
 import { Space_Grotesk, Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -12,19 +14,26 @@ const bodyFont = Outfit({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "LinkSites App | Creator Pages and Mini Sites",
-  description:
-    "The LinkSites SaaS layer for premium link-in-bio pages, creator pages, and professional mini sites.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const content = appContent[locale];
 
-export default function RootLayout({
+  return {
+    title: content.metadata.title,
+    description: content.metadata.description,
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getServerLocale();
+  const content = appContent[locale];
+
   return (
-    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang={content.lang} className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>{children}</body>
     </html>
   );

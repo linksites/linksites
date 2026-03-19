@@ -1,4 +1,5 @@
 import { cache } from "react";
+import type { User } from "@supabase/supabase-js";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -42,6 +43,96 @@ function mapProfile(profile: ProfileRow, links: LinkRow[]): ProfileWithLinks {
         isActive: link.is_active,
       })),
   };
+}
+
+function normalizeUsernameSeed(value: string) {
+  const normalized = value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  if (!normalized) {
+    return "creator";
+  }
+
+  if (normalized.length >= 3) {
+    return normalized.slice(0, 32).replace(/-+$/g, "") || "creator";
+  }
+
+  return `${normalized}${"creator".slice(0, 3 - normalized.length)}`;
+}
+
+function buildDisplayName(user: User) {
+  const metadataName =
+    typeof user.user_metadata?.display_name === "string"
+      ? user.user_metadata.display_name
+      : typeof user.user_metadata?.full_name === "string"
+        ? user.user_metadata.full_name
+        : null;
+
+  if (metadataName?.trim()) {
+    return metadataName.trim();
+  }
+
+  const emailName = user.email?.split("@")[0]?.replace(/[._-]+/g, " ").trim();
+
+  if (emailName) {
+    return emailName.replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
+
+  return "New creator";
+}
+
+export async function ensureProfileForUser(user: User): Promise<ProfileWithLinks | null> {
+  if (!hasSupabaseEnv()) {
+    return demoProfile;
+  }
+
+  const existingProfile = await getProfileByUserId(user.id);
+
+  if (existingProfile) {
+    return existingProfile;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const baseUsername = normalizeUsernameSeed(
+    user.user_metadata?.username ||
+      user.user_metadata?.user_name ||
+      user.email?.split("@")[0] ||
+      user.id.slice(0, 8),
+  );
+  const displayName = buildDisplayName(user);
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const suffix = attempt === 0 ? "" : `-${attempt + 1}`;
+    const candidateUsername = `${baseUsername.slice(0, 32 - suffix.length)}${suffix}`;
+    const { error } = await supabase.from("profiles").insert({
+      user_id: user.id,
+      username: candidateUsername,
+      display_name: displayName,
+      bio: "",
+    });
+
+    if (!error) {
+      return getProfileByUserId(user.id);
+    }
+
+    if (error.code === "23505") {
+      const profileAfterConflict = await getProfileByUserId(user.id);
+
+      if (profileAfterConflict) {
+        return profileAfterConflict;
+      }
+
+      continue;
+    }
+
+    return null;
+  }
+
+  return getProfileByUserId(user.id);
 }
 
 export const getProfileByUserId = cache(async (userId: string): Promise<ProfileWithLinks | null> => {

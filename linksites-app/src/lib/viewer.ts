@@ -2,7 +2,7 @@ import { cache } from "react";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { demoProfile } from "@/lib/mock-data";
-import { getProfileByUserId } from "@/lib/profiles";
+import { ensureProfileForUser, getProfileByUserId } from "@/lib/profiles";
 
 export const getCurrentViewer = cache(async () => {
   if (!hasSupabaseEnv()) {
@@ -29,7 +29,7 @@ export const getCurrentViewer = cache(async () => {
     };
   }
 
-  const profile = await getProfileByUserId(user.id);
+  const profile = (await getProfileByUserId(user.id)) ?? (await ensureProfileForUser(user));
 
   return {
     user,

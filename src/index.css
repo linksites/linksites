@@ -150,6 +150,7 @@ a {
   border-radius: 999px;
   border: 1px solid rgba(98, 240, 235, 0.14);
   pointer-events: none;
+  animation: orbitPulse 5.5s ease-in-out infinite;
 }
 
 .hero-orbit::before {
@@ -160,6 +161,107 @@ a {
 .hero-orbit::after {
   inset: 20% 12%;
   transform: rotate(82deg) scaleX(0.62);
+  animation-delay: -1.8s;
+}
+
+.hero-energy-shell {
+  isolation: isolate;
+}
+
+.hero-energy-shell::before,
+.hero-energy-shell::after {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  border-radius: 2.8rem;
+  pointer-events: none;
+}
+
+.hero-energy-shell::before {
+  inset: -3%;
+  border: 1px solid rgba(98, 240, 235, 0.28);
+  box-shadow:
+    0 0 1.5rem rgba(98, 240, 235, 0.18),
+    inset 0 0 1rem rgba(98, 240, 235, 0.08);
+  animation: energyPulse 2.4s ease-in-out infinite;
+}
+
+.hero-energy-shell::after {
+  border: 2px solid transparent;
+  border-top-color: rgba(98, 240, 235, 0.95);
+  border-right-color: rgba(113, 204, 255, 0.72);
+  border-bottom-color: rgba(59, 130, 246, 0.38);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 1rem rgba(98, 240, 235, 0.28));
+  animation:
+    energySpin 8.5s linear infinite,
+    energyGlow 3s ease-in-out infinite;
+}
+
+.hero-energy-logo {
+  position: relative;
+  z-index: 2;
+  animation: logoFloat 4.8s ease-in-out infinite;
+}
+
+@keyframes orbitPulse {
+  0%,
+  100% {
+    opacity: 0.46;
+    box-shadow: 0 0 0 rgba(98, 240, 235, 0);
+  }
+
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 1.8rem rgba(98, 240, 235, 0.12);
+  }
+}
+
+@keyframes energySpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes energyPulse {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: scale(0.985);
+  }
+
+  50% {
+    opacity: 0.96;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes energyGlow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 0.92;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes logoFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -0.35rem, 0);
+  }
 }
 
 @media (max-width: 768px) {
@@ -177,6 +279,14 @@ a {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .hero-orbit::before,
+  .hero-orbit::after,
+  .hero-energy-shell::before,
+  .hero-energy-shell::after,
+  .hero-energy-logo {
+    animation: none;
   }
 }
 

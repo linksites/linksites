@@ -179,9 +179,9 @@ const heroPoints = [
 const REPO_UPDATE_LOADING = "Consultando atualização...";
 const REPO_UPDATE_FALLBACK = "Atualização indisponível";
 
-function formatRelativeTime(dateString) {
+function formatRelativeTime(dateString, now = Date.now()) {
   const updatedAt = new Date(dateString);
-  const diffMs = Date.now() - updatedAt.getTime();
+  const diffMs = now - updatedAt.getTime();
 
   if (!Number.isFinite(updatedAt.getTime()) || diffMs < 0) {
     return "agora";
@@ -223,12 +223,12 @@ function formatRelativeTime(dateString) {
   return years === 1 ? "há 1 ano" : `há ${years} anos`;
 }
 
-function formatRepoUpdateStatus(dateString) {
+function formatRepoUpdateStatus(dateString, now) {
   if (!dateString) {
     return REPO_UPDATE_FALLBACK;
   }
 
-  return `Atualizado ${formatRelativeTime(dateString)}`;
+  return `Atualizado ${formatRelativeTime(dateString, now)}`;
 }
 
 function SectionTag({ children }) {
@@ -308,11 +308,12 @@ function Chevron({ direction }) {
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [repoUpdates, setRepoUpdates] = useState({});
+  const [repoUpdateDates, setRepoUpdateDates] = useState({});
   const [visitCount, setVisitCount] = useState("Sincronizando");
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
   const [isCurrentSiteDialogOpen, setIsCurrentSiteDialogOpen] = useState(false);
+  const [timeTick, setTimeTick] = useState(() => Date.now());
   const trackRef = useRef(null);
   const dragStateRef = useRef({
     isPointerDown: false,
@@ -348,7 +349,7 @@ export default function App() {
 
             return {
               key: `${item.owner}/${item.repo}`,
-              value: formatRepoUpdateStatus(repo.pushed_at),
+              value: repo.pushed_at || null,
             };
         }),
       );
@@ -368,10 +369,10 @@ export default function App() {
           return;
         }
 
-        nextUpdates[key] = REPO_UPDATE_FALLBACK;
+        nextUpdates[key] = null;
       });
 
-      setRepoUpdates(nextUpdates);
+      setRepoUpdateDates(nextUpdates);
     }
 
     loadRepoUpdates();
@@ -379,6 +380,16 @@ export default function App() {
     return () => {
       active = false;
       controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setTimeTick(Date.now());
+    }, 60 * 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -755,11 +766,11 @@ export default function App() {
                   <div className="absolute inset-[14%] rounded-full border border-cyan-300/12" />
                   <div className="absolute inset-[18%] rounded-full border border-white/6" />
 
-                  <div className="relative flex h-[16rem] w-[16rem] items-center justify-center rounded-[2.2rem] border border-cyan-300/12 bg-[radial-gradient(circle_at_50%_30%,rgba(98,240,235,0.12),rgba(9,19,31,0.18)_55%,rgba(9,19,31,0)_78%)] shadow-[0_24px_70px_rgba(6,12,22,0.38)] sm:h-[19rem] sm:w-[19rem]">
+                  <div className="hero-energy-shell relative flex h-[16rem] w-[16rem] items-center justify-center rounded-[2.2rem] border border-cyan-300/12 bg-[radial-gradient(circle_at_50%_30%,rgba(98,240,235,0.12),rgba(9,19,31,0.18)_55%,rgba(9,19,31,0)_78%)] shadow-[0_24px_70px_rgba(6,12,22,0.38)] sm:h-[19rem] sm:w-[19rem]">
                     <img
                       src={heroLogo}
                       alt="Marca transparente da LinkSites"
-                      className="h-full w-full object-contain drop-shadow-[0_0_42px_rgba(98,240,235,0.2)]"
+                      className="hero-energy-logo h-full w-full object-contain drop-shadow-[0_0_42px_rgba(98,240,235,0.2)]"
                     />
                   </div>
                 </div>
@@ -898,6 +909,7 @@ export default function App() {
             >
               {cases.map((item, index) => {
                 const repoKey = `${item.owner}/${item.repo}`;
+                const repoUpdateLabel = formatRepoUpdateStatus(repoUpdateDates[repoKey], timeTick);
 
                 return (
                   <article
@@ -959,7 +971,7 @@ export default function App() {
                             Último push
                           </p>
                           <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
-                            {repoUpdates[repoKey] ?? REPO_UPDATE_LOADING}
+                            {repoUpdateDates[repoKey] === undefined ? REPO_UPDATE_LOADING : repoUpdateLabel}
                           </p>
                         </div>
                       </div>

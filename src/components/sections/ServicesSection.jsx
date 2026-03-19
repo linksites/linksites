@@ -1,22 +1,19 @@
 import SectionTag from "../shared/SectionTag";
 import ServiceIcon from "../shared/ServiceIcon";
 
-export default function ServicesSection({ services }) {
+export default function ServicesSection({ content }) {
   return (
     <section id="servicos" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="max-w-2xl" data-reveal="">
-        <SectionTag>Servicos</SectionTag>
+        <SectionTag>{content.tag}</SectionTag>
         <h2 className="mt-5 font-display text-4xl tracking-tight text-white sm:text-5xl">
-          Solucoes digitais para marcas que querem crescer com clareza.
+          {content.title}
         </h2>
-        <p className="mt-4 text-lg leading-8 text-white/62">
-          A nova interface continua elegante, mas agora com o conteudo institucional completo da LinkSites
-          e uma oferta muito mais fiel ao que a empresa entrega.
-        </p>
+        <p className="mt-4 text-lg leading-8 text-white/62">{content.description}</p>
       </div>
 
       <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {services.map((service, index) => (
+        {content.items.map((service, index) => (
           <article
             key={service.title}
             data-reveal=""

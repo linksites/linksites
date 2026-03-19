@@ -1,66 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import AboutSection from "./components/sections/AboutSection";
 import ContactSection from "./components/sections/ContactSection";
 import CurrentSiteDialog from "./components/sections/CurrentSiteDialog";
 import DifferentialsSection from "./components/sections/DifferentialsSection";
 import HeroSection from "./components/sections/HeroSection";
+import PlansSection from "./components/sections/PlansSection";
 import PortfolioSection from "./components/sections/PortfolioSection";
 import ServicesSection from "./components/sections/ServicesSection";
 import SiteFooter from "./components/sections/SiteFooter";
 import SiteHeader from "./components/sections/SiteHeader";
-import { cases } from "./data/cases";
+import { localizedCases } from "./data/cases";
+import { siteContent } from "./data/siteContent";
 
-const navItems = [
-  { label: "Início", href: "#inicio" },
-  { label: "Serviços", href: "#servicos" },
-  { label: "Diferenciais", href: "#diferenciais" },
-  { label: "Portfólio", href: "#portfolio" },
-  { label: "Sobre", href: "#sobre" },
-  { label: "Contato", href: "#contato" },
-];
-
-const services = [
-  {
-    icon: "globe",
-    accent: "Presença institucional",
-    title: "Sites Corporativos",
-    text: "Desenvolvimento de sites institucionais, landing pages e portais empresariais com tecnologia de ponta.",
-  },
-  {
-    icon: "cart",
-    accent: "Venda digital",
-    title: "Lojas Virtuais",
-    text: "E-commerce completo, seguro e escalável para impulsionar suas vendas online.",
-  },
-  {
-    icon: "chart",
-    accent: "Visibilidade online",
-    title: "SEO & Marketing",
-    text: "Otimização para buscadores e estratégias digitais para você ser encontrado e crescer.",
-  },
-  {
-    icon: "shield",
-    accent: "Base e suporte",
-    title: "Hospedagem & Suporte",
-    text: "Infraestrutura robusta, monitoramento e atendimento ágil para seu site nunca parar.",
-  },
-];
-
-const differentials = [
-  "Segurança e performance de alto nível",
-  "Entrega rápida e processos inteligentes",
-  "Atendimento consultivo e personalizado",
-  "Soluções escaláveis e inovadoras",
-  "Equipe Techlab: expertise e paixão por tecnologia",
-];
-
-const heroPoints = [
-  "Identidade futurista",
-  "Rede visual premium",
-  "Experiência responsiva",
-];
-
-const githubRepoGroups = cases.reduce((groups, item) => {
+const repoCaseSource = localizedCases.ptBR;
+const githubRepoGroups = repoCaseSource.reduce((groups, item) => {
   const existingRepos = groups[item.owner] ?? [];
 
   if (!existingRepos.includes(item.repo)) {
@@ -71,7 +23,7 @@ const githubRepoGroups = cases.reduce((groups, item) => {
 }, {});
 
 function createRepoUpdateMap(defaultValue = null) {
-  return cases.reduce((repoUpdates, item) => {
+  return repoCaseSource.reduce((repoUpdates, item) => {
     repoUpdates[`${item.owner}/${item.repo}`] = defaultValue;
     return repoUpdates;
   }, {});
@@ -80,7 +32,7 @@ function createRepoUpdateMap(defaultValue = null) {
 function normalizeRepoUpdates(rawUpdates = {}) {
   const normalizedUpdates = createRepoUpdateMap();
 
-  cases.forEach((item) => {
+  repoCaseSource.forEach((item) => {
     const key = `${item.owner}/${item.repo}`;
     normalizedUpdates[key] = rawUpdates[key] ?? null;
   });
@@ -135,9 +87,16 @@ async function fetchSnapshotRepoUpdates(repoUpdatesUrl, signal) {
 }
 
 export default function App() {
+  const [locale, setLocale] = useState(() => {
+    try {
+      return window.localStorage.getItem("linksites-locale") ?? "ptBR";
+    } catch {
+      return "ptBR";
+    }
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const [repoUpdateDates, setRepoUpdateDates] = useState({});
-  const [visitCount, setVisitCount] = useState("Sincronizando");
+  const [visitCount, setVisitCount] = useState(siteContent.ptBR.visitCount.loading);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
   const [isCurrentSiteDialogOpen, setIsCurrentSiteDialogOpen] = useState(false);
@@ -149,6 +108,27 @@ export default function App() {
     startX: 0,
     startScrollLeft: 0,
   });
+
+  const content = siteContent[locale] ?? siteContent.ptBR;
+  const cases = localizedCases[locale] ?? localizedCases.ptBR;
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("linksites-locale", locale);
+    } catch {
+      // Ignore storage issues and keep the selected locale in memory.
+    }
+  }, [locale]);
+
+  useEffect(() => {
+    document.documentElement.lang = content.lang;
+    document.title = content.metadata.title;
+
+    const description = document.querySelector('meta[name="description"]');
+    if (description) {
+      description.setAttribute("content", content.metadata.description);
+    }
+  }, [content]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -262,11 +242,11 @@ export default function App() {
         }
 
         if (active) {
-          setVisitCount(value.toLocaleString("pt-BR"));
+          setVisitCount(value.toLocaleString(content.numberLocale));
         }
       } catch {
         if (active) {
-          setVisitCount("Offline");
+          setVisitCount(content.visitCount.offline);
         }
       }
     }
@@ -276,7 +256,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [content.numberLocale, content.visitCount.offline]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -333,7 +313,7 @@ export default function App() {
   }
 
   function handleProjectClick(event, item) {
-    if (item.repo !== "linksites") {
+    if (item.repo !== content.portfolio.currentDemoRepo) {
       return;
     }
 
@@ -433,12 +413,19 @@ export default function App() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(98,240,235,0.09),transparent_28%),linear-gradient(180deg,#08111d_0%,#0b1625_45%,#07101b_100%)]" />
       </div>
 
-      <SiteHeader navItems={navItems} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <SiteHeader
+        navItems={content.navItems}
+        header={content.header}
+        locale={locale}
+        setLocale={setLocale}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+      />
 
       <main id="inicio">
-        <HeroSection heroPoints={heroPoints} />
-        <ServicesSection services={services} />
-        <DifferentialsSection differentials={differentials} />
+        <HeroSection hero={content.hero} />
+        <ServicesSection content={content.services} />
+        <DifferentialsSection content={content.audiences} />
         <PortfolioSection
           canScrollPrev={canScrollPrev}
           canScrollNext={canScrollNext}
@@ -449,17 +436,20 @@ export default function App() {
           handleTrackPointerMove={handleTrackPointerMove}
           handleTrackPointerUp={handleTrackPointerUp}
           handleTrackWheel={handleTrackWheel}
+          content={content.portfolio}
+          caseCardContent={content.caseCard}
           cases={cases}
           repoUpdateDates={repoUpdateDates}
           onProjectClick={handleProjectClick}
         />
-        <AboutSection visitCount={visitCount} />
-        <ContactSection />
+        <PlansSection content={content.plans} visitCount={visitCount} />
+        <ContactSection content={content.contact} />
       </main>
 
-      <SiteFooter />
+      <SiteFooter content={content.footer} />
       <CurrentSiteDialog
         open={isCurrentSiteDialogOpen}
+        content={content.dialog}
         onClose={() => setIsCurrentSiteDialogOpen(false)}
       />
     </div>

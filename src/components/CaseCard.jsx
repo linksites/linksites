@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 
-const REPO_UPDATE_LOADING = "Consultando atualizacao...";
-const REPO_UPDATE_FALLBACK = "Atualizacao indisponivel";
-
-function getRelativeTimeState(dateString, now = Date.now()) {
+function getRelativeTimeState(dateString, relativeTimeContent, now = Date.now()) {
   const updatedAt = new Date(dateString);
   const updatedAtMs = updatedAt.getTime();
   const diffMs = now - updatedAtMs;
 
   if (!Number.isFinite(updatedAtMs) || diffMs < 0) {
     return {
-      label: "agora",
+      label: relativeTimeContent.now,
       nextUpdateInMs: 60 * 1000,
     };
   }
@@ -29,7 +26,10 @@ function getRelativeTimeState(dateString, now = Date.now()) {
   if (diffMs < hourMs) {
     const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
     return {
-      label: minutes === 1 ? "ha 1 minuto" : `ha ${minutes} minutos`,
+      label:
+        minutes === 1
+          ? relativeTimeContent.minute[0]
+          : relativeTimeContent.minute[1].replace("{value}", String(minutes)),
       nextUpdateInMs: getNextBoundary(minuteMs),
     };
   }
@@ -37,7 +37,7 @@ function getRelativeTimeState(dateString, now = Date.now()) {
   if (diffMs < dayMs) {
     const hours = Math.floor(diffMs / hourMs);
     return {
-      label: hours === 1 ? "ha 1 hora" : `ha ${hours} horas`,
+      label: hours === 1 ? relativeTimeContent.hour[0] : relativeTimeContent.hour[1].replace("{value}", String(hours)),
       nextUpdateInMs: getNextBoundary(hourMs),
     };
   }
@@ -45,7 +45,7 @@ function getRelativeTimeState(dateString, now = Date.now()) {
   if (diffMs < weekMs) {
     const days = Math.floor(diffMs / dayMs);
     return {
-      label: days === 1 ? "ha 1 dia" : `ha ${days} dias`,
+      label: days === 1 ? relativeTimeContent.day[0] : relativeTimeContent.day[1].replace("{value}", String(days)),
       nextUpdateInMs: getNextBoundary(dayMs),
     };
   }
@@ -53,7 +53,8 @@ function getRelativeTimeState(dateString, now = Date.now()) {
   if (diffMs < monthMs) {
     const weeks = Math.floor(diffMs / weekMs);
     return {
-      label: weeks === 1 ? "ha 1 semana" : `ha ${weeks} semanas`,
+      label:
+        weeks === 1 ? relativeTimeContent.week[0] : relativeTimeContent.week[1].replace("{value}", String(weeks)),
       nextUpdateInMs: getNextBoundary(weekMs),
     };
   }
@@ -61,44 +62,47 @@ function getRelativeTimeState(dateString, now = Date.now()) {
   if (diffMs < yearMs) {
     const months = Math.floor(diffMs / monthMs);
     return {
-      label: months === 1 ? "ha 1 mes" : `ha ${months} meses`,
+      label:
+        months === 1
+          ? relativeTimeContent.month[0]
+          : relativeTimeContent.month[1].replace("{value}", String(months)),
       nextUpdateInMs: getNextBoundary(monthMs),
     };
   }
 
   const years = Math.floor(diffMs / yearMs);
   return {
-    label: years === 1 ? "ha 1 ano" : `ha ${years} anos`,
+    label: years === 1 ? relativeTimeContent.year[0] : relativeTimeContent.year[1].replace("{value}", String(years)),
     nextUpdateInMs: getNextBoundary(yearMs),
   };
 }
 
-function formatRelativeTime(dateString, now = Date.now()) {
-  return getRelativeTimeState(dateString, now).label;
+function formatRelativeTime(dateString, relativeTimeContent, now = Date.now()) {
+  return getRelativeTimeState(dateString, relativeTimeContent, now).label;
 }
 
-function formatRepoUpdateStatus(dateString, now) {
+function formatRepoUpdateStatus(dateString, content, now) {
   if (!dateString) {
-    return REPO_UPDATE_FALLBACK;
+    return content.fallback;
   }
 
-  return `Atualizado ${formatRelativeTime(dateString, now)}`;
+  return `${content.updatedPrefix} ${formatRelativeTime(dateString, content.relativeTime, now)}`;
 }
 
-function useRelativeRepoUpdateLabel(dateString) {
-  const [label, setLabel] = useState(() => formatRepoUpdateStatus(dateString));
+function useRelativeRepoUpdateLabel(dateString, content) {
+  const [label, setLabel] = useState(() => formatRepoUpdateStatus(dateString, content));
 
   useEffect(() => {
     if (!dateString) {
-      setLabel(REPO_UPDATE_FALLBACK);
+      setLabel(content.fallback);
       return undefined;
     }
 
     let timeoutId;
 
     const updateLabel = () => {
-      const { label: relativeLabel, nextUpdateInMs } = getRelativeTimeState(dateString, Date.now());
-      setLabel(`Atualizado ${relativeLabel}`);
+      const { label: relativeLabel, nextUpdateInMs } = getRelativeTimeState(dateString, content.relativeTime, Date.now());
+      setLabel(`${content.updatedPrefix} ${relativeLabel}`);
       timeoutId = window.setTimeout(updateLabel, nextUpdateInMs);
     };
 
@@ -107,14 +111,14 @@ function useRelativeRepoUpdateLabel(dateString) {
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [dateString]);
+  }, [content, dateString]);
 
   return label;
 }
 
-export default function CaseCard({ item, index, repoDate, onProjectClick }) {
+export default function CaseCard({ item, index, repoDate, content, onProjectClick }) {
   const repoKey = `${item.owner}/${item.repo}`;
-  const repoUpdateLabel = useRelativeRepoUpdateLabel(repoDate);
+  const repoUpdateLabel = useRelativeRepoUpdateLabel(repoDate, content);
   const isRepoUpdateLoading = repoDate === undefined;
 
   return (
@@ -146,7 +150,7 @@ export default function CaseCard({ item, index, repoDate, onProjectClick }) {
           </div>
           <span className="status-live rounded-full border border-emerald-400/24 bg-emerald-400/10 px-3 py-1 text-[0.65rem] uppercase tracking-[0.2em] text-emerald-200">
             <span className="status-live-dot" />
-            Online
+            {content.online}
           </span>
         </div>
 
@@ -161,17 +165,15 @@ export default function CaseCard({ item, index, repoDate, onProjectClick }) {
               rel="noreferrer"
               className="mt-3 inline-flex max-w-full items-center gap-2 text-[0.72rem] text-white/52 transition hover:text-cyan-100/80"
             >
-              <span className="truncate">{`github.com/${item.owner}`}</span>
+              <span className="truncate">{`${content.githubPrefix}/${item.owner}`}</span>
               <span className="text-white/28">/</span>
               <span className="truncate text-white/42">{item.repo}</span>
             </a>
           </div>
           <div className="w-full rounded-[1rem] border border-white/6 bg-slate-950/25 px-3 py-2 sm:w-auto sm:min-w-[8.5rem] sm:max-w-[9.5rem]">
-            <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40 sm:text-right">
-              Ultimo push
-            </p>
+            <p className="text-[0.64rem] uppercase tracking-[0.2em] text-white/40 sm:text-right">{content.lastPush}</p>
             <p className="mt-1 text-xs font-medium leading-5 text-cyan-100/78 sm:text-right sm:text-sm">
-              {isRepoUpdateLoading ? REPO_UPDATE_LOADING : repoUpdateLabel}
+              {isRepoUpdateLoading ? content.loading : repoUpdateLabel}
             </p>
           </div>
         </div>
@@ -184,7 +186,7 @@ export default function CaseCard({ item, index, repoDate, onProjectClick }) {
             onClick={(event) => onProjectClick(event, item)}
             className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px]"
           >
-            Ver projeto
+            {content.viewExample}
           </a>
           <a
             href={item.codeUrl}
@@ -192,7 +194,7 @@ export default function CaseCard({ item, index, repoDate, onProjectClick }) {
             rel="noreferrer"
             className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white/80 transition hover:border-cyan-300/30 hover:text-cyan-100"
           >
-            Ver codigo
+            {content.viewCode}
           </a>
         </div>
       </div>

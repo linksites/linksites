@@ -140,6 +140,21 @@ const cases = [
   },
   {
     owner: "linksites",
+    repo: "democrata",
+    label: "Gastronomia & lifestyle",
+    eyebrow: "Landing page / Experiencia",
+    name: "Democrata",
+    coverTitle: "Democrata",
+    description:
+      "Landing page premium com identidade forte para unir burger artesanal, pub noturno e barbearia em uma unica experiencia.",
+    stack: "CSS",
+    projectUrl: "https://linksites.github.io/democrata/",
+    codeUrl: "https://github.com/linksites/democrata",
+    coverClass:
+      "bg-[radial-gradient(circle_at_24%_18%,rgba(251,191,36,0.18),transparent_24%),radial-gradient(circle_at_76%_26%,rgba(239,68,68,0.18),transparent_28%),linear-gradient(145deg,#2b160f,#120b12)]",
+  },
+  {
+    owner: "linksites",
     repo: "sergiorodrigues",
     label: "Portfolio React",
     eyebrow: "Portfolio / React",

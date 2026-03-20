@@ -28,6 +28,36 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
+  const code = request.nextUrl.searchParams.get("code");
+  const next = request.nextUrl.searchParams.get("next") ?? "/dashboard";
+
+  if (code) {
+    const redirectTo = request.nextUrl.clone();
+    redirectTo.pathname = next;
+    redirectTo.searchParams.delete("code");
+    redirectTo.searchParams.delete("next");
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error) {
+      const redirectResponse = NextResponse.redirect(redirectTo);
+
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+
+      return redirectResponse;
+    }
+
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.delete("code");
+    loginUrl.searchParams.delete("next");
+    loginUrl.searchParams.set("error", "verify_link_failed");
+
+    return NextResponse.redirect(loginUrl);
+  }
+
   await supabase.auth.getUser();
 
   return supabaseResponse;

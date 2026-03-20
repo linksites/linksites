@@ -22,9 +22,9 @@ export const themeCatalog: Record<
 
 export const demoProfile: ProfileWithLinks = {
   id: "demo-profile",
-  username: "linksites",
-  displayName: "LinkSites",
-  bio: "Arvore de links oficial da LinkSites para apresentar a plataforma, direcionar contatos e divulgar a landing publica.",
+  username: "linksitesapp",
+  displayName: "LinkSites App",
+  bio: "Perfil oficial da LinkSites App para apresentar a plataforma, direcionar contatos e mostrar como uma arvore de links profissional pode vender melhor a marca.",
   avatarUrl: null,
   themeSlug: "midnight-grid",
   isPublished: true,

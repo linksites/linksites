@@ -12,6 +12,7 @@ import { appLinks } from "./config/app-links";
 import { localizedCases } from "./data/cases";
 import { siteContent } from "./data/siteContent";
 import { useDialogEscape } from "./hooks/useDialogEscape";
+import { useFormattedPlans } from "./hooks/useFormattedPlans";
 import { useExchangeRate } from "./hooks/useExchangeRate";
 import { useLandingLocale } from "./hooks/useLandingLocale";
 import { usePageMetadata } from "./hooks/usePageMetadata";
@@ -19,7 +20,6 @@ import { usePortfolioTrack } from "./hooks/usePortfolioTrack";
 import { useRepoUpdates } from "./hooks/useRepoUpdates";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
 import { useVisitCount } from "./hooks/useVisitCount";
-import { formatPlanPrice } from "./lib/plan-pricing";
 
 export default function App() {
   const [locale, setLocale] = useLandingLocale();
@@ -50,14 +50,8 @@ export default function App() {
   usePageMetadata(content);
   useRevealOnScroll();
   useDialogEscape(isCurrentSiteDialogOpen, () => setIsCurrentSiteDialogOpen(false));
-
-  const plansContent = {
-    ...content.plans,
-    items: content.plans.items.map((plan) => ({
-      ...plan,
-      price: formatPlanPrice(plan.amountBrl, locale, exchangeRate) ?? content.plans.priceLoading,
-    })),
-  };
+  
+  const plansContent = useFormattedPlans(content.plans, locale, exchangeRate);
 
   function handleProjectClick(event, item) {
     if (item.repo !== content.portfolio.currentDemoRepo) {

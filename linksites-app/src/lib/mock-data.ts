@@ -24,7 +24,7 @@ export const demoProfile: ProfileWithLinks = {
   id: "demo-profile",
   username: "linksitesapp",
   displayName: "LinkSites App",
-  bio: "Perfil oficial da LinkSites App para apresentar a plataforma, direcionar contatos e mostrar como uma arvore de links profissional pode vender melhor a marca.",
+  bio: "Perfil oficial da LinkSites App para apresentar a plataforma, direcionar contatos e mostrar como uma árvore de links profissional pode vender melhor a marca.",
   avatarUrl: null,
   themeSlug: "midnight-grid",
   isPublished: true,

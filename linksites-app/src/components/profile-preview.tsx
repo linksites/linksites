@@ -2,11 +2,14 @@
 
 import clsx from "clsx";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { appContent } from "@/data/app-content";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { AppLocale } from "@/lib/locale";
 import { themeCatalog } from "@/lib/mock-data";
+import { hasSupabaseEnv } from "@/lib/supabase/env";
 import type { ProfileWithLinks } from "@/lib/types";
+import FollowButton from "./FollowButton";
 
 const ANALYTICS_SESSION_KEY = "linksites-analytics-session-id";
 
@@ -68,6 +71,11 @@ export function ProfilePreview({
   const theme = themeCatalog[profile.themeSlug];
   const content = appContent[locale];
   const activeLinks = profile.links.filter((link) => link.isActive);
+  const hasBrowserSupabase = hasSupabaseEnv();
+  const supabase = hasBrowserSupabase ? createSupabaseBrowserClient() : null;
+
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoading, setIsLoading] = useState(hasBrowserSupabase);
 
   useEffect(() => {
     if (!analyticsEnabled) {
@@ -97,6 +105,47 @@ export function ProfilePreview({
       // Ignore client storage issues and keep the public page interactive.
     }
   }, [analyticsEnabled, profile.id]);
+
+  useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    const checkFollowStatus = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: myProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!myProfile) {
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("follows")
+        .select()
+        .match({ follower_id: myProfile.id, followed_id: profile.id })
+        .single();
+
+      if (!error && data) {
+        setIsFollowing(true);
+      }
+      setIsLoading(false);
+    };
+
+    checkFollowStatus();
+  }, [profile.id, supabase]);
 
   function handleLinkClick(linkId: string, linkTitle: string) {
     if (!analyticsEnabled) {
@@ -148,6 +197,12 @@ export function ProfilePreview({
           <h3 className="text-2xl font-semibold tracking-tight">{profile.displayName}</h3>
           <p className="mt-2 text-sm opacity-70">@{profile.username}</p>
           <p className="mt-4 text-sm leading-7 opacity-80">{profile.bio}</p>
+        </div>
+
+        <div className="mt-6">
+          {!isLoading && supabase ? (
+            <FollowButton targetProfileId={profile.id} initialIsFollowing={isFollowing} />
+          ) : null}
         </div>
 
         <div className="mt-6 flex flex-col gap-3">

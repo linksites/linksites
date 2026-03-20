@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LanguageToggle } from "@/components/language-toggle";
+import { OpenInBrowserFab } from "@/components/open-in-browser-fab";
 import { ProfilePreview } from "@/components/profile-preview";
 import { appContent } from "@/data/app-content";
-import { getServerLocale } from "@/lib/locale-server";
 import { getPublicProfileByUsername } from "@/lib/profiles";
 
 type PublicProfilePageProps = {
@@ -13,7 +12,7 @@ type PublicProfilePageProps = {
 };
 
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
-  const locale = await getServerLocale();
+  const locale = "ptBR";
   const content = appContent[locale];
   const { username } = await params;
   const profile = await getPublicProfileByUsername(username);
@@ -32,17 +31,16 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
           >
             {content.publicProfile.backHome}
           </Link>
-          <LanguageToggle
-            locale={locale}
-            label={content.shared.languageLabel}
-            locales={content.shared.locales}
-          />
         </div>
 
         <div className="flex items-center justify-center">
           <ProfilePreview profile={profile} locale={locale} analyticsEnabled />
         </div>
       </div>
+      <OpenInBrowserFab
+        label={content.publicProfile.openInBrowser}
+        hint={content.publicProfile.openInBrowserHint}
+      />
     </div>
   );
 }

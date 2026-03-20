@@ -138,21 +138,29 @@ Hoje o app e um construtor de pagina publica. Se a proposta e virar uma mini red
 - expandir analytics
 - suportar dominios personalizados
 
-### Camada 2. Relacao entre perfis
+### Camada 2. Sinais e medida
+
+- consolidar analytics
+- entender origem de trafego
+- medir clique, retorno e perfil mais acessado
+- transformar dados em proximas acoes de produto
+
+### Camada 3. Relacao entre perfis
 
 - seguir criadores
 - favoritos
 - perfis relacionados
 - notificacoes de atividade
 
-### Camada 3. Conteudo social leve
+### Camada 4. Conteudo social leve
 
+- blocos de destaque e colecoes de links
 - posts curtos
 - destaques fixados no perfil
 - reacoes
 - comentarios moderados
 
-### Camada 4. Descoberta
+### Camada 5. Descoberta
 
 - feed por interesses
 - busca por categoria

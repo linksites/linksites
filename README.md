@@ -10,12 +10,16 @@
 
 O **LinkSites** hoje funciona como uma landing page SaaS publicada no GitHub Pages. O projeto apresenta a marca, mostra modelos reais, reforca prova social e prepara a transicao da vitrine institucional para um produto escalavel de bio link premium e mini site profissional.
 
+O repositorio agora tambem abriga a camada do produto em `linksites-app/`, publicada separadamente na Vercel.
+
 ## Acesso rapido
 
 - Site publicado: [https://linksites.github.io/linksites/](https://linksites.github.io/linksites/)
+- App publicado: [https://linksites.vercel.app/](https://linksites.vercel.app/)
 - Repositorio: [https://github.com/linksites/linksites](https://github.com/linksites/linksites)
-- Stack principal: `React`, `Vite`, `Tailwind CSS`
-- Deploy: automatico via `GitHub Pages`
+- Landing stack: `React`, `Vite`, `Tailwind CSS`
+- App stack: `Next.js`, `Supabase`, `Tailwind CSS`
+- Deploys: `GitHub Pages` para a landing e `Vercel` para o app
 
 ## Visao atual
 
@@ -26,7 +30,13 @@ A home foi reposicionada para uma narrativa de produto:
 - secao de para quem serve
 - showcase com casos reais e modelos
 - planos de entrada, pro e business
-- CTA final para captura via WhatsApp
+- CTA final conectado ao `LinkSites App`
+
+A landing agora funciona como ponte para o app:
+
+- CTAs principais levando para `https://linksites.vercel.app/dashboard`
+- demo publica apontando para `https://linksites.vercel.app/u/linksitesapp`
+- transicao da vitrine para o produto sem depender de um segundo repositorio
 
 Ao mesmo tempo, o projeto continua servindo como vitrine comercial da LinkSites e base para a futura separacao entre landing publica e app do produto.
 
@@ -42,6 +52,12 @@ Ao mesmo tempo, o projeto continua servindo como vitrine comercial da LinkSites 
 - cards do portfolio consultando `pushed_at` ao vivo na API do GitHub, com fallback em `public/repo-updates.json`
 - contador de visitantes unicos por navegador
 - conversao automatica de moeda nos planos entre `BRL` e `USD`, incluindo o valor numerico
+- conexao direta entre os CTAs da landing e o `linksites-app`
+- home do app com vitrine da conta oficial `@linksitesapp`
+- autenticacao real com Supabase no app
+- criacao automatica de perfil no primeiro acesso do usuario
+- dashboard editavel com perfil, links, tema, publicacao e avatar
+- pagina publica por `username` em `/u/[username]`
 
 ## Arquitetura
 
@@ -54,9 +70,10 @@ Principais decisoes da base atual:
 - `src/components/shared` para UI reutilizavel
 - `src/data/cases.js` para os cases do showcase
 - `src/data/siteContent.js` para conteudo bilingue
+- `linksites-app/` como camada SaaS dentro do mesmo repositorio
 - consulta em tempo real ao GitHub para atividade dos repositorios
 - fallback estatico gerado por `npm run sync:repo-updates`
-- deploy continuo com `.github/workflows/deploy-pages.yml`
+- deploy continuo com `.github/workflows/deploy-pages.yml` para a landing
 
 ## Internacionalizacao
 
@@ -91,12 +108,24 @@ No navegador, a cotacao `BRL -> USD` e buscada em tempo real e guardada em cache
 
 ## Como rodar localmente
 
+Landing:
+
 ```bash
 npm install
 npm run dev
 ```
 
 Depois, abra a URL exibida pelo Vite no navegador.
+
+App:
+
+```bash
+cd linksites-app
+npm install
+npm run dev
+```
+
+Depois, abra a URL exibida pelo Next.js no navegador.
 
 ## Build de producao
 
@@ -109,16 +138,16 @@ O resultado e gerado na pasta `dist/`.
 
 ## Publicacao
 
-O deploy acontece automaticamente a cada push na branch `main`.
+Os deploys acontecem a cada push na branch `main`.
 
 Fluxo atual:
 
-1. editar os arquivos do projeto
+1. editar a landing em `src/` ou o app em `linksites-app/`
 2. sincronizar o fallback com `npm run sync:repo-updates`
-3. validar com `npm run build`
+3. validar com `npm run build` na landing ou no app
 4. fazer commit
 5. enviar para `origin/main`
-6. aguardar a publicacao no GitHub Pages
+6. aguardar a publicacao no GitHub Pages e/ou na Vercel
 
 ## Estrutura essencial
 
@@ -149,6 +178,11 @@ Fluxo atual:
 |-- .github/
 |   `-- workflows/
 |       `-- deploy-pages.yml
+|-- linksites-app/
+|   |-- docs/
+|   |-- src/
+|   |-- supabase/
+|   `-- README.md
 |-- index.html
 |-- package.json
 `-- vite.config.js
@@ -156,12 +190,14 @@ Fluxo atual:
 
 ## Proximas metas
 
-- mover os demais blocos de conteudo fixo para a camada `src/data/`
 - preparar SEO por pagina ou projeto quando houver rotas dedicadas
 - gerar social previews em PNG ou JPG para ampliar compatibilidade nas plataformas
 - adicionar validacoes automaticas de build, links e metadados no CI
-- documentar a separacao futura entre landing publica e app SaaS
-- iniciar o repositorio separado do produto, como `linksites-app`
+- refinar o fluxo de confirmacao de cadastro e entrega de emails no Supabase
+- adicionar analytics de visitas e cliques no `linksites-app`
+- ampliar temas e personalizacao visual dos perfis
+- melhorar onboarding, estados de erro e feedback do dashboard
+- avaliar provedor SMTP dedicado para cadastro publico confiavel
 
 ## Contato
 
@@ -172,4 +208,7 @@ Fluxo atual:
 
 O caminho atual da LinkSites e claro: manter a landing como vitrine comercial e evoluir o produto SaaS em paralelo.
 
-Este repositorio representa a camada publica dessa estrategia.
+Este repositorio agora cobre as duas frentes:
+
+- a camada publica da estrategia em `linksites/`
+- a camada SaaS em `linksites-app/`

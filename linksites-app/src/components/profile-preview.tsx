@@ -119,13 +119,14 @@ export function ProfilePreview({
     let active = true;
 
     const loadSocialState = async () => {
-      const { count } = await supabase
-        .from("follows")
-        .select("*", { count: "exact", head: true })
-        .eq("followed_id", profile.id);
+      const { data: publicProfile } = await supabase
+        .from("profiles")
+        .select("followers_count")
+        .eq("id", profile.id)
+        .maybeSingle();
 
-      if (active && typeof count === "number") {
-        setFollowersCount(count);
+      if (active && typeof publicProfile?.followers_count === "number") {
+        setFollowersCount(publicProfile.followers_count);
       }
 
       const {

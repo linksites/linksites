@@ -12,6 +12,12 @@ import { localizedCases } from "./data/cases";
 import { siteContent } from "./data/siteContent";
 
 const repoCaseSource = localizedCases.ptBR;
+const APP_BASE_URL = "https://linksites.vercel.app";
+const LOCALE_STORAGE_KEY = "linksites-locale";
+const EXCHANGE_RATE_STORAGE_KEY = "linksites-brl-usd-rate-v1";
+const VISITOR_COUNTER_API_BASE = "https://countapi.mileshilliard.com/api/v1";
+const VISITOR_COUNTER_KEY = "linksites-home-unique-browsers";
+const VISITOR_COUNTER_STORAGE_KEY = "linksites-home-unique-browser-v1";
 const githubRepoGroups = repoCaseSource.reduce((groups, item) => {
   const existingRepos = groups[item.owner] ?? [];
 
@@ -86,7 +92,13 @@ async function fetchSnapshotRepoUpdates(repoUpdatesUrl, signal) {
   return normalizeRepoUpdates(payload?.repos);
 }
 
-const EXCHANGE_RATE_STORAGE_KEY = "linksites-brl-usd-rate-v1";
+function readStoredLocale() {
+  try {
+    return window.localStorage.getItem(LOCALE_STORAGE_KEY) ?? "ptBR";
+  } catch {
+    return "ptBR";
+  }
+}
 
 function readCachedExchangeRate() {
   try {
@@ -155,13 +167,7 @@ function formatPlanPrice(amountBrl, locale, exchangeRate) {
 }
 
 export default function App() {
-  const [locale, setLocale] = useState(() => {
-    try {
-      return window.localStorage.getItem("linksites-locale") ?? "ptBR";
-    } catch {
-      return "ptBR";
-    }
-  });
+  const [locale, setLocale] = useState(() => readStoredLocale());
   const [menuOpen, setMenuOpen] = useState(false);
   const [repoUpdateDates, setRepoUpdateDates] = useState({});
   const [visitCount, setVisitCount] = useState(siteContent.ptBR.visitCount.loading);
@@ -180,12 +186,11 @@ export default function App() {
 
   const content = siteContent[locale] ?? siteContent.ptBR;
   const cases = localizedCases[locale] ?? localizedCases.ptBR;
-  const appBaseUrl = "https://linksites.vercel.app";
   const appLinks = {
-    homeUrl: appBaseUrl,
-    loginUrl: `${appBaseUrl}/login`,
-    dashboardUrl: `${appBaseUrl}/dashboard`,
-    showcaseUrl: `${appBaseUrl}/u/linksitesapp`,
+    homeUrl: APP_BASE_URL,
+    loginUrl: `${APP_BASE_URL}/login`,
+    dashboardUrl: `${APP_BASE_URL}/dashboard`,
+    showcaseUrl: `${APP_BASE_URL}/u/linksitesapp`,
   };
   const plansContent = {
     ...content.plans,
@@ -197,7 +202,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem("linksites-locale", locale);
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     } catch {
       // Ignore storage issues and keep the selected locale in memory.
     }
@@ -314,19 +319,16 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    const apiBase = "https://countapi.mileshilliard.com/api/v1";
-    const counterKey = "linksites-home-unique-browsers";
-    const storageKey = "linksites-home-unique-browser-v1";
     let shouldIncrement = false;
 
     try {
-      shouldIncrement = window.localStorage.getItem(storageKey) !== "1";
+      shouldIncrement = window.localStorage.getItem(VISITOR_COUNTER_STORAGE_KEY) !== "1";
     } catch {
       shouldIncrement = true;
     }
 
     async function requestCounter(mode) {
-      const response = await fetch(`${apiBase}/${mode}/${counterKey}`);
+      const response = await fetch(`${VISITOR_COUNTER_API_BASE}/${mode}/${VISITOR_COUNTER_KEY}`);
 
       if (!response.ok && response.status === 404 && mode === "get") {
         return requestCounter("hit");
@@ -350,7 +352,7 @@ export default function App() {
 
         if (shouldIncrement) {
           try {
-            window.localStorage.setItem(storageKey, "1");
+            window.localStorage.setItem(VISITOR_COUNTER_STORAGE_KEY, "1");
           } catch {
             // Ignore storage issues and still show the fetched number.
           }

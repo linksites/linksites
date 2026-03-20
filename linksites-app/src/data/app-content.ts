@@ -98,35 +98,35 @@ export const appContent: Record<AppLocale, {
     identityTitle: string;
     identityLive: string;
     identityFallback: string;
-      fields: {
-        displayName: string;
-        username: string;
-        bio: string;
-        avatarUrl: string;
-        links: string;
-        theme: string;
-        visibility: string;
-      };
+    fields: {
+      displayName: string;
+      username: string;
+      bio: string;
+      avatarUrl: string;
+      links: string;
+      theme: string;
+      visibility: string;
+    };
     themeOptions: Record<string, string>;
     visibilityDraft: string;
-      visibilityPublished: string;
-      saveButton: string;
-      avatarUpload: string;
-      avatarUploadHint: string;
-      avatarRemove: string;
-      linksDescription: string;
-      linkTitle: string;
-      linkUrl: string;
-      linkPosition: string;
-      linkStatus: string;
-      linkRemove: string;
-      linkNew: string;
-      linkInactiveHint: string;
-      addLinkHint: string;
-      saveLinksButton: string;
-      mockReadonly: string;
-      linkActive: string;
-      linkInactive: string;
+    visibilityPublished: string;
+    saveButton: string;
+    avatarUpload: string;
+    avatarUploadHint: string;
+    avatarRemove: string;
+    linksDescription: string;
+    linkTitle: string;
+    linkUrl: string;
+    linkPosition: string;
+    linkStatus: string;
+    linkRemove: string;
+    linkNew: string;
+    linkInactiveHint: string;
+    addLinkHint: string;
+    saveLinksButton: string;
+    mockReadonly: string;
+    linkActive: string;
+    linkInactive: string;
     emptyLinks: string;
     nextStep: string;
     pendingProfileName: string;
@@ -323,9 +323,9 @@ export const appContent: Record<AppLocale, {
       mockReadonly: "O modo mock nao salva alteracoes. Conecte o Supabase para editar o perfil real.",
       linkActive: "Ativo",
       linkInactive: "Inativo",
-      emptyLinks: "Ainda nao existem links. A proxima fase vai permitir criar e editar tudo direto deste dashboard.",
+      emptyLinks: "Ainda nao existem links. Use o bloco abaixo para criar seus primeiros botoes publicos.",
       nextStep:
-        "Proximo passo de implementacao: trocar este estado somente leitura por acoes de edicao do perfil e dos links, com feedback de salvamento e progresso de onboarding.",
+        "Proximo passo de implementacao: adicionar onboarding guiado, analytics de cliques e mais blocos de conteudo para transformar a pagina em mini site.",
       pendingProfileName: "Novo criador",
       pendingProfileBio:
         "Sua conta esta autenticada, mas o registro do perfil ainda precisa ser criado ou vinculado corretamente no banco de dados.",
@@ -537,9 +537,9 @@ export const appContent: Record<AppLocale, {
       mockReadonly: "Mock mode does not save changes. Connect Supabase to edit the real profile.",
       linkActive: "Active",
       linkInactive: "Inactive",
-      emptyLinks: "No links yet. The next phase will let users create and edit them directly from this dashboard.",
+      emptyLinks: "No links yet. Use the section below to create your first public buttons.",
       nextStep:
-        "Next implementation step: replace this read-only state with editable profile and link actions, then add save feedback and onboarding progress.",
+        "Next implementation step: add guided onboarding, click analytics, and richer content blocks so the page can evolve into a mini site.",
       pendingProfileName: "New creator",
       pendingProfileBio:
         "Your account is authenticated, but your profile record still needs to be created or linked correctly in the database.",

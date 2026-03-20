@@ -2,93 +2,68 @@
 
 `linksites-app` e a camada SaaS do ecossistema LinkSites.
 
-Este projeto fica separado da landing publica para permitir a evolucao do produto sem misturar vitrine comercial, autenticacao, dashboard, banco de dados e regras de negocio no site servido pelo GitHub Pages.
+Ele existe separado da landing publica para nao misturar marketing, SEO e prova social com autenticacao, dashboard, banco de dados e regras de produto.
 
-## Visao do produto
+## O que o app ja entrega
 
-O objetivo do app e entregar uma experiencia tipo Linktree premium, mas com mais identidade visual e espaco para evoluir para mini sites profissionais.
+O MVP atual ja cobre o fluxo principal de um criador:
 
-Hoje a base ja cobre:
+- criar conta com email e senha
+- entrar com email e senha ou magic link
+- confirmar email
+- gerar automaticamente um perfil no primeiro acesso
+- editar `display name`, `username`, `bio`, `tema`, `status de publicacao` e `avatar`
+- enviar avatar com `Supabase Storage`
+- criar, editar, remover, reordenar e ativar links
+- publicar a pagina publica em `/u/[username]`
+- visualizar preview do perfil no dashboard
 
-- autenticacao real com Supabase
-- criacao automatica de `profile` no primeiro acesso
-- dashboard autenticado
-- pagina publica por `username`
-- edicao de perfil no dashboard
-- gerenciamento de links
-- interface bilingue `pt-BR` e `en`
-
-## Separacao de responsabilidades
-
-- `linksites/`
-  Landing page, marketing, SEO e vitrine publica
-- `linksites-app/`
-  Produto SaaS, auth, dashboard, preview, pagina publica e integracao com banco
+Sem variaveis de ambiente, o app entra em modo mock para revisao visual da experiencia.
 
 ## Stack
 
-- Next.js App Router
-- React
-- Tailwind CSS
-- Supabase Auth
-- Supabase Postgres
-- Supabase Storage
-- Vercel para deploy do app
+- `Next.js` App Router
+- `React`
+- `Tailwind CSS`
+- `Supabase Auth`
+- `Supabase Postgres`
+- `Supabase Storage`
+- `Vercel`
 
-## Status atual
-
-O app ja permite:
-
-- criar conta com email e senha
-- usar magic link
-- confirmar email
-- entrar com sessao real
-- criar automaticamente o perfil do usuario
-- editar:
-  nome de exibicao
-  username
-  bio
-  avatar por URL
-  tema visual
-  publicacao da pagina
-- editar links:
-  criar
-  atualizar
-  remover
-  ativar ou desativar
-  reorganizar por ordem numerica
-- visualizar a pre-visualizacao da pagina publica no proprio dashboard
-
-## Rotas atuais
+## Rotas principais
 
 - `/`
-  Entrada do produto
+  Entrada do produto e vitrine da conta oficial
 - `/login`
   Login, cadastro e magic link
 - `/dashboard`
-  Painel autenticado do criador
+  Painel autenticado de configuracao
 - `/u/[username]`
   Pagina publica do perfil
+- `/auth/confirm`
+  Callback de confirmacao por email
+- `/auth/signout`
+  Encerramento de sessao
 
-## Estrutura principal
+## Estrutura
 
 - `src/app/`
-  Rotas, paginas, server actions e fluxo do App Router
+  Rotas, paginas e server actions
 - `src/components/`
-  Componentes reutilizaveis, preview e seletor de idioma
+  Componentes reutilizaveis e preview
 - `src/data/`
-  Conteudo centralizado e traducao da interface
+  Conteudo textual e traducao
 - `src/lib/`
-  Tipos, integracao Supabase, locale, mocks e loaders
+  Integracao Supabase, mocks, locale, loaders e tipos
 - `supabase/schema.sql`
-  Schema inicial do banco e politicas RLS
+  Schema inicial com RLS
 - `docs/ARCHITECTURE.md`
-  Visao arquitetural do app
+  Visao arquitetural resumida
 
 ## Configuracao local
 
 1. Copie `.env.example` para `.env.local`
-2. Preencha as variaveis:
+2. Preencha:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=...
@@ -102,90 +77,92 @@ npm install
 npm run dev
 ```
 
-Se as variaveis do Supabase nao estiverem configuradas, o app entra em modo mock para permitir revisao visual da interface.
+Validacoes uteis:
 
-## Banco de dados
+```bash
+npm run lint
+npm run build
+```
 
-O schema inicial esta em:
+## Modelo de dados atual
 
-- `supabase/schema.sql`
-
-Ele cria:
+O schema inicial cria:
 
 - `profiles`
+  um perfil por usuario autenticado
 - `links`
+  botoes e destinos exibidos na pagina publica
 - `themes`
+  catalogo de temas visuais
+
+Tambem ja existem:
+
 - trigger de `updated_at`
-- politicas de Row Level Security
+- politicas de `Row Level Security`
+- bucket publico `avatars`
+- politicas de upload, leitura, update e delete para avatar
 
-Modelo atual:
+## Direcao de produto
 
-- `profiles`
-  Um perfil por usuario autenticado
-- `links`
-  Lista de botoes exibidos na pagina publica
-- `themes`
-  Catalogo de temas visuais
+Hoje o app e um construtor de pagina publica. Se a proposta e virar uma mini rede social entre usuarios, o melhor caminho e crescer por camadas:
 
-## Autenticacao
+### Camada 1. Perfil forte
 
-O fluxo atual usa Supabase Auth com:
+- melhorar onboarding
+- ampliar blocos de conteudo
+- adicionar analytics
+- suportar dominios personalizados
 
-- login por email e senha
-- cadastro por email e senha
-- magic link
-- callback em `/auth/confirm`
-- logout em `/auth/signout`
+### Camada 2. Relacao entre perfis
 
-Quando um usuario autenticado entra pela primeira vez, o app cria automaticamente o registro em `profiles`.
+- seguir criadores
+- favoritos
+- perfis relacionados
+- notificacoes de atividade
 
-## Internacionalizacao
+### Camada 3. Conteudo social leve
 
-O app segue a mesma ideia de alternancia do projeto principal:
+- posts curtos
+- destaques fixados no perfil
+- reacoes
+- comentarios moderados
 
-- seletor de idioma visivel na interface
-- persistencia via cookie `linksites-locale`
-- conteudo centralizado em `src/data/app-content.ts`
+### Camada 4. Descoberta
 
-Idiomas disponiveis:
+- feed por interesses
+- busca por categoria
+- ranking de perfis e colecoes
 
-- `pt-BR`
-- `en`
+## Tabelas recomendadas para a proxima fase
+
+Se a meta de mini rede social for confirmada, as proximas entidades naturais sao:
+
+- `follows`
+- `posts`
+- `post_reactions`
+- `comments`
+- `notifications`
+- `profile_metrics` ou `analytics_events`
+
+Vale manter a evolucao incremental: primeiro sinais sociais leves e analytics, depois feed e interacao mais densa.
 
 ## Deploy
 
-Deploy recomendado:
+Configuracao recomendada na Vercel:
 
-- landing publica no GitHub Pages
-- app SaaS na Vercel
-
-Configuracao da Vercel:
-
-- repositório: `linksites/linksites`
+- repositorio: `linksites/linksites`
 - root directory: `linksites-app`
 - framework preset: `Next.js`
 
-Variaveis de ambiente na Vercel:
+Variaveis de ambiente:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 ```
 
-Depois do deploy, ajuste no Supabase:
+Depois do deploy, alinhe no Supabase:
 
 - `Authentication > URL Configuration`
 - `Site URL`
 - `Redirect URLs`
-
-## Proximos passos
-
-Metas naturais para a proxima fase:
-
-- upload real de avatar com Supabase Storage
-- refinamento visual do dashboard
-- feedback de onboarding e progresso
-- analytics de visitas e cliques
-- dominios personalizados
-- planos e cobranca
-- controles mais ricos de layout e secoes

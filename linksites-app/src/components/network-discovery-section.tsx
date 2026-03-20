@@ -7,6 +7,7 @@ import { appContent } from "@/data/app-content";
 type NetworkDiscoverySectionProps = {
   profiles: PublicDirectoryProfile[];
   locale?: AppLocale;
+  variant?: "grid" | "stack";
 };
 
 function getInitials(name: string) {
@@ -20,11 +21,16 @@ function getInitials(name: string) {
 export function NetworkDiscoverySection({
   profiles,
   locale = "ptBR",
+  variant = "grid",
 }: NetworkDiscoverySectionProps) {
   const content = appContent[locale].dashboard.discovery;
+  const gridClassName =
+    variant === "stack"
+      ? "mt-5 grid gap-4"
+      : "mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3";
 
   return (
-    <section className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+    <section className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl">
           <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.label}</div>
@@ -39,9 +45,12 @@ export function NetworkDiscoverySection({
       </div>
 
       {profiles.length ? (
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className={gridClassName}>
           {profiles.map((profile) => (
-            <article key={profile.id} className="rounded-[1.4rem] border border-white/8 bg-white/4 p-4">
+            <article
+              key={profile.id}
+              className="rounded-[1.4rem] border border-white/8 bg-white/4 p-4 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/18 hover:bg-white/6"
+            >
               <div className="flex items-center gap-3">
                 <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-slate-950 text-sm font-semibold text-white">
                   {profile.avatarUrl ? (

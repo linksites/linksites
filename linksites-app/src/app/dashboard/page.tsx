@@ -105,8 +105,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div className="page-shell min-h-screen">
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
+      <main className="dashboard-shell mx-auto max-w-[1600px] px-4 py-8 sm:px-6 xl:px-10">
+        <div className="dashboard-rise flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[var(--accent)]">{content.dashboard.eyebrow}</p>
             <h1 className="mt-3 font-[var(--font-display)] text-4xl font-semibold tracking-tight text-white">
@@ -135,10 +135,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </div>
         </div>
 
-        <section className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+        <section className="mt-10 grid gap-8 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.84fr)_minmax(320px,0.96fr)] xl:items-start">
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+              <div className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
                 <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.sessionLabel}</div>
                 <p className="mt-3 text-lg font-semibold text-white">
                   {viewer.user ? content.dashboard.sessionAuthenticated : content.dashboard.sessionFallback}
@@ -147,7 +147,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   {viewer.user?.email ?? content.dashboard.sessionFallbackDescription}
                 </p>
               </div>
-              <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+              <div className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
                 <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.profileStatusLabel}</div>
                 <p className="mt-3 text-lg font-semibold text-white">
                   {profile.isPublished ? content.dashboard.profilePublished : content.dashboard.profileDraft}
@@ -156,7 +156,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   {profile.isPublished ? publishedDescription : content.dashboard.profileDraftDescription}
                 </p>
               </div>
-              <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+              <div className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
                 <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.unlockedLabel}</div>
                 <p className="mt-3 text-lg font-semibold text-white">
                   {profile.links.length} {content.dashboard.unlockedSuffix}
@@ -165,7 +165,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </div>
             </div>
 
-            <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+            <div className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="max-w-2xl">
                   <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.analyticsLabel}</div>
@@ -192,7 +192,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </div>
             </div>
 
-            <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+            <div className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="max-w-2xl">
                   <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.onboardingLabel}</div>
@@ -230,7 +230,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </div>
             </div>
 
-            <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+            <div className="dashboard-panel dashboard-rise rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
               <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.publicCardLabel}</div>
               <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
                 <div className="max-w-2xl">
@@ -275,9 +275,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </div>
             </div>
 
-            <NetworkDiscoverySection profiles={networkProfiles} locale={locale} />
-
-            <div className="rounded-[2rem] border border-white/8 bg-[var(--panel)] p-6">
+            <div className="dashboard-panel dashboard-rise rounded-[2rem] border border-white/8 bg-[var(--panel)] p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.identityLabel}</div>
@@ -560,8 +558,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </div>
           </div>
 
-          <div className="flex self-start justify-center lg:sticky lg:top-8 lg:justify-end">
-            <ProfilePreview profile={profile} compact locale={locale} />
+          <div className="flex self-start justify-center xl:sticky xl:top-8 xl:justify-end">
+            <div className="dashboard-rise w-full max-w-md">
+              <ProfilePreview profile={profile} compact locale={locale} />
+            </div>
+          </div>
+
+          <div className="self-start xl:sticky xl:top-8">
+            <NetworkDiscoverySection profiles={networkProfiles} locale={locale} variant="stack" />
           </div>
         </section>
       </main>

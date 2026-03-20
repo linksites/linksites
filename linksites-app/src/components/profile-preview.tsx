@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import Image from "next/image";
 import { appContent } from "@/data/app-content";
 import type { AppLocale } from "@/lib/locale";
 import { themeCatalog } from "@/lib/mock-data";
@@ -32,13 +33,24 @@ export function ProfilePreview({ profile, compact = false, locale = "ptBR" }: Pr
         background: theme.background,
         color: theme.text,
       }}
-    >
-      <div
-        className="rounded-[1.7rem] border border-white/8 p-5 backdrop-blur"
-        style={{ backgroundColor: theme.panel }}
       >
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/12 bg-white/8 text-xl font-semibold">
-          {getInitials(profile.displayName)}
+        <div
+          className="rounded-[1.7rem] border border-white/8 p-5 backdrop-blur"
+          style={{ backgroundColor: theme.panel }}
+        >
+        <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-white/12 bg-white/8 text-xl font-semibold">
+          {profile.avatarUrl ? (
+            <Image
+              src={profile.avatarUrl}
+              alt={profile.displayName}
+              width={80}
+              height={80}
+              className="h-full w-full object-cover"
+              unoptimized
+            />
+          ) : (
+            getInitials(profile.displayName)
+          )}
         </div>
 
         <div className="mt-5 text-center">

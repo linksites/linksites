@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { updateProfile } from "@/app/dashboard/actions";
+import { updateLinks, updateProfile } from "@/app/dashboard/actions";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProfilePreview } from "@/components/profile-preview";
 import { appContent } from "@/data/app-content";
@@ -69,6 +69,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: content.dashboard.fields.displayName, name: "displayName", value: profile.displayName },
     { label: content.dashboard.fields.username, name: "username", value: profile.username },
   ];
+  const newLinkSlots = 3;
   const dashboardTitle = content.dashboard.title.replace("{name}", profile.displayName);
   const publishedDescription = content.dashboard.profilePublishedDescription.replace("{username}", profile.username);
 
@@ -159,7 +160,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 {usingMockData ? <Notice tone="info">{content.dashboard.mockReadonly}</Notice> : null}
               </div>
 
-              <form action={updateProfile} className="mt-6">
+              <form action={updateProfile} className="mt-6" encType="multipart/form-data">
                 <div className="grid gap-4 md:grid-cols-2">
                   {editorFields.map((field) => (
                     <label key={field.label} className="flex flex-col gap-2">
@@ -217,6 +218,44 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
                 <label className="mt-4 flex flex-col gap-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                    {content.dashboard.fields.avatarUrl}
+                  </span>
+                  <input
+                    name="avatarUrl"
+                    defaultValue={profile.avatarUrl ?? ""}
+                    disabled={usingMockData}
+                    placeholder="https://..."
+                    className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+                </label>
+
+                <div className="mt-4 rounded-[1.4rem] border border-white/8 bg-white/3 p-4">
+                  <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                    {content.dashboard.avatarUpload}
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-white/58">{content.dashboard.avatarUploadHint}</p>
+                  <input
+                    name="avatarFile"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                    disabled={usingMockData}
+                    className="mt-4 block w-full text-sm text-white file:mr-4 file:rounded-full file:border-0 file:bg-cyan-300/12 file:px-4 file:py-2 file:font-semibold file:text-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+                  <label className="mt-4 flex items-center gap-2 text-sm text-white/68">
+                    <input type="hidden" name="removeAvatar" value="false" />
+                    <input
+                      type="checkbox"
+                      name="removeAvatar"
+                      value="true"
+                      disabled={usingMockData}
+                      className="h-4 w-4 rounded border-white/20 bg-white/5"
+                    />
+                    <span>{content.dashboard.avatarRemove}</span>
+                  </label>
+                </div>
+
+                <label className="mt-4 flex flex-col gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
                     {content.dashboard.fields.bio}
                   </span>
                   <textarea
@@ -238,21 +277,78 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
               <div className="mt-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">{content.dashboard.fields.links}</div>
-                <div className="mt-4 space-y-3">
+                <p className="mt-3 text-sm leading-7 text-white/60">{content.dashboard.linksDescription}</p>
+
+                <form action={updateLinks} className="mt-4 space-y-4">
                   {profile.links.length ? (
-                    profile.links.map((link, index) => (
-                      <div
-                        key={link.id}
-                        className="flex items-center justify-between rounded-[1.4rem] border border-white/8 bg-white/4 px-4 py-4"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold text-white">
-                            {index + 1}. {link.title}
-                          </p>
-                          <p className="mt-1 text-xs text-white/54">{link.url}</p>
+                    profile.links.map((link) => (
+                      <div key={link.id} className="rounded-[1.4rem] border border-white/8 bg-white/4 p-4">
+                        <input type="hidden" name="existingLinkIds" value={link.id} />
+                        <div className="grid gap-4 md:grid-cols-[1fr_1.4fr_110px]">
+                          <label className="flex flex-col gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                              {content.dashboard.linkTitle}
+                            </span>
+                            <input
+                              name={`title-${link.id}`}
+                              defaultValue={link.title}
+                              disabled={usingMockData}
+                              className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                            />
+                          </label>
+                          <label className="flex flex-col gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                              {content.dashboard.linkUrl}
+                            </span>
+                            <input
+                              name={`url-${link.id}`}
+                              defaultValue={link.url}
+                              disabled={usingMockData}
+                              className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                            />
+                          </label>
+                          <label className="flex flex-col gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                              {content.dashboard.linkPosition}
+                            </span>
+                            <input
+                              name={`position-${link.id}`}
+                              type="number"
+                              defaultValue={link.position}
+                              disabled={usingMockData}
+                              className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                            />
+                          </label>
                         </div>
-                        <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.22em] text-[var(--accent)]">
-                          {link.isActive ? content.dashboard.linkActive : content.dashboard.linkInactive}
+
+                        <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-white/70">
+                          <label className="flex items-center gap-2">
+                            <input type="hidden" name={`isActive-${link.id}`} value="false" />
+                            <input
+                              type="checkbox"
+                              name={`isActive-${link.id}`}
+                              value="true"
+                              defaultChecked={link.isActive}
+                              disabled={usingMockData}
+                              className="h-4 w-4 rounded border-white/20 bg-white/5"
+                            />
+                            <span>
+                              {content.dashboard.linkStatus}:{" "}
+                              {link.isActive ? content.dashboard.linkActive : content.dashboard.linkInactive}
+                            </span>
+                          </label>
+
+                          <label className="flex items-center gap-2">
+                            <input type="hidden" name={`remove-${link.id}`} value="false" />
+                            <input
+                              type="checkbox"
+                              name={`remove-${link.id}`}
+                              value="true"
+                              disabled={usingMockData}
+                              className="h-4 w-4 rounded border-white/20 bg-white/5"
+                            />
+                            <span>{content.dashboard.linkRemove}</span>
+                          </label>
                         </div>
                       </div>
                     ))
@@ -261,7 +357,59 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                       {content.dashboard.emptyLinks}
                     </div>
                   )}
-                </div>
+
+                  <div className="rounded-[1.6rem] border border-dashed border-white/12 bg-white/3 p-5">
+                    <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                      {content.dashboard.linkNew}
+                    </div>
+                    <p className="mt-2 text-sm leading-7 text-white/58">{content.dashboard.addLinkHint}</p>
+                    <input type="hidden" name="newLinkSlots" value={String(newLinkSlots)} />
+                    <div className="mt-4 space-y-4">
+                      {Array.from({ length: newLinkSlots }).map((_, slotIndex) => (
+                        <div key={`new-link-${slotIndex}`} className="grid gap-4 md:grid-cols-[1fr_1.4fr_110px]">
+                          <input
+                            name={`new-title-${slotIndex}`}
+                            placeholder={content.dashboard.linkTitle}
+                            disabled={usingMockData}
+                            className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                          />
+                          <input
+                            name={`new-url-${slotIndex}`}
+                            placeholder="https://"
+                            disabled={usingMockData}
+                            className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                          />
+                          <input
+                            name={`new-position-${slotIndex}`}
+                            type="number"
+                            defaultValue={profile.links.length + slotIndex}
+                            disabled={usingMockData}
+                            className="min-h-12 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                          />
+                          <label className="flex items-center gap-2 text-sm text-white/68 md:col-span-3">
+                            <input type="hidden" name={`new-isActive-${slotIndex}`} value="false" />
+                            <input
+                              type="checkbox"
+                              name={`new-isActive-${slotIndex}`}
+                              value="true"
+                              defaultChecked
+                              disabled={usingMockData}
+                              className="h-4 w-4 rounded border-white/20 bg-white/5"
+                            />
+                            <span>{content.dashboard.linkInactiveHint}</span>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={usingMockData}
+                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-6 py-3 text-sm font-semibold text-cyan-100 transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                  >
+                    {content.dashboard.saveLinksButton}
+                  </button>
+                </form>
               </div>
 
               <div className="mt-6 rounded-[1.6rem] border border-dashed border-white/12 bg-white/3 p-5">

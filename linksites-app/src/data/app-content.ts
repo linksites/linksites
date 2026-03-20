@@ -81,21 +81,35 @@ export const appContent: Record<AppLocale, {
     identityTitle: string;
     identityLive: string;
     identityFallback: string;
-    fields: {
-      displayName: string;
-      username: string;
-      bio: string;
-      links: string;
-      theme: string;
-      visibility: string;
-    };
+      fields: {
+        displayName: string;
+        username: string;
+        bio: string;
+        avatarUrl: string;
+        links: string;
+        theme: string;
+        visibility: string;
+      };
     themeOptions: Record<string, string>;
     visibilityDraft: string;
-    visibilityPublished: string;
-    saveButton: string;
-    mockReadonly: string;
-    linkActive: string;
-    linkInactive: string;
+      visibilityPublished: string;
+      saveButton: string;
+      avatarUpload: string;
+      avatarUploadHint: string;
+      avatarRemove: string;
+      linksDescription: string;
+      linkTitle: string;
+      linkUrl: string;
+      linkPosition: string;
+      linkStatus: string;
+      linkRemove: string;
+      linkNew: string;
+      linkInactiveHint: string;
+      addLinkHint: string;
+      saveLinksButton: string;
+      mockReadonly: string;
+      linkActive: string;
+      linkInactive: string;
     emptyLinks: string;
     nextStep: string;
     pendingProfileName: string;
@@ -234,6 +248,7 @@ export const appContent: Record<AppLocale, {
         displayName: "Nome de exibicao",
         username: "Username",
         bio: "Bio",
+        avatarUrl: "Avatar (URL)",
         links: "Links",
         theme: "Tema visual",
         visibility: "Publicacao",
@@ -245,6 +260,19 @@ export const appContent: Record<AppLocale, {
       visibilityDraft: "Manter como rascunho",
       visibilityPublished: "Publicar pagina",
       saveButton: "Salvar perfil",
+      avatarUpload: "Enviar nova foto",
+      avatarUploadHint: "Formatos aceitos: JPG, PNG, WEBP, GIF ou AVIF com ate 5 MB.",
+      avatarRemove: "Remover avatar atual",
+      linksDescription: "Edite os links publicos, reorganize a ordem, desative o que nao quiser mostrar e adicione novos botoes.",
+      linkTitle: "Titulo",
+      linkUrl: "URL",
+      linkPosition: "Ordem",
+      linkStatus: "Status",
+      linkRemove: "Remover",
+      linkNew: "Novo link",
+      linkInactiveHint: "Desative para esconder este botao da pagina publica.",
+      addLinkHint: "Preencha titulo e URL para criar um novo link.",
+      saveLinksButton: "Salvar links",
       mockReadonly: "O modo mock nao salva alteracoes. Conecte o Supabase para editar o perfil real.",
       linkActive: "Ativo",
       linkInactive: "Inativo",
@@ -256,10 +284,17 @@ export const appContent: Record<AppLocale, {
         "Sua conta esta autenticada, mas o registro do perfil ainda precisa ser criado ou vinculado corretamente no banco de dados.",
       feedback: {
         profile_saved: "Perfil salvo com sucesso.",
+        links_saved: "Links salvos com sucesso.",
         profile_save_failed: "Nao foi possivel salvar o perfil agora.",
+        links_save_failed: "Nao foi possivel salvar os links agora.",
         username_taken: "Esse username ja esta em uso. Tente outro.",
         invalid_username: "Use um username entre 3 e 32 caracteres com letras minusculas, numeros e hifens.",
         invalid_display_name: "Informe um nome de exibicao para salvar o perfil.",
+        invalid_avatar_url: "Use uma URL valida para o avatar ou deixe o campo vazio.",
+        invalid_avatar_file: "Envie uma imagem valida de ate 5 MB para o avatar.",
+        avatar_upload_failed: "Nao foi possivel enviar a foto de perfil agora.",
+        invalid_link_title: "Cada link precisa ter um titulo antes de salvar.",
+        invalid_link_url: "Cada link precisa usar uma URL valida com http:// ou https://.",
         unauthorized: "Entre novamente para continuar editando seu perfil.",
         mock_mode_readonly: "O modo mock nao permite salvar alteracoes reais.",
       },
@@ -397,6 +432,7 @@ export const appContent: Record<AppLocale, {
         displayName: "Display name",
         username: "Username",
         bio: "Bio",
+        avatarUrl: "Avatar (URL)",
         links: "Links",
         theme: "Visual theme",
         visibility: "Visibility",
@@ -408,6 +444,19 @@ export const appContent: Record<AppLocale, {
       visibilityDraft: "Keep as draft",
       visibilityPublished: "Publish page",
       saveButton: "Save profile",
+      avatarUpload: "Upload new photo",
+      avatarUploadHint: "Accepted formats: JPG, PNG, WEBP, GIF, or AVIF up to 5 MB.",
+      avatarRemove: "Remove current avatar",
+      linksDescription: "Edit your public links, reorder them, hide what you do not want to show, and add new buttons.",
+      linkTitle: "Title",
+      linkUrl: "URL",
+      linkPosition: "Order",
+      linkStatus: "Status",
+      linkRemove: "Remove",
+      linkNew: "New link",
+      linkInactiveHint: "Turn this off to hide the button from your public page.",
+      addLinkHint: "Fill in title and URL to create a new link.",
+      saveLinksButton: "Save links",
       mockReadonly: "Mock mode does not save changes. Connect Supabase to edit the real profile.",
       linkActive: "Active",
       linkInactive: "Inactive",
@@ -419,10 +468,17 @@ export const appContent: Record<AppLocale, {
         "Your account is authenticated, but your profile record still needs to be created or linked correctly in the database.",
       feedback: {
         profile_saved: "Profile saved successfully.",
+        links_saved: "Links saved successfully.",
         profile_save_failed: "We could not save your profile right now.",
+        links_save_failed: "We could not save your links right now.",
         username_taken: "That username is already taken. Try another one.",
         invalid_username: "Use a username between 3 and 32 characters with lowercase letters, numbers, and hyphens.",
         invalid_display_name: "Enter a display name before saving the profile.",
+        invalid_avatar_url: "Use a valid avatar URL or leave the field empty.",
+        invalid_avatar_file: "Upload a valid image up to 5 MB for the avatar.",
+        avatar_upload_failed: "We could not upload your profile photo right now.",
+        invalid_link_title: "Each link needs a title before saving.",
+        invalid_link_url: "Each link must use a valid URL with http:// or https://.",
         unauthorized: "Sign in again to keep editing your profile.",
         mock_mode_readonly: "Mock mode does not allow saving real changes.",
       },

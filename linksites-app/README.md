@@ -1,18 +1,29 @@
 # LinkSites App
 
-`linksites-app` is the SaaS product layer for LinkSites.
+`linksites-app` e a camada SaaS do ecossistema LinkSites.
 
-This app is intentionally separate from the public landing page so we can evolve the product without coupling marketing pages, dashboard flows, auth, and database concerns to the GitHub Pages site.
+Este projeto fica separado da landing publica para permitir a evolucao do produto sem misturar vitrine comercial, autenticacao, dashboard, banco de dados e regras de negocio no site servido pelo GitHub Pages.
 
-## Product direction
+## Visao do produto
 
-Initial product model:
+O objetivo do app e entregar uma experiencia tipo Linktree premium, mas com mais identidade visual e espaco para evoluir para mini sites profissionais.
 
-- public profile pages, similar to Linktree
-- creator dashboard to edit avatar, bio, theme, and links
-- username-based public routes
-- auth and storage with Supabase
-- Postgres with row level security
+Hoje a base ja cobre:
+
+- autenticacao real com Supabase
+- criacao automatica de `profile` no primeiro acesso
+- dashboard autenticado
+- pagina publica por `username`
+- edicao de perfil no dashboard
+- gerenciamento de links
+- interface bilingue `pt-BR` e `en`
+
+## Separacao de responsabilidades
+
+- `linksites/`
+  Landing page, marketing, SEO e vitrine publica
+- `linksites-app/`
+  Produto SaaS, auth, dashboard, preview, pagina publica e integracao com banco
 
 ## Stack
 
@@ -22,45 +33,159 @@ Initial product model:
 - Supabase Auth
 - Supabase Postgres
 - Supabase Storage
+- Vercel para deploy do app
 
-## Local setup
+## Status atual
 
-1. Copy `.env.example` to `.env.local`
-2. Fill in your Supabase project URL and publishable key
-3. Run:
+O app ja permite:
+
+- criar conta com email e senha
+- usar magic link
+- confirmar email
+- entrar com sessao real
+- criar automaticamente o perfil do usuario
+- editar:
+  nome de exibicao
+  username
+  bio
+  avatar por URL
+  tema visual
+  publicacao da pagina
+- editar links:
+  criar
+  atualizar
+  remover
+  ativar ou desativar
+  reorganizar por ordem numerica
+- visualizar a pre-visualizacao da pagina publica no proprio dashboard
+
+## Rotas atuais
+
+- `/`
+  Entrada do produto
+- `/login`
+  Login, cadastro e magic link
+- `/dashboard`
+  Painel autenticado do criador
+- `/u/[username]`
+  Pagina publica do perfil
+
+## Estrutura principal
+
+- `src/app/`
+  Rotas, paginas, server actions e fluxo do App Router
+- `src/components/`
+  Componentes reutilizaveis, preview e seletor de idioma
+- `src/data/`
+  Conteudo centralizado e traducao da interface
+- `src/lib/`
+  Tipos, integracao Supabase, locale, mocks e loaders
+- `supabase/schema.sql`
+  Schema inicial do banco e politicas RLS
+- `docs/ARCHITECTURE.md`
+  Visao arquitetural do app
+
+## Configuracao local
+
+1. Copie `.env.example` para `.env.local`
+2. Preencha as variaveis:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+```
+
+3. Rode:
 
 ```bash
 npm install
 npm run dev
 ```
 
-If Supabase env vars are missing, the app falls back to mock data so the UI can still be reviewed.
+Se as variaveis do Supabase nao estiverem configuradas, o app entra em modo mock para permitir revisao visual da interface.
 
-## Current routes
+## Banco de dados
 
-- `/` product entry page
-- `/dashboard` creator editor MVP
-- `/u/demo` public profile preview
-
-## Database
-
-The initial schema is in:
+O schema inicial esta em:
 
 - `supabase/schema.sql`
 
-It includes:
+Ele cria:
 
 - `profiles`
 - `links`
 - `themes`
-- helper trigger for `updated_at`
-- basic RLS policies
+- trigger de `updated_at`
+- politicas de Row Level Security
 
-## Next steps
+Modelo atual:
 
-- connect dashboard forms to server actions
-- add Supabase Auth sign in and sign up
-- persist profile changes
-- support drag-and-drop link sorting
-- add analytics and click tracking
-- add paid plans and billing
+- `profiles`
+  Um perfil por usuario autenticado
+- `links`
+  Lista de botoes exibidos na pagina publica
+- `themes`
+  Catalogo de temas visuais
+
+## Autenticacao
+
+O fluxo atual usa Supabase Auth com:
+
+- login por email e senha
+- cadastro por email e senha
+- magic link
+- callback em `/auth/confirm`
+- logout em `/auth/signout`
+
+Quando um usuario autenticado entra pela primeira vez, o app cria automaticamente o registro em `profiles`.
+
+## Internacionalizacao
+
+O app segue a mesma ideia de alternancia do projeto principal:
+
+- seletor de idioma visivel na interface
+- persistencia via cookie `linksites-locale`
+- conteudo centralizado em `src/data/app-content.ts`
+
+Idiomas disponiveis:
+
+- `pt-BR`
+- `en`
+
+## Deploy
+
+Deploy recomendado:
+
+- landing publica no GitHub Pages
+- app SaaS na Vercel
+
+Configuracao da Vercel:
+
+- repositório: `linksites/linksites`
+- root directory: `linksites-app`
+- framework preset: `Next.js`
+
+Variaveis de ambiente na Vercel:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+```
+
+Depois do deploy, ajuste no Supabase:
+
+- `Authentication > URL Configuration`
+- `Site URL`
+- `Redirect URLs`
+
+## Proximos passos
+
+Metas naturais para a proxima fase:
+
+- upload real de avatar com Supabase Storage
+- refinamento visual do dashboard
+- feedback de onboarding e progresso
+- analytics de visitas e cliques
+- dominios personalizados
+- planos e cobranca
+- controles mais ricos de layout e secoes

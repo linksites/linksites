@@ -1,14 +1,20 @@
+"use client";
+
 import clsx from "clsx";
 import Image from "next/image";
+import { useEffect } from "react";
 import { appContent } from "@/data/app-content";
 import type { AppLocale } from "@/lib/locale";
 import { themeCatalog } from "@/lib/mock-data";
 import type { ProfileWithLinks } from "@/lib/types";
 
+const ANALYTICS_SESSION_KEY = "linksites-analytics-session-id";
+
 type ProfilePreviewProps = {
   profile: ProfileWithLinks;
   compact?: boolean;
   locale?: AppLocale;
+  analyticsEnabled?: boolean;
 };
 
 function getInitials(name: string) {
@@ -19,9 +25,94 @@ function getInitials(name: string) {
     .join("");
 }
 
-export function ProfilePreview({ profile, compact = false, locale = "ptBR" }: ProfilePreviewProps) {
+function getAnalyticsSessionId() {
+  try {
+    const existingValue = window.localStorage.getItem(ANALYTICS_SESSION_KEY);
+
+    if (existingValue) {
+      return existingValue;
+    }
+
+    const newValue = window.crypto.randomUUID();
+    window.localStorage.setItem(ANALYTICS_SESSION_KEY, newValue);
+    return newValue;
+  } catch {
+    return "anonymous-session";
+  }
+}
+
+function sendAnalyticsEvent(payload: Record<string, string | null>) {
+  const body = JSON.stringify(payload);
+
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon("/api/analytics", new Blob([body], { type: "application/json" }));
+    return;
+  }
+
+  void fetch("/api/analytics", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+    keepalive: true,
+  });
+}
+
+export function ProfilePreview({
+  profile,
+  compact = false,
+  locale = "ptBR",
+  analyticsEnabled = false,
+}: ProfilePreviewProps) {
   const theme = themeCatalog[profile.themeSlug];
   const content = appContent[locale];
+  const activeLinks = profile.links.filter((link) => link.isActive);
+
+  useEffect(() => {
+    if (!analyticsEnabled) {
+      return;
+    }
+
+    try {
+      const dateKey = new Date().toISOString().slice(0, 10);
+      const viewStorageKey = `linksites-analytics:view:${profile.id}:${dateKey}`;
+
+      if (window.localStorage.getItem(viewStorageKey) === "1") {
+        return;
+      }
+
+      sendAnalyticsEvent({
+        profileId: profile.id,
+        eventType: "profile_view",
+        sessionId: getAnalyticsSessionId(),
+        path: window.location.pathname,
+        referrer: document.referrer || null,
+        linkId: null,
+        linkTitle: null,
+      });
+
+      window.localStorage.setItem(viewStorageKey, "1");
+    } catch {
+      // Ignore client storage issues and keep the public page interactive.
+    }
+  }, [analyticsEnabled, profile.id]);
+
+  function handleLinkClick(linkId: string, linkTitle: string) {
+    if (!analyticsEnabled) {
+      return;
+    }
+
+    sendAnalyticsEvent({
+      profileId: profile.id,
+      eventType: "link_click",
+      sessionId: getAnalyticsSessionId(),
+      path: window.location.pathname,
+      referrer: document.referrer || null,
+      linkId,
+      linkTitle,
+    });
+  }
 
   return (
     <section
@@ -33,11 +124,11 @@ export function ProfilePreview({ profile, compact = false, locale = "ptBR" }: Pr
         background: theme.background,
         color: theme.text,
       }}
+    >
+      <div
+        className="rounded-[1.7rem] border border-white/8 p-5 backdrop-blur"
+        style={{ backgroundColor: theme.panel }}
       >
-        <div
-          className="rounded-[1.7rem] border border-white/8 p-5 backdrop-blur"
-          style={{ backgroundColor: theme.panel }}
-        >
         <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-white/12 bg-white/8 text-xl font-semibold">
           {profile.avatarUrl ? (
             <Image
@@ -60,12 +151,13 @@ export function ProfilePreview({ profile, compact = false, locale = "ptBR" }: Pr
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          {profile.links.filter((link) => link.isActive).map((link) => (
+          {activeLinks.map((link) => (
             <a
               key={link.id}
               href={link.url}
               target="_blank"
               rel="noreferrer"
+              onClick={() => handleLinkClick(link.id, link.title)}
               className="flex min-h-13 items-center justify-between rounded-2xl border border-white/10 px-4 py-3 text-sm font-medium transition hover:-translate-y-px"
               style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
             >

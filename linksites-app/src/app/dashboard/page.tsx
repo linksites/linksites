@@ -4,11 +4,13 @@ import type { ReactNode } from "react";
 import { updateLinks, updateProfile } from "@/app/dashboard/actions";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProfilePreview } from "@/components/profile-preview";
+import { getProfileAnalytics } from "@/lib/analytics";
 import { appContent } from "@/data/app-content";
 import { getAppBaseUrl } from "@/lib/app-url";
 import { getServerLocale } from "@/lib/locale-server";
 import { themeCatalog } from "@/lib/mock-data";
 import { demoProfile } from "@/lib/mock-data";
+import { getProfileOnboarding } from "@/lib/onboarding";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getCurrentViewer } from "@/lib/viewer";
 
@@ -75,6 +77,28 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const dashboardTitle = content.dashboard.title.replace("{name}", profile.displayName);
   const publishedDescription = content.dashboard.profilePublishedDescription.replace("{username}", profile.username);
   const publicProfileUrl = `${appBaseUrl}/u/${profile.username}`;
+  const analytics = await getProfileAnalytics(profile.id);
+  const onboarding = getProfileOnboarding(profile);
+  const analyticsCards = [
+    {
+      label: content.dashboard.analyticsViewsLabel,
+      value: analytics.totalViews.toLocaleString(locale === "ptBR" ? "pt-BR" : "en-US"),
+      helper: content.dashboard.analyticsRecentViewsLabel,
+      helperValue: analytics.recentViews.toLocaleString(locale === "ptBR" ? "pt-BR" : "en-US"),
+    },
+    {
+      label: content.dashboard.analyticsVisitorsLabel,
+      value: analytics.uniqueVisitors.toLocaleString(locale === "ptBR" ? "pt-BR" : "en-US"),
+      helper: content.dashboard.analyticsClicksLabel,
+      helperValue: analytics.totalClicks.toLocaleString(locale === "ptBR" ? "pt-BR" : "en-US"),
+    },
+    {
+      label: content.dashboard.analyticsTopLinkLabel,
+      value: analytics.topLinkTitle ?? content.dashboard.analyticsTopLinkEmpty,
+      helper: content.dashboard.analyticsClicksLabel,
+      helperValue: analytics.topLinkClicks.toLocaleString(locale === "ptBR" ? "pt-BR" : "en-US"),
+    },
+  ];
 
   return (
     <div className="page-shell min-h-screen">
@@ -135,6 +159,71 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   {profile.links.length} {content.dashboard.unlockedSuffix}
                 </p>
                 <p className="mt-2 text-sm leading-7 text-white/58">{content.dashboard.unlockedDescription}</p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-2xl">
+                  <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.analyticsLabel}</div>
+                  <h2 className="mt-2 font-[var(--font-display)] text-2xl font-semibold text-white">
+                    {content.dashboard.analyticsTitle}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-white/60">{content.dashboard.analyticsDescription}</p>
+                </div>
+                <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[var(--accent)]">
+                  {analytics.recentViews} / 7d
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-3">
+                {analyticsCards.map((card) => (
+                  <div key={card.label} className="rounded-[1.4rem] border border-white/8 bg-white/4 p-4">
+                    <div className="text-xs uppercase tracking-[0.24em] text-white/42">{card.label}</div>
+                    <p className="mt-3 text-lg font-semibold text-white">{card.value}</p>
+                    <p className="mt-2 text-sm leading-7 text-white/58">
+                      {card.helper}: {card.helperValue}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-2xl">
+                  <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.onboardingLabel}</div>
+                  <h2 className="mt-2 font-[var(--font-display)] text-2xl font-semibold text-white">
+                    {content.dashboard.onboardingTitle}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-white/60">{content.dashboard.onboardingDescription}</p>
+                </div>
+                <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[var(--accent)]">
+                  {onboarding.completedCount}/{onboarding.totalCount} {content.dashboard.onboardingCompletedLabel}
+                </div>
+              </div>
+
+              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/8">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)]"
+                  style={{ width: `${onboarding.progressPercent}%` }}
+                />
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {onboarding.steps.map((step) => (
+                  <div
+                    key={step.key}
+                    className={`rounded-[1.2rem] border px-4 py-3 text-sm ${
+                      step.complete
+                        ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+                        : "border-white/8 bg-white/4 text-white/70"
+                    }`}
+                  >
+                    {step.complete ? content.dashboard.onboardingStepDone : content.dashboard.onboardingStepPending}:{" "}
+                    {content.dashboard.onboardingSteps[step.key]}
+                  </div>
+                ))}
               </div>
             </div>
 

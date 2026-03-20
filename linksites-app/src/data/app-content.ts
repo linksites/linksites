@@ -98,6 +98,22 @@ export const appContent: Record<AppLocale, {
     identityTitle: string;
     identityLive: string;
     identityFallback: string;
+    analyticsLabel: string;
+    analyticsTitle: string;
+    analyticsDescription: string;
+    analyticsViewsLabel: string;
+    analyticsVisitorsLabel: string;
+    analyticsClicksLabel: string;
+    analyticsRecentViewsLabel: string;
+    analyticsTopLinkLabel: string;
+    analyticsTopLinkEmpty: string;
+    onboardingLabel: string;
+    onboardingTitle: string;
+    onboardingDescription: string;
+    onboardingCompletedLabel: string;
+    onboardingStepDone: string;
+    onboardingStepPending: string;
+    onboardingSteps: Record<"profile" | "bio" | "avatar" | "links" | "publish", string>;
     fields: {
       displayName: string;
       username: string;
@@ -291,6 +307,28 @@ export const appContent: Record<AppLocale, {
       identityTitle: "Informacoes do perfil vindas da sua conta",
       identityLive: "Ao vivo no Supabase",
       identityFallback: "Dados de fallback",
+      analyticsLabel: "Analytics",
+      analyticsTitle: "Como sua pagina esta performando",
+      analyticsDescription: "Acompanhe visitas, visitantes unicos e cliques para entender o que mais atrai interesse no seu perfil.",
+      analyticsViewsLabel: "Visualizacoes",
+      analyticsVisitorsLabel: "Visitantes unicos",
+      analyticsClicksLabel: "Cliques em links",
+      analyticsRecentViewsLabel: "Visualizacoes nos ultimos 7 dias",
+      analyticsTopLinkLabel: "Link com mais cliques",
+      analyticsTopLinkEmpty: "Ainda sem cliques",
+      onboardingLabel: "Onboarding",
+      onboardingTitle: "Checklist para publicar melhor",
+      onboardingDescription: "Complete estas etapas para deixar seu perfil mais forte, mais confiavel e pronto para divulgar.",
+      onboardingCompletedLabel: "etapas concluidas",
+      onboardingStepDone: "OK",
+      onboardingStepPending: "Pendente",
+      onboardingSteps: {
+        profile: "Definir nome e username",
+        bio: "Escrever uma bio clara",
+        avatar: "Adicionar avatar",
+        links: "Publicar pelo menos 3 links ativos",
+        publish: "Ativar a pagina publica",
+      },
       fields: {
         displayName: "Nome de exibicao",
         username: "Username",
@@ -505,6 +543,28 @@ export const appContent: Record<AppLocale, {
       identityTitle: "Profile information from your account",
       identityLive: "Live from Supabase",
       identityFallback: "Fallback data",
+      analyticsLabel: "Analytics",
+      analyticsTitle: "How your page is performing",
+      analyticsDescription: "Track views, unique visitors, and link clicks to understand what gets the most attention on your profile.",
+      analyticsViewsLabel: "Views",
+      analyticsVisitorsLabel: "Unique visitors",
+      analyticsClicksLabel: "Link clicks",
+      analyticsRecentViewsLabel: "Views in the last 7 days",
+      analyticsTopLinkLabel: "Top link",
+      analyticsTopLinkEmpty: "No clicks yet",
+      onboardingLabel: "Onboarding",
+      onboardingTitle: "Checklist for a stronger launch",
+      onboardingDescription: "Complete these steps to make your profile stronger, clearer, and ready to share.",
+      onboardingCompletedLabel: "steps completed",
+      onboardingStepDone: "Done",
+      onboardingStepPending: "Pending",
+      onboardingSteps: {
+        profile: "Set display name and username",
+        bio: "Write a clear bio",
+        avatar: "Add an avatar",
+        links: "Publish at least 3 active links",
+        publish: "Turn on the public page",
+      },
       fields: {
         displayName: "Display name",
         username: "Username",

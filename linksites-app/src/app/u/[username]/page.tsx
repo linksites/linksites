@@ -40,7 +40,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
         </div>
 
         <div className="flex items-center justify-center">
-          <ProfilePreview profile={profile} locale={locale} />
+          <ProfilePreview profile={profile} locale={locale} analyticsEnabled />
         </div>
       </div>
     </div>

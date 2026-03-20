@@ -17,6 +17,8 @@ O MVP atual ja cobre o fluxo principal de um criador:
 - criar, editar, remover, reordenar e ativar links
 - publicar a pagina publica em `/u/[username]`
 - visualizar preview do perfil no dashboard
+- acompanhar onboarding com checklist de publicacao
+- acompanhar analytics de visitas, visitantes unicos e cliques
 
 Sem variaveis de ambiente, o app entra em modo mock para revisao visual da experiencia.
 
@@ -38,6 +40,8 @@ Sem variaveis de ambiente, o app entra em modo mock para revisao visual da exper
   Login, cadastro e magic link
 - `/dashboard`
   Painel autenticado de configuracao
+- `/api/analytics`
+  Captura publica de `profile_view` e `link_click`
 - `/u/[username]`
   Pagina publica do perfil
 - `/auth/confirm`
@@ -94,6 +98,8 @@ O schema inicial cria:
   botoes e destinos exibidos na pagina publica
 - `themes`
   catalogo de temas visuais
+- `analytics_events`
+  eventos publicos de visualizacao de perfil e clique em link
 
 Tambem ja existem:
 
@@ -101,6 +107,25 @@ Tambem ja existem:
 - politicas de `Row Level Security`
 - bucket publico `avatars`
 - politicas de upload, leitura, update e delete para avatar
+- politicas para leitura privada de analytics pelo dono do perfil
+- politica publica de insert para capturar eventos em perfis publicados
+
+## Dashboard atual
+
+O dashboard agora concentra tres camadas:
+
+- configuracao do perfil
+- checklist de onboarding
+- resumo de analytics
+
+Hoje ele mostra:
+
+- views totais
+- visitantes unicos
+- cliques em links
+- views dos ultimos 7 dias
+- link com maior volume de cliques
+- progresso de publicacao do perfil
 
 ## Direcao de produto
 
@@ -108,9 +133,9 @@ Hoje o app e um construtor de pagina publica. Se a proposta e virar uma mini red
 
 ### Camada 1. Perfil forte
 
-- melhorar onboarding
+- aprofundar onboarding
 - ampliar blocos de conteudo
-- adicionar analytics
+- expandir analytics
 - suportar dominios personalizados
 
 ### Camada 2. Relacao entre perfis
@@ -142,7 +167,7 @@ Se a meta de mini rede social for confirmada, as proximas entidades naturais sao
 - `post_reactions`
 - `comments`
 - `notifications`
-- `profile_metrics` ou `analytics_events`
+- `profile_metrics`
 
 Vale manter a evolucao incremental: primeiro sinais sociais leves e analytics, depois feed e interacao mais densa.
 
@@ -166,3 +191,4 @@ Depois do deploy, alinhe no Supabase:
 - `Authentication > URL Configuration`
 - `Site URL`
 - `Redirect URLs`
+- aplicacao do schema mais recente em `supabase/schema.sql`

@@ -40,6 +40,8 @@ Stack atual:
 - autenticacao com `Supabase`
 - criacao automatica de perfil
 - dashboard editavel
+- onboarding com checklist de publicacao
+- analytics de visitas e cliques no dashboard
 - avatar por upload ou URL
 - pagina publica em `/u/[username]`
 - modo mock quando o ambiente nao esta configurado
@@ -62,8 +64,10 @@ Ja existe hoje:
 - conversao de precos `BRL -> USD`
 - autenticacao real no app
 - dashboard com edicao de perfil, tema, links, avatar e publicacao
+- onboarding com progresso do perfil
+- analytics de visualizacoes, visitantes unicos e cliques
 - pagina publica de perfil
-- schema inicial com `profiles`, `links`, `themes` e politicas RLS
+- schema com `profiles`, `links`, `themes`, `analytics_events` e politicas RLS
 
 ## Estrutura principal
 
@@ -120,6 +124,8 @@ npm run lint
 npm run build
 ```
 
+Se voce alterar o schema do app, aplique tambem `linksites-app/supabase/schema.sql` no projeto Supabase antes do deploy completo da funcionalidade.
+
 ## Higiene do repositorio
 
 Arquivos gerados localmente nao devem ser versionados. Este repositorio agora ignora os principais artefatos da raiz, como:
@@ -163,7 +169,7 @@ Traduzindo isso em funcionalidades:
 - extrair logicas da landing que hoje vivem em `src/App.jsx` para hooks utilitarios
 - mover URLs externas fixas para configuracao central
 - adicionar validacao automatica de build no CI para landing e app
-- criar um documento de roadmap por fases do produto
+- consolidar migracoes do Supabase em arquivos incrementais para reduzir risco de rollout
 - evoluir o modelo de dados do app para suportar `follows`, `posts`, `reactions` e `notifications`
 - separar claramente o que e conteudo institucional do que e regra de negocio
 

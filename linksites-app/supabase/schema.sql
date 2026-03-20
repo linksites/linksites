@@ -46,8 +46,28 @@ create table if not exists public.links (
   constraint url_format check (url ~* '^https?://')
 );
 
+create table if not exists public.analytics_events (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  event_type text not null,
+  session_id text not null,
+  link_id uuid,
+  link_title text,
+  path text,
+  referrer text,
+  created_at timestamptz not null default timezone('utc', now()),
+  constraint analytics_event_type check (event_type in ('profile_view', 'link_click')),
+  constraint analytics_session_length check (char_length(session_id) between 8 and 120)
+);
+
 create index if not exists links_profile_id_position_idx
   on public.links(profile_id, position);
+create index if not exists analytics_events_profile_created_idx
+  on public.analytics_events(profile_id, created_at desc);
+create index if not exists analytics_events_profile_type_created_idx
+  on public.analytics_events(profile_id, event_type, created_at desc);
+create index if not exists analytics_events_profile_session_idx
+  on public.analytics_events(profile_id, session_id);
 
 drop trigger if exists themes_set_updated_at on public.themes;
 drop trigger if exists profiles_set_updated_at on public.profiles;
@@ -106,6 +126,7 @@ set
 alter table public.themes enable row level security;
 alter table public.profiles enable row level security;
 alter table public.links enable row level security;
+alter table public.analytics_events enable row level security;
 
 drop policy if exists "themes are readable by everyone" on public.themes;
 create policy "themes are readable by everyone"
@@ -173,6 +194,33 @@ using (
     select 1
     from public.profiles
     where public.profiles.id = public.links.profile_id
+      and public.profiles.is_published = true
+  )
+);
+
+drop policy if exists "owners can read their own analytics" on public.analytics_events;
+create policy "owners can read their own analytics"
+on public.analytics_events
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.profiles
+    where public.profiles.id = public.analytics_events.profile_id
+      and public.profiles.user_id = auth.uid()
+  )
+);
+
+drop policy if exists "public can write analytics for published profiles" on public.analytics_events;
+create policy "public can write analytics for published profiles"
+on public.analytics_events
+for insert
+with check (
+  exists (
+    select 1
+    from public.profiles
+    where public.profiles.id = public.analytics_events.profile_id
       and public.profiles.is_published = true
   )
 );

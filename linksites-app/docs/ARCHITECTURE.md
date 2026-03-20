@@ -16,19 +16,23 @@ Build the SaaS layer of LinkSites as a dedicated application for creator pages, 
 3. User customizes bio, avatar, theme, and links
 4. User publishes a public page
 5. Visitors open `/u/:username`
+6. Public visits and link clicks are stored as analytics events
+7. The dashboard shows onboarding progress and performance summary
 
 ## App structure
 
 - `src/app/page.tsx`
   Product-facing entry page
 - `src/app/dashboard/page.tsx`
-  Creator editor MVP
+  Creator editor MVP with onboarding and analytics summary
+- `src/app/api/analytics/route.ts`
+  Public analytics ingestion endpoint
 - `src/app/u/[username]/page.tsx`
-  Public profile page
+  Public profile page and analytics capture surface
 - `src/components/`
   Reusable UI and preview components
 - `src/lib/`
-  Supabase clients, mock data, shared types, and data loaders
+  Supabase clients, mock data, shared types, analytics, onboarding, and data loaders
 - `supabase/schema.sql`
   Database schema and RLS
 
@@ -50,6 +54,12 @@ Build the SaaS layer of LinkSites as a dedicated application for creator pages, 
 - preset theme catalog
 - used by profile pages and dashboard preview
 
+### analytics_events
+
+- belongs to a profile
+- stores `profile_view` and `link_click`
+- keeps session id, path, referrer, and top link context
+
 ## Auth strategy
 
 - Supabase Auth for email and magic link initially
@@ -67,6 +77,8 @@ Build the SaaS layer of LinkSites as a dedicated application for creator pages, 
 - Row Level Security enabled on product tables
 - only owners can manage their profiles and links
 - public visitors can read published profiles and active links only
+- public visitors can insert analytics events only for published profiles
+- only owners can read their own analytics events
 
 ## Milestones
 
@@ -82,9 +94,11 @@ Build the SaaS layer of LinkSites as a dedicated application for creator pages, 
 - auth
 - persistence
 - image upload
+- onboarding
+- analytics
 
 ### Phase 3
 
-- analytics
 - custom domains
 - plans and billing
+- follows and social discovery

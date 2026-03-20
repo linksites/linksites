@@ -151,6 +151,8 @@ export const appContent: Record<AppLocale, {
   };
   publicProfile: {
     backHome: string;
+    followersSingular: string;
+    followersPlural: string;
     openInBrowser: string;
     openInBrowserHint: string;
   };
@@ -387,7 +389,9 @@ export const appContent: Record<AppLocale, {
       },
     },
     publicProfile: {
-      backHome: "Voltar para o app",
+      backHome: "Voltar para o dashboard",
+      followersSingular: "seguidor",
+      followersPlural: "seguidores",
       openInBrowser: "Abrir no navegador",
       openInBrowserHint: "Se o perfil abrir dentro do Instagram ou do X, toque aqui para tentar abrir no navegador do aparelho.",
     },
@@ -625,7 +629,9 @@ export const appContent: Record<AppLocale, {
       },
     },
     publicProfile: {
-      backHome: "Back to app",
+      backHome: "Back to dashboard",
+      followersSingular: "follower",
+      followersPlural: "followers",
       openInBrowser: "Open in browser",
       openInBrowserHint: "If this profile opens inside Instagram or X, tap here to try opening it in your device browser.",
     },

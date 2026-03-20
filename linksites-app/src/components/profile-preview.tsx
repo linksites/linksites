@@ -18,6 +18,8 @@ type ProfilePreviewProps = {
   compact?: boolean;
   locale?: AppLocale;
   analyticsEnabled?: boolean;
+  socialEnabled?: boolean;
+  initialFollowersCount?: number;
 };
 
 function getInitials(name: string) {
@@ -67,6 +69,8 @@ export function ProfilePreview({
   compact = false,
   locale = "ptBR",
   analyticsEnabled = false,
+  socialEnabled = false,
+  initialFollowersCount = 0,
 }: ProfilePreviewProps) {
   const theme = themeCatalog[profile.themeSlug];
   const content = appContent[locale];
@@ -75,7 +79,8 @@ export function ProfilePreview({
   const supabase = hasBrowserSupabase ? createSupabaseBrowserClient() : null;
 
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isLoading, setIsLoading] = useState(hasBrowserSupabase);
+  const [isLoading, setIsLoading] = useState(hasBrowserSupabase && socialEnabled);
+  const [followersCount, setFollowersCount] = useState(initialFollowersCount);
 
   useEffect(() => {
     if (!analyticsEnabled) {
@@ -107,17 +112,30 @@ export function ProfilePreview({
   }, [analyticsEnabled, profile.id]);
 
   useEffect(() => {
-    if (!supabase) {
+    if (!socialEnabled || !supabase) {
       return;
     }
 
-    const checkFollowStatus = async () => {
+    let active = true;
+
+    const loadSocialState = async () => {
+      const { count } = await supabase
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("followed_id", profile.id);
+
+      if (active && typeof count === "number") {
+        setFollowersCount(count);
+      }
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (!user) {
-        setIsLoading(false);
+        if (active) {
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -128,7 +146,9 @@ export function ProfilePreview({
         .single();
 
       if (!myProfile) {
-        setIsLoading(false);
+        if (active) {
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -138,14 +158,38 @@ export function ProfilePreview({
         .match({ follower_id: myProfile.id, followed_id: profile.id })
         .single();
 
-      if (!error && data) {
+      if (active && !error && data) {
         setIsFollowing(true);
       }
-      setIsLoading(false);
+
+      if (active) {
+        setIsLoading(false);
+      }
     };
 
-    checkFollowStatus();
-  }, [profile.id, supabase]);
+    loadSocialState();
+
+    return () => {
+      active = false;
+    };
+  }, [profile.id, socialEnabled, supabase]);
+
+  function handleFollowChange(nextIsFollowing: boolean) {
+    setIsFollowing(nextIsFollowing);
+    setFollowersCount((currentValue) => {
+      if (nextIsFollowing === isFollowing) {
+        return currentValue;
+      }
+
+      return Math.max(0, currentValue + (nextIsFollowing ? 1 : -1));
+    });
+  }
+
+  function getFollowersLabel(count: number) {
+    return count === 1
+      ? content.publicProfile.followersSingular
+      : content.publicProfile.followersPlural;
+  }
 
   function handleLinkClick(linkId: string, linkTitle: string) {
     if (!analyticsEnabled) {
@@ -199,11 +243,22 @@ export function ProfilePreview({
           <p className="mt-4 text-sm leading-7 opacity-80">{profile.bio}</p>
         </div>
 
-        <div className="mt-6">
-          {!isLoading && supabase ? (
-            <FollowButton targetProfileId={profile.id} initialIsFollowing={isFollowing} />
-          ) : null}
-        </div>
+        {socialEnabled ? (
+          <div className="mt-6 flex flex-col items-center gap-4">
+            <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78">
+              <strong className="text-white">{followersCount}</strong>{" "}
+              {getFollowersLabel(followersCount)}
+            </div>
+
+            {!isLoading && supabase ? (
+              <FollowButton
+                targetProfileId={profile.id}
+                initialIsFollowing={isFollowing}
+                onFollowChange={handleFollowChange}
+              />
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="mt-6 flex flex-col gap-3">
           {activeLinks.map((link) => (

@@ -6,9 +6,14 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 interface FollowButtonProps {
   targetProfileId: string;
   initialIsFollowing: boolean;
+  onFollowChange?: (nextIsFollowing: boolean) => void;
 }
 
-export default function FollowButton({ targetProfileId, initialIsFollowing }: FollowButtonProps) {
+export default function FollowButton({
+  targetProfileId,
+  initialIsFollowing,
+  onFollowChange,
+}: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createSupabaseBrowserClient();
@@ -43,6 +48,7 @@ export default function FollowButton({ targetProfileId, initialIsFollowing }: Fo
           .delete()
           .match({ follower_id: myProfile.id, followed_id: targetProfileId });
         setIsFollowing(false);
+        onFollowChange?.(false);
         return;
       }
 
@@ -50,6 +56,7 @@ export default function FollowButton({ targetProfileId, initialIsFollowing }: Fo
         .from("follows")
         .insert({ follower_id: myProfile.id, followed_id: targetProfileId });
       setIsFollowing(true);
+      onFollowChange?.(true);
     } catch (error) {
       console.error("Erro ao alterar follow:", error);
     } finally {

@@ -194,3 +194,21 @@ export const getPublicProfileByUsername = cache(async (username: string): Promis
 
   return mapProfile(profile as ProfileRow, (links ?? []) as LinkRow[], { onlyActive: true });
 });
+
+export const getFollowerCountByProfileId = cache(async (profileId: string): Promise<number> => {
+  if (!hasSupabaseEnv()) {
+    return 0;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("follows")
+    .select("*", { count: "exact", head: true })
+    .eq("followed_id", profileId);
+
+  if (error || typeof count !== "number") {
+    return 0;
+  }
+
+  return count;
+});

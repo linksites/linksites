@@ -43,16 +43,30 @@ export default function FollowButton({
       }
 
       if (isFollowing) {
-        const { error } = await supabase
+        const { error: deleteError } = await supabase
           .from("follows")
           .delete()
           .match({ follower_id: myProfile.id, followed_id: targetProfileId });
 
-        if (error) {
-          console.error("Error unfollowing:", error);
-          // Revert state if the operation fails
-          setIsFollowing(true);
+        if (deleteError) {
+          console.error("Error unfollowing:", deleteError);
           return;
+        }
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("followers_count")
+          .eq("id", targetProfileId)
+          .single();
+
+        if (profile) {
+          const { error: updateError } = await supabase
+            .from("profiles")
+            .update({ followers_count: Math.max(0, profile.followers_count - 1) })
+            .eq("id", targetProfileId);
+          if (updateError) {
+            console.error("Error updating follower count:", updateError);
+          }
         }
 
         setIsFollowing(false);
@@ -60,15 +74,29 @@ export default function FollowButton({
         return;
       }
 
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from("follows")
         .insert({ follower_id: myProfile.id, followed_id: targetProfileId });
 
-      if (error) {
-        console.error("Error following:", error);
-        // Revert state if the operation fails
-        setIsFollowing(false);
+      if (insertError) {
+        console.error("Error following:", insertError);
         return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("followers_count")
+        .eq("id", targetProfileId)
+        .single();
+      
+      if (profile) {
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ followers_count: profile.followers_count + 1 })
+          .eq("id", targetProfileId);
+        if (updateError) {
+          console.error("Error updating follower count:", updateError);
+        }
       }
 
       setIsFollowing(true);

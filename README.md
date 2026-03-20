@@ -213,7 +213,8 @@ Traduzindo isso em funcionalidades:
 - **Sistema de Chat**: Desenvolver as telas de DMs e grupos aproveitando as tabelas e politicas RLS ja criadas.
 - **Presenca de Usuarios**: Implementar o hook de presenca no Next.js para mostrar quem esta online.
 - **Gestao do Banco**: Consolidar o uso de `supabase migration new` para todas as proximas alteracoes de schema.
-- **UI de Posts**: Finalizar a construcao da tela para a publicacao de `posts` e interacao via `reactions`.
+- **UI de Posts**: Finalizar a construcao da tela para a publicacao de `posts` e interacao via `reactions`.deploy
+
 
 ## Contato
 

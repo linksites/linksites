@@ -23,6 +23,10 @@ type LinkRow = {
   is_active: boolean;
 };
 
+type NetworkProfileRow = ProfileRow & {
+  followers_count?: number | null;
+};
+
 function mapProfile(profile: ProfileRow, links: LinkRow[], options?: { onlyActive?: boolean }): ProfileWithLinks {
   return {
     id: profile.id,
@@ -201,12 +205,22 @@ export const getFollowerCountByProfileId = cache(async (profileId: string): Prom
   }
 
   const supabase = await createSupabaseServerClient();
-  const { count, error } = await supabase
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("followers_count")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (!error && profile) {
+    return profile.followers_count ?? 0;
+  }
+
+  const { count, error: fallbackError } = await supabase
     .from("follows")
     .select("*", { count: "exact", head: true })
     .eq("followed_id", profileId);
 
-  if (error || typeof count !== "number") {
+  if (fallbackError || typeof count !== "number") {
     return 0;
   }
 
@@ -222,7 +236,7 @@ export const getNetworkProfiles = cache(
     const supabase = await createSupabaseServerClient();
     let query = supabase
       .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme_slug, is_published")
+      .select("id, username, display_name, bio, avatar_url, theme_slug, is_published, followers_count")
       .eq("is_published", true)
       .order("username", { ascending: true })
       .limit(limit);
@@ -231,21 +245,40 @@ export const getNetworkProfiles = cache(
       query = query.neq("id", excludeProfileId);
     }
 
-    const { data: profiles, error } = await query;
+    const initialResponse = await query;
+    let profiles = (initialResponse.data ?? null) as NetworkProfileRow[] | null;
+    let error = initialResponse.error;
+    let useStoredFollowersCount = true;
+
+    if (error) {
+      useStoredFollowersCount = false;
+
+      let fallbackQuery = supabase
+        .from("profiles")
+        .select("id, username, display_name, bio, avatar_url, theme_slug, is_published")
+        .eq("is_published", true)
+        .order("username", { ascending: true })
+        .limit(limit);
+
+      if (excludeProfileId) {
+        fallbackQuery = fallbackQuery.neq("id", excludeProfileId);
+      }
+
+      const fallbackResponse = await fallbackQuery;
+      profiles = (fallbackResponse.data ?? null) as NetworkProfileRow[] | null;
+      error = fallbackResponse.error;
+    }
 
     if (error || !profiles?.length) {
       return [];
     }
 
     const profileIds = profiles.map((profile) => profile.id);
-    const [{ data: links }, { data: follows }] = await Promise.all([
-      supabase
-        .from("links")
-        .select("profile_id")
-        .in("profile_id", profileIds)
-        .eq("is_active", true),
-      supabase.from("follows").select("followed_id").in("followed_id", profileIds),
-    ]);
+    const { data: links } = await supabase
+      .from("links")
+      .select("profile_id")
+      .in("profile_id", profileIds)
+      .eq("is_active", true);
 
     const linksCountByProfileId = new Map<string, number>();
     const followersCountByProfileId = new Map<string, number>();
@@ -254,14 +287,21 @@ export const getNetworkProfiles = cache(
       linksCountByProfileId.set(link.profile_id, (linksCountByProfileId.get(link.profile_id) ?? 0) + 1);
     });
 
-    (follows ?? []).forEach((follow) => {
-      followersCountByProfileId.set(
-        follow.followed_id,
-        (followersCountByProfileId.get(follow.followed_id) ?? 0) + 1,
-      );
-    });
+    if (!useStoredFollowersCount) {
+      const { data: follows } = await supabase
+        .from("follows")
+        .select("followed_id")
+        .in("followed_id", profileIds);
 
-    return profiles.map((profile) => ({
+      (follows ?? []).forEach((follow) => {
+        followersCountByProfileId.set(
+          follow.followed_id,
+          (followersCountByProfileId.get(follow.followed_id) ?? 0) + 1,
+        );
+      });
+    }
+
+    return (profiles as NetworkProfileRow[]).map((profile) => ({
       id: profile.id,
       username: profile.username,
       displayName: profile.display_name,
@@ -269,7 +309,9 @@ export const getNetworkProfiles = cache(
       avatarUrl: profile.avatar_url,
       themeSlug: profile.theme_slug,
       activeLinksCount: linksCountByProfileId.get(profile.id) ?? 0,
-      followersCount: followersCountByProfileId.get(profile.id) ?? 0,
+      followersCount: useStoredFollowersCount
+        ? profile.followers_count ?? 0
+        : followersCountByProfileId.get(profile.id) ?? 0,
     }));
   },
 );

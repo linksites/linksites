@@ -43,18 +43,34 @@ export default function FollowButton({
       }
 
       if (isFollowing) {
-        await supabase
+        const { error } = await supabase
           .from("follows")
           .delete()
           .match({ follower_id: myProfile.id, followed_id: targetProfileId });
+
+        if (error) {
+          console.error("Error unfollowing:", error);
+          // Revert state if the operation fails
+          setIsFollowing(true);
+          return;
+        }
+
         setIsFollowing(false);
         onFollowChange?.(false);
         return;
       }
 
-      await supabase
+      const { error } = await supabase
         .from("follows")
         .insert({ follower_id: myProfile.id, followed_id: targetProfileId });
+
+      if (error) {
+        console.error("Error following:", error);
+        // Revert state if the operation fails
+        setIsFollowing(false);
+        return;
+      }
+
       setIsFollowing(true);
       onFollowChange?.(true);
     } catch (error) {

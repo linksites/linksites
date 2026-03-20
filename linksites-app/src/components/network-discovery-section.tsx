@@ -43,18 +43,20 @@ export function NetworkDiscoverySection({
           {profiles.map((profile) => (
             <article key={profile.id} className="rounded-[1.4rem] border border-white/8 bg-white/4 p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/8 text-sm font-semibold text-white">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-slate-950 text-sm font-semibold text-white">
                   {profile.avatarUrl ? (
                     <Image
                       src={profile.avatarUrl}
                       alt={profile.displayName}
-                      width={56}
-                      height={56}
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="56px"
+                      className="scale-[1.08] rounded-full object-cover object-center"
                       unoptimized
                     />
                   ) : (
-                    getInitials(profile.displayName)
+                    <span className="flex h-full w-full items-center justify-center">
+                      {getInitials(profile.displayName)}
+                    </span>
                   )}
                 </div>
 

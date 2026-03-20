@@ -178,10 +178,6 @@ export function ProfilePreview({
   function handleFollowChange(nextIsFollowing: boolean) {
     setIsFollowing(nextIsFollowing);
     setFollowersCount((currentValue) => {
-      if (nextIsFollowing === isFollowing) {
-        return currentValue;
-      }
-
       return Math.max(0, currentValue + (nextIsFollowing ? 1 : -1));
     });
   }

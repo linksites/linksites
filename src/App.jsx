@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import ContactSection from "./components/sections/ContactSection";
 import CurrentSiteDialog from "./components/sections/CurrentSiteDialog";
 import DifferentialsSection from "./components/sections/DifferentialsSection";
@@ -8,426 +8,56 @@ import PortfolioSection from "./components/sections/PortfolioSection";
 import ServicesSection from "./components/sections/ServicesSection";
 import SiteFooter from "./components/sections/SiteFooter";
 import SiteHeader from "./components/sections/SiteHeader";
+import { appLinks } from "./config/app-links";
 import { localizedCases } from "./data/cases";
 import { siteContent } from "./data/siteContent";
-
-const repoCaseSource = localizedCases.ptBR;
-const APP_BASE_URL = "https://linksites.vercel.app";
-const LOCALE_STORAGE_KEY = "linksites-locale";
-const EXCHANGE_RATE_STORAGE_KEY = "linksites-brl-usd-rate-v1";
-const VISITOR_COUNTER_API_BASE = "https://countapi.mileshilliard.com/api/v1";
-const VISITOR_COUNTER_KEY = "linksites-home-unique-browsers";
-const VISITOR_COUNTER_STORAGE_KEY = "linksites-home-unique-browser-v1";
-const githubRepoGroups = repoCaseSource.reduce((groups, item) => {
-  const existingRepos = groups[item.owner] ?? [];
-
-  if (!existingRepos.includes(item.repo)) {
-    groups[item.owner] = [...existingRepos, item.repo];
-  }
-
-  return groups;
-}, {});
-
-function createRepoUpdateMap(defaultValue = null) {
-  return repoCaseSource.reduce((repoUpdates, item) => {
-    repoUpdates[`${item.owner}/${item.repo}`] = defaultValue;
-    return repoUpdates;
-  }, {});
-}
-
-function normalizeRepoUpdates(rawUpdates = {}) {
-  const normalizedUpdates = createRepoUpdateMap();
-
-  repoCaseSource.forEach((item) => {
-    const key = `${item.owner}/${item.repo}`;
-    normalizedUpdates[key] = rawUpdates[key] ?? null;
-  });
-
-  return normalizedUpdates;
-}
-
-async function fetchLiveRepoUpdates(signal) {
-  const ownerEntries = Object.entries(githubRepoGroups);
-  const repoUpdatesByOwner = await Promise.all(
-    ownerEntries.map(async ([owner, repos]) => {
-      const response = await fetch(`https://api.github.com/users/${owner}/repos?per_page=100&type=owner`, {
-        cache: "no-store",
-        signal,
-        headers: {
-          Accept: "application/vnd.github+json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`github_repos_unavailable:${owner}`);
-      }
-
-      const payload = await response.json();
-      const repoSet = new Set(repos);
-
-      return payload.reduce((ownerUpdates, repo) => {
-        if (repoSet.has(repo.name)) {
-          ownerUpdates[`${owner}/${repo.name}`] = repo.pushed_at ?? null;
-        }
-
-        return ownerUpdates;
-      }, {});
-    }),
-  );
-
-  return normalizeRepoUpdates(Object.assign({}, ...repoUpdatesByOwner));
-}
-
-async function fetchSnapshotRepoUpdates(repoUpdatesUrl, signal) {
-  const response = await fetch(repoUpdatesUrl, {
-    cache: "no-store",
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error("repo_updates_unavailable");
-  }
-
-  const payload = await response.json();
-  return normalizeRepoUpdates(payload?.repos);
-}
-
-function readStoredLocale() {
-  try {
-    return window.localStorage.getItem(LOCALE_STORAGE_KEY) ?? "ptBR";
-  } catch {
-    return "ptBR";
-  }
-}
-
-function readCachedExchangeRate() {
-  try {
-    const rawValue = window.localStorage.getItem(EXCHANGE_RATE_STORAGE_KEY);
-
-    if (!rawValue) {
-      return null;
-    }
-
-    const parsedValue = JSON.parse(rawValue);
-    const rate = Number(parsedValue?.rate);
-
-    return Number.isFinite(rate) && rate > 0 ? rate : null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchBrlToUsdRate(signal) {
-  const response = await fetch("https://api.frankfurter.dev/v1/latest?base=BRL&symbols=USD", {
-    cache: "no-store",
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error("exchange_rate_unavailable");
-  }
-
-  const payload = await response.json();
-  const rate = Number(payload?.rates?.USD);
-
-  if (!Number.isFinite(rate) || rate <= 0) {
-    throw new Error("invalid_exchange_rate");
-  }
-
-  return {
-    rate,
-    date: payload?.date ?? null,
-  };
-}
-
-function formatPlanPrice(amountBrl, locale, exchangeRate) {
-  if (!Number.isFinite(amountBrl)) {
-    return null;
-  }
-
-  if (locale === "en") {
-    if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
-      return null;
-    }
-
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: amountBrl === 0 ? 0 : 2,
-      maximumFractionDigits: 2,
-    }).format(amountBrl * exchangeRate);
-  }
-
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: amountBrl === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(amountBrl);
-}
+import { useDialogEscape } from "./hooks/useDialogEscape";
+import { useExchangeRate } from "./hooks/useExchangeRate";
+import { useLandingLocale } from "./hooks/useLandingLocale";
+import { usePageMetadata } from "./hooks/usePageMetadata";
+import { usePortfolioTrack } from "./hooks/usePortfolioTrack";
+import { useRepoUpdates } from "./hooks/useRepoUpdates";
+import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
+import { useVisitCount } from "./hooks/useVisitCount";
+import { formatPlanPrice } from "./lib/plan-pricing";
 
 export default function App() {
-  const [locale, setLocale] = useState(() => readStoredLocale());
+  const [locale, setLocale] = useLandingLocale();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [repoUpdateDates, setRepoUpdateDates] = useState({});
-  const [visitCount, setVisitCount] = useState(siteContent.ptBR.visitCount.loading);
-  const [brlToUsdRate, setBrlToUsdRate] = useState(() => readCachedExchangeRate());
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
   const [isCurrentSiteDialogOpen, setIsCurrentSiteDialogOpen] = useState(false);
-  const trackRef = useRef(null);
-  const dragStateRef = useRef({
-    isPointerDown: false,
-    moved: false,
-    pointerId: null,
-    startX: 0,
-    startScrollLeft: 0,
-  });
 
   const content = siteContent[locale] ?? siteContent.ptBR;
   const cases = localizedCases[locale] ?? localizedCases.ptBR;
-  const appLinks = {
-    homeUrl: APP_BASE_URL,
-    loginUrl: `${APP_BASE_URL}/login`,
-    dashboardUrl: `${APP_BASE_URL}/dashboard`,
-    showcaseUrl: `${APP_BASE_URL}/u/linksitesapp`,
-  };
+  const exchangeRate = useExchangeRate();
+  const repoUpdateDates = useRepoUpdates();
+  const visitCount = useVisitCount(
+    content.numberLocale,
+    content.visitCount.offline,
+    content.visitCount.loading,
+  );
+  const {
+    canScrollPrev,
+    canScrollNext,
+    handleTrackClickCapture,
+    handleTrackPointerDown,
+    handleTrackPointerMove,
+    handleTrackPointerUp,
+    handleTrackWheel,
+    scrollCases,
+    trackRef,
+  } = usePortfolioTrack();
+
+  usePageMetadata(content);
+  useRevealOnScroll();
+  useDialogEscape(isCurrentSiteDialogOpen, () => setIsCurrentSiteDialogOpen(false));
+
   const plansContent = {
     ...content.plans,
     items: content.plans.items.map((plan) => ({
       ...plan,
-      price: formatPlanPrice(plan.amountBrl, locale, brlToUsdRate) ?? content.plans.priceLoading,
+      price: formatPlanPrice(plan.amountBrl, locale, exchangeRate) ?? content.plans.priceLoading,
     })),
   };
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-    } catch {
-      // Ignore storage issues and keep the selected locale in memory.
-    }
-  }, [locale]);
-
-  useEffect(() => {
-    document.documentElement.lang = content.lang;
-    document.title = content.metadata.title;
-
-    const description = document.querySelector('meta[name="description"]');
-    if (description) {
-      description.setAttribute("content", content.metadata.description);
-    }
-  }, [content]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-
-    async function loadExchangeRate() {
-      try {
-        const exchangeRate = await fetchBrlToUsdRate(controller.signal);
-
-        if (active) {
-          setBrlToUsdRate(exchangeRate.rate);
-        }
-
-        try {
-          window.localStorage.setItem(EXCHANGE_RATE_STORAGE_KEY, JSON.stringify(exchangeRate));
-        } catch {
-          // Ignore storage issues and keep the fresh rate in memory.
-        }
-      } catch (error) {
-        if (!active || error.name === "AbortError") {
-          return;
-        }
-      }
-    }
-
-    loadExchangeRate();
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    const repoUpdatesUrl = `${import.meta.env.BASE_URL}repo-updates.json`;
-
-    async function loadRepoUpdates() {
-      try {
-        const liveUpdates = await fetchLiveRepoUpdates(controller.signal);
-
-        if (active) {
-          setRepoUpdateDates(liveUpdates);
-        }
-
-        return;
-      } catch (liveError) {
-        if (!active || liveError.name === "AbortError") {
-          return;
-        }
-      }
-
-      try {
-        const snapshotUpdates = await fetchSnapshotRepoUpdates(repoUpdatesUrl, controller.signal);
-
-        if (active) {
-          setRepoUpdateDates(snapshotUpdates);
-        }
-      } catch (snapshotError) {
-        if (!active || snapshotError.name === "AbortError") {
-          return;
-        }
-
-        setRepoUpdateDates(createRepoUpdateMap());
-      }
-    }
-
-    loadRepoUpdates();
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, []);
-
-  useEffect(() => {
-    const elements = Array.from(document.querySelectorAll("[data-reveal]"));
-
-    if (!elements.length) {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.16, rootMargin: "0px 0px -8% 0px" },
-    );
-
-    elements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-    let shouldIncrement = false;
-
-    try {
-      shouldIncrement = window.localStorage.getItem(VISITOR_COUNTER_STORAGE_KEY) !== "1";
-    } catch {
-      shouldIncrement = true;
-    }
-
-    async function requestCounter(mode) {
-      const response = await fetch(`${VISITOR_COUNTER_API_BASE}/${mode}/${VISITOR_COUNTER_KEY}`);
-
-      if (!response.ok && response.status === 404 && mode === "get") {
-        return requestCounter("hit");
-      }
-
-      if (!response.ok) {
-        throw new Error("counter_unavailable");
-      }
-
-      return response.json();
-    }
-
-    async function loadCounter() {
-      try {
-        const data = await requestCounter(shouldIncrement ? "hit" : "get");
-        const value = Number(data.value);
-
-        if (!Number.isFinite(value)) {
-          throw new Error("invalid_counter_value");
-        }
-
-        if (shouldIncrement) {
-          try {
-            window.localStorage.setItem(VISITOR_COUNTER_STORAGE_KEY, "1");
-          } catch {
-            // Ignore storage issues and still show the fetched number.
-          }
-        }
-
-        if (active) {
-          setVisitCount(value.toLocaleString(content.numberLocale));
-        }
-      } catch {
-        if (active) {
-          setVisitCount(content.visitCount.offline);
-        }
-      }
-    }
-
-    loadCounter();
-
-    return () => {
-      active = false;
-    };
-  }, [content.numberLocale, content.visitCount.offline]);
-
-  useEffect(() => {
-    const track = trackRef.current;
-
-    if (!track) {
-      return undefined;
-    }
-
-    const updateScrollState = () => {
-      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth - 8);
-      setCanScrollPrev(track.scrollLeft > 8);
-      setCanScrollNext(track.scrollLeft < maxScroll);
-    };
-
-    updateScrollState();
-    track.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
-
-    return () => {
-      track.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isCurrentSiteDialogOpen) {
-      return undefined;
-    }
-
-    function handleKeyDown(event) {
-      if (event.key === "Escape") {
-        setIsCurrentSiteDialogOpen(false);
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isCurrentSiteDialogOpen]);
-
-  function scrollCases(direction) {
-    const track = trackRef.current;
-
-    if (!track) {
-      return;
-    }
-
-    const firstCard = track.querySelector("[data-case-card='true']");
-    const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 0;
-    const amount = Math.max(340, Math.round(cardWidth || track.clientWidth * 0.72));
-    track.scrollBy({ left: amount * direction, behavior: "smooth" });
-  }
 
   function handleProjectClick(event, item) {
     if (item.repo !== content.portfolio.currentDemoRepo) {
@@ -436,90 +66,6 @@ export default function App() {
 
     event.preventDefault();
     setIsCurrentSiteDialogOpen(true);
-  }
-
-  function handleTrackPointerDown(event) {
-    const track = trackRef.current;
-
-    if (!track || event.pointerType !== "mouse") {
-      return;
-    }
-
-    if (event.target.closest("a, button")) {
-      return;
-    }
-
-    dragStateRef.current = {
-      isPointerDown: true,
-      moved: false,
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startScrollLeft: track.scrollLeft,
-    };
-
-    track.classList.add("is-dragging");
-    track.setPointerCapture(event.pointerId);
-  }
-
-  function handleTrackPointerMove(event) {
-    const track = trackRef.current;
-    const dragState = dragStateRef.current;
-
-    if (!track || !dragState.isPointerDown || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    const deltaX = event.clientX - dragState.startX;
-
-    if (Math.abs(deltaX) > 6) {
-      dragStateRef.current.moved = true;
-    }
-
-    track.scrollLeft = dragState.startScrollLeft - deltaX;
-  }
-
-  function handleTrackPointerUp(event) {
-    const track = trackRef.current;
-    const dragState = dragStateRef.current;
-
-    if (!track || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    dragStateRef.current.isPointerDown = false;
-    dragStateRef.current.pointerId = null;
-
-    track.classList.remove("is-dragging");
-
-    if (track.hasPointerCapture(event.pointerId)) {
-      track.releasePointerCapture(event.pointerId);
-    }
-
-    window.setTimeout(() => {
-      dragStateRef.current.moved = false;
-    }, 0);
-  }
-
-  function handleTrackClickCapture(event) {
-    if (dragStateRef.current.moved) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }
-
-  function handleTrackWheel(event) {
-    const track = trackRef.current;
-
-    if (!track || window.innerWidth < 1024) {
-      return;
-    }
-
-    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
-      return;
-    }
-
-    event.preventDefault();
-    track.scrollLeft += event.deltaY;
   }
 
   return (

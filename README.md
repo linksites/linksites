@@ -83,6 +83,9 @@ Ja existe hoje:
 - dashboard com edicao de perfil, tema, links, avatar e publicacao
 - onboarding com progresso do perfil
 - analytics de visualizacoes, visitantes unicos e cliques
+- validacao automatica de build e lint no CI (GitHub Actions)
+- landing page modularizada com hooks utilitarios customizados
+- banco de dados preparado para interatividade (follows, chat, notificacoes, presenca)
 - pagina publica de perfil
 - schema com `profiles`, `links`, `themes`, `analytics_events` e politicas RLS
 
@@ -206,12 +209,11 @@ Traduzindo isso em funcionalidades:
 
 ## Proximas metas sugeridas
 
-- extrair logicas da landing que hoje vivem em `src/App.jsx` para hooks utilitarios
-- mover URLs externas fixas para configuracao central
-- adicionar validacao automatica de build no CI para landing e app
-- consolidar migracoes do Supabase em arquivos incrementais para reduzir risco de rollout
-- evoluir o modelo de dados do app para suportar `follows`, `posts`, `reactions` e `notifications`
-- separar claramente o que e conteudo institucional do que e regra de negocio
+- **UI de Interatividade**: Construir e integrar a interface do feed de notificacoes em tempo real.
+- **Sistema de Chat**: Desenvolver as telas de DMs e grupos aproveitando as tabelas e politicas RLS ja criadas.
+- **Presenca de Usuarios**: Implementar o hook de presenca no Next.js para mostrar quem esta online.
+- **Gestao do Banco**: Consolidar o uso de `supabase migration new` para todas as proximas alteracoes de schema.
+- **UI de Posts**: Finalizar a construcao da tela para a publicacao de `posts` e interacao via `reactions`.
 
 ## Contato
 

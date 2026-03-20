@@ -36,6 +36,7 @@ vite-dev.log
 
 # vercel
 .vercel
+/supabase/.temp/
 
 # typescript
 *.tsbuildinfo

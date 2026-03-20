@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { updateLinks, updateProfile } from "@/app/dashboard/actions";
@@ -46,6 +47,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const content = appContent[locale];
   const viewer = await getCurrentViewer();
   const usingMockData = !hasSupabaseEnv() || viewer.isMock;
+  const headerStore = await headers();
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host") ?? "localhost:3000";
+  const protocol = headerStore.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
 
   if (!usingMockData && !viewer.user) {
     redirect("/login?message=sign_in_required");
@@ -72,6 +76,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const newLinkSlots = 3;
   const dashboardTitle = content.dashboard.title.replace("{name}", profile.displayName);
   const publishedDescription = content.dashboard.profilePublishedDescription.replace("{username}", profile.username);
+  const publicProfileUrl = `${protocol}://${host}/u/${profile.username}`;
 
   return (
     <div className="page-shell min-h-screen">
@@ -132,6 +137,51 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   {profile.links.length} {content.dashboard.unlockedSuffix}
                 </p>
                 <p className="mt-2 text-sm leading-7 text-white/58">{content.dashboard.unlockedDescription}</p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
+              <div className="text-xs uppercase tracking-[0.24em] text-white/42">{content.dashboard.publicCardLabel}</div>
+              <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-2xl">
+                  <h2 className="font-[var(--font-display)] text-2xl font-semibold text-white">
+                    {content.dashboard.publicCardTitle}
+                  </h2>
+                  <p className="mt-2 text-sm leading-7 text-white/60">
+                    {profile.isPublished
+                      ? content.dashboard.publicCardDescriptionPublished
+                      : content.dashboard.publicCardDescriptionDraft}
+                  </p>
+                </div>
+                <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[var(--accent)]">
+                  {profile.isPublished ? content.dashboard.publicCardPublished : content.dashboard.publicCardDraft}
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.24em] text-white/46">
+                  {content.dashboard.publicCardUrlLabel}
+                </div>
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                  <input
+                    readOnly
+                    value={publicProfileUrl}
+                    className="min-h-12 flex-1 rounded-2xl border border-white/10 bg-white/4 px-4 text-sm text-white outline-none"
+                  />
+                  <Link
+                    href={publicProfileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`inline-flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition ${
+                      profile.isPublished
+                        ? "bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] text-slate-950 hover:-translate-y-px"
+                        : "cursor-not-allowed border border-white/10 bg-white/4 text-white/42 pointer-events-none"
+                    }`}
+                    aria-disabled={!profile.isPublished}
+                  >
+                    {content.dashboard.publicCardOpen}
+                  </Link>
+                </div>
               </div>
             </div>
 

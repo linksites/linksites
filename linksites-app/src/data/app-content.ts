@@ -77,6 +77,14 @@ export const appContent: Record<AppLocale, {
     unlockedLabel: string;
     unlockedSuffix: string;
     unlockedDescription: string;
+    publicCardLabel: string;
+    publicCardTitle: string;
+    publicCardPublished: string;
+    publicCardDraft: string;
+    publicCardDescriptionPublished: string;
+    publicCardDescriptionDraft: string;
+    publicCardUrlLabel: string;
+    publicCardOpen: string;
     identityLabel: string;
     identityTitle: string;
     identityLive: string;
@@ -240,6 +248,14 @@ export const appContent: Record<AppLocale, {
       unlockedLabel: "Liberado",
       unlockedSuffix: "servicos ativos",
       unlockedDescription: "Perfil publico, pilha de links, tema visual e acesso protegido ao dashboard ja estao conectados.",
+      publicCardLabel: "Link de apresentacao",
+      publicCardTitle: "Sua arvore de links publica",
+      publicCardPublished: "Pronto para divulgar",
+      publicCardDraft: "Aguardando publicacao",
+      publicCardDescriptionPublished: "Seu perfil ja pode ser compartilhado com qualquer pessoa como um link de apresentacao.",
+      publicCardDescriptionDraft: "Ative a publicacao do perfil para transformar sua pagina em um link publico para divulgacao.",
+      publicCardUrlLabel: "URL publica",
+      publicCardOpen: "Abrir pagina publica",
       identityLabel: "Identidade do criador",
       identityTitle: "Informacoes do perfil vindas da sua conta",
       identityLive: "Ao vivo no Supabase",
@@ -424,6 +440,14 @@ export const appContent: Record<AppLocale, {
       unlockedLabel: "Unlocked",
       unlockedSuffix: "active services",
       unlockedDescription: "Public profile, link stack, visual theme, and protected dashboard access are already connected.",
+      publicCardLabel: "Presentation link",
+      publicCardTitle: "Your public link tree",
+      publicCardPublished: "Ready to share",
+      publicCardDraft: "Waiting for publication",
+      publicCardDescriptionPublished: "Your profile can already be shared with anyone as a presentation link.",
+      publicCardDescriptionDraft: "Turn profile publication on to transform your page into a public shareable link.",
+      publicCardUrlLabel: "Public URL",
+      publicCardOpen: "Open public page",
       identityLabel: "Creator identity",
       identityTitle: "Profile information from your account",
       identityLive: "Live from Supabase",

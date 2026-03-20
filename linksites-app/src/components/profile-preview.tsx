@@ -2,14 +2,11 @@
 
 import clsx from "clsx";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { appContent } from "@/data/app-content";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { AppLocale } from "@/lib/locale";
 import { themeCatalog } from "@/lib/mock-data";
-import { hasSupabaseEnv } from "@/lib/supabase/env";
 import type { ProfileWithLinks } from "@/lib/types";
-import FollowButton from "./FollowButton";
 
 const ANALYTICS_SESSION_KEY = "linksites-analytics-session-id";
 
@@ -18,8 +15,6 @@ type ProfilePreviewProps = {
   compact?: boolean;
   locale?: AppLocale;
   analyticsEnabled?: boolean;
-  socialEnabled?: boolean;
-  initialFollowersCount?: number;
 };
 
 function getInitials(name: string) {
@@ -69,18 +64,10 @@ export function ProfilePreview({
   compact = false,
   locale = "ptBR",
   analyticsEnabled = false,
-  socialEnabled = false,
-  initialFollowersCount = 0,
 }: ProfilePreviewProps) {
   const theme = themeCatalog[profile.themeSlug];
   const content = appContent[locale];
   const activeLinks = profile.links.filter((link) => link.isActive);
-  const hasBrowserSupabase = hasSupabaseEnv();
-  const supabase = hasBrowserSupabase ? createSupabaseBrowserClient() : null;
-
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isLoading, setIsLoading] = useState(hasBrowserSupabase && socialEnabled);
-  const [followersCount, setFollowersCount] = useState(initialFollowersCount);
 
   useEffect(() => {
     if (!analyticsEnabled) {
@@ -110,83 +97,6 @@ export function ProfilePreview({
       // Ignore client storage issues and keep the public page interactive.
     }
   }, [analyticsEnabled, profile.id]);
-
-  useEffect(() => {
-    if (!socialEnabled || !supabase) {
-      return;
-    }
-
-    let active = true;
-
-    const loadSocialState = async () => {
-      const { data: publicProfile } = await supabase
-        .from("profiles")
-        .select("followers_count")
-        .eq("id", profile.id)
-        .maybeSingle();
-
-      if (active && typeof publicProfile?.followers_count === "number") {
-        setFollowersCount(publicProfile.followers_count);
-      }
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        if (active) {
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      const { data: myProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!myProfile) {
-        if (active) {
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("follows")
-        .select()
-        .match({ follower_id: myProfile.id, followed_id: profile.id })
-        .single();
-
-      if (active && !error && data) {
-        setIsFollowing(true);
-      }
-
-      if (active) {
-        setIsLoading(false);
-      }
-    };
-
-    loadSocialState();
-
-    return () => {
-      active = false;
-    };
-  }, [profile.id, socialEnabled, supabase]);
-
-  function handleFollowChange(nextIsFollowing: boolean) {
-    setIsFollowing(nextIsFollowing);
-    setFollowersCount((currentValue) => {
-      return Math.max(0, currentValue + (nextIsFollowing ? 1 : -1));
-    });
-  }
-
-  function getFollowersLabel(count: number) {
-    return count === 1
-      ? content.publicProfile.followersSingular
-      : content.publicProfile.followersPlural;
-  }
 
   function handleLinkClick(linkId: string, linkTitle: string) {
     if (!analyticsEnabled) {
@@ -239,23 +149,6 @@ export function ProfilePreview({
           <p className="mt-2 text-sm opacity-70">@{profile.username}</p>
           <p className="mt-4 text-sm leading-7 opacity-80">{profile.bio}</p>
         </div>
-
-        {socialEnabled ? (
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            {!isLoading && supabase ? (
-              <FollowButton
-                targetProfileId={profile.id}
-                initialIsFollowing={isFollowing}
-                onFollowChange={handleFollowChange}
-              />
-            ) : null}
-
-            <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78">
-              <strong className="text-white">{followersCount}</strong>{" "}
-              {getFollowersLabel(followersCount)}
-            </div>
-          </div>
-        ) : null}
 
         <div className="mt-6 flex flex-col gap-3">
           {activeLinks.map((link) => (

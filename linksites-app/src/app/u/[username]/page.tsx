@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { OpenInBrowserFab } from "@/components/open-in-browser-fab";
 import { ProfilePreview } from "@/components/profile-preview";
 import { appContent } from "@/data/app-content";
-import { getFollowerCountByProfileId, getPublicProfileByUsername } from "@/lib/profiles";
+import { getPublicProfileByUsername } from "@/lib/profiles";
 
 type PublicProfilePageProps = {
   params: Promise<{
@@ -20,9 +20,6 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   if (!profile) {
     notFound();
   }
-
-  const followerCount = await getFollowerCountByProfileId(profile.id);
-
   return (
     <div className="page-shell min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
@@ -36,13 +33,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
         </div>
 
         <div className="flex items-center justify-center">
-          <ProfilePreview
-            profile={profile}
-            locale={locale}
-            analyticsEnabled
-            socialEnabled
-            initialFollowersCount={followerCount}
-          />
+          <ProfilePreview profile={profile} locale={locale} analyticsEnabled />
         </div>
       </div>
       <OpenInBrowserFab

@@ -1,8 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getAppBaseUrl } from "@/lib/app-url";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function buildMessageUrl(path: string, key: "error" | "message", value: string) {
@@ -34,8 +34,7 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
-  const headerStore = await headers();
-  const origin = headerStore.get("origin") ?? "http://localhost:3000";
+  const appBaseUrl = await getAppBaseUrl();
 
   if (!email || !password) {
     redirect(buildMessageUrl("/login", "error", "missing_signup_credentials"));
@@ -46,7 +45,7 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: `${appBaseUrl}/auth/confirm?next=/dashboard`,
     },
   });
 
@@ -60,8 +59,7 @@ export async function signup(formData: FormData) {
 
 export async function magicLink(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
-  const headerStore = await headers();
-  const origin = headerStore.get("origin") ?? "http://localhost:3000";
+  const appBaseUrl = await getAppBaseUrl();
 
   if (!email) {
     redirect(buildMessageUrl("/login", "error", "missing_magic_email"));
@@ -71,7 +69,7 @@ export async function magicLink(formData: FormData) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: `${appBaseUrl}/auth/confirm?next=/dashboard`,
     },
   });
 

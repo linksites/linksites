@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { updateLinks, updateProfile } from "@/app/dashboard/actions";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ProfilePreview } from "@/components/profile-preview";
 import { appContent } from "@/data/app-content";
+import { getAppBaseUrl } from "@/lib/app-url";
 import { getServerLocale } from "@/lib/locale-server";
 import { themeCatalog } from "@/lib/mock-data";
 import { demoProfile } from "@/lib/mock-data";
@@ -47,9 +47,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const content = appContent[locale];
   const viewer = await getCurrentViewer();
   const usingMockData = !hasSupabaseEnv() || viewer.isMock;
-  const headerStore = await headers();
-  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host") ?? "localhost:3000";
-  const protocol = headerStore.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
+  const appBaseUrl = await getAppBaseUrl();
 
   if (!usingMockData && !viewer.user) {
     redirect("/login?message=sign_in_required");
@@ -76,7 +74,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const newLinkSlots = 3;
   const dashboardTitle = content.dashboard.title.replace("{name}", profile.displayName);
   const publishedDescription = content.dashboard.profilePublishedDescription.replace("{username}", profile.username);
-  const publicProfileUrl = `${protocol}://${host}/u/${profile.username}`;
+  const publicProfileUrl = `${appBaseUrl}/u/${profile.username}`;
 
   return (
     <div className="page-shell min-h-screen">

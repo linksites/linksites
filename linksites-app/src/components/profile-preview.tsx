@@ -60,7 +60,7 @@ export function ProfilePreview({ profile, compact = false, locale = "ptBR" }: Pr
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          {profile.links.map((link) => (
+          {profile.links.filter((link) => link.isActive).map((link) => (
             <a
               key={link.id}
               href={link.url}

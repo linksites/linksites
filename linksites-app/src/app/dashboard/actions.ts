@@ -27,6 +27,10 @@ function normalizeOptionalUrl(value: string) {
   return trimmed.length ? trimmed : null;
 }
 
+function getBooleanFormValue(formData: FormData, key: string) {
+  return formData.getAll(key).some((value) => String(value) === "true");
+}
+
 function sanitizeFileName(value: string) {
   return value
     .normalize("NFD")
@@ -114,7 +118,7 @@ export async function updateProfile(formData: FormData) {
   const username = normalizeUsernameInput(String(formData.get("username") ?? "").trim());
   const bio = String(formData.get("bio") ?? "").trim();
   const avatarUrlInput = normalizeOptionalUrl(String(formData.get("avatarUrl") ?? ""));
-  const removeAvatar = formData.get("removeAvatar") === "true";
+  const removeAvatar = getBooleanFormValue(formData, "removeAvatar");
   const avatarFile = formData.get("avatarFile");
   const themeSlug = String(formData.get("themeSlug") ?? "midnight-grid");
   const isPublished = formData.get("isPublished") === "true";
@@ -203,7 +207,7 @@ export async function updateLinks(formData: FormData) {
     .filter(Boolean);
 
   for (const linkId of existingIds) {
-    if (formData.get(`remove-${linkId}`) === "true") {
+    if (getBooleanFormValue(formData, `remove-${linkId}`)) {
       const { error } = await supabase.from("links").delete().eq("id", linkId).eq("profile_id", profile.id);
 
       if (error) {
@@ -216,7 +220,7 @@ export async function updateLinks(formData: FormData) {
     const title = String(formData.get(`title-${linkId}`) ?? "").trim();
     const url = String(formData.get(`url-${linkId}`) ?? "").trim();
     const position = Number(formData.get(`position-${linkId}`) ?? 0);
-    const isActive = formData.get(`isActive-${linkId}`) === "true";
+    const isActive = getBooleanFormValue(formData, `isActive-${linkId}`);
 
     if (!title) {
       redirect(buildDashboardUrl("error", "invalid_link_title"));
@@ -248,7 +252,7 @@ export async function updateLinks(formData: FormData) {
     const title = String(formData.get(`new-title-${index}`) ?? "").trim();
     const url = String(formData.get(`new-url-${index}`) ?? "").trim();
     const position = Number(formData.get(`new-position-${index}`) ?? existingIds.length + index);
-    const isActive = formData.get(`new-isActive-${index}`) === "true";
+    const isActive = getBooleanFormValue(formData, `new-isActive-${index}`);
 
     if (!title && !url) {
       continue;

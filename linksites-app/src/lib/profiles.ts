@@ -23,7 +23,7 @@ type LinkRow = {
   is_active: boolean;
 };
 
-function mapProfile(profile: ProfileRow, links: LinkRow[]): ProfileWithLinks {
+function mapProfile(profile: ProfileRow, links: LinkRow[], options?: { onlyActive?: boolean }): ProfileWithLinks {
   return {
     id: profile.id,
     username: profile.username,
@@ -33,7 +33,7 @@ function mapProfile(profile: ProfileRow, links: LinkRow[]): ProfileWithLinks {
     themeSlug: profile.theme_slug,
     isPublished: profile.is_published,
     links: links
-      .filter((link) => link.is_active)
+      .filter((link) => (options?.onlyActive ? link.is_active : true))
       .sort((left, right) => left.position - right.position)
       .map((link) => ({
         id: link.id,
@@ -189,8 +189,8 @@ export const getPublicProfileByUsername = cache(async (username: string): Promis
     .order("position", { ascending: true });
 
   if (linksError) {
-    return mapProfile(profile as ProfileRow, []);
+    return mapProfile(profile as ProfileRow, [], { onlyActive: true });
   }
 
-  return mapProfile(profile as ProfileRow, (links ?? []) as LinkRow[]);
+  return mapProfile(profile as ProfileRow, (links ?? []) as LinkRow[], { onlyActive: true });
 });

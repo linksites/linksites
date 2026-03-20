@@ -105,7 +105,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </div>
         </div>
 
-        <section className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-[1.6rem] border border-white/8 bg-[var(--panel)] p-5">
@@ -418,7 +418,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </div>
           </div>
 
-          <div className="flex justify-center lg:justify-end">
+          <div className="flex self-start justify-center lg:sticky lg:top-8 lg:justify-end">
             <ProfilePreview profile={profile} compact locale={locale} />
           </div>
         </section>

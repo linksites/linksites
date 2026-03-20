@@ -20,6 +20,10 @@ function resolveAuthFeedbackKey(
     patterns.some((pattern) => code.includes(pattern) || message.includes(pattern));
 
   if (flow === "signup") {
+    if (matches("error sending confirmation email", "error sending email", "confirmation email")) {
+      return "signup_confirmation_email_failed";
+    }
+
     if (matches("user_already_exists", "email_exists", "user already registered", "already registered")) {
       return "signup_email_registered";
     }
@@ -53,6 +57,10 @@ function resolveAuthFeedbackKey(
     }
 
     return error.message?.trim() || "could_not_sign_in";
+  }
+
+  if (matches("error sending confirmation email", "error sending email", "confirmation email")) {
+    return "magic_confirmation_email_failed";
   }
 
   if (matches("email_address_invalid", "invalid email", "email address")) {

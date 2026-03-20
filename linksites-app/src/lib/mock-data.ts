@@ -22,30 +22,30 @@ export const themeCatalog: Record<
 
 export const demoProfile: ProfileWithLinks = {
   id: "demo-profile",
-  username: "demo",
-  displayName: "Sergio Rodrigues",
-  bio: "Creator page MVP for LinkSites. A premium link-in-bio page with stronger branding, direct CTAs, and room to grow into a full mini site.",
+  username: "linksites",
+  displayName: "LinkSites",
+  bio: "Arvore de links oficial da LinkSites para apresentar a plataforma, direcionar contatos e divulgar a landing publica.",
   avatarUrl: null,
   themeSlug: "midnight-grid",
   isPublished: true,
   links: [
     {
       id: "1",
-      title: "Book a discovery call",
+      title: "Falar no WhatsApp",
       url: "https://wa.me/5591982460001",
       position: 0,
       isActive: true,
     },
     {
       id: "2",
-      title: "View a client demo",
+      title: "Ver landing oficial",
       url: "https://linksites.github.io/linksites/",
       position: 1,
       isActive: true,
     },
     {
       id: "3",
-      title: "Explore premium plans",
+      title: "Conhecer os planos",
       url: "https://linksites.github.io/linksites/#planos",
       position: 2,
       isActive: true,

@@ -32,6 +32,15 @@ export const appContent: Record<AppLocale, {
       title: string;
       text: string;
     }>;
+    showcaseEyebrow: string;
+    showcaseTitle: string;
+    showcaseDescription: string;
+    showcaseBadges: string[];
+    showcaseOfficialLabel: string;
+    showcaseLinksLabel: string;
+    showcaseStatusLabel: string;
+    showcaseStatusLive: string;
+    showcaseStatusSetup: string;
     roadmapEyebrow: string;
     roadmapTitle: string;
     roadmapDescription: string;
@@ -177,6 +186,16 @@ export const appContent: Record<AppLocale, {
           text: "Auth, Postgres, Storage e RLS ja se encaixam na direcao do produto para o MVP e para a evolucao.",
         },
       ],
+      showcaseEyebrow: "Conta oficial em destaque",
+      showcaseTitle: "A propria LinkSites em formato de arvore de links",
+      showcaseDescription:
+        "Use esta area como vitrine viva da conta da empresa. Ela pode ser atualizada como qualquer outro perfil e funciona como demonstracao real do produto para novos clientes.",
+      showcaseBadges: ["Conta oficial", "Perfil divulgavel", "Demo viva do produto"],
+      showcaseOfficialLabel: "Perfil oficial",
+      showcaseLinksLabel: "Links ativos",
+      showcaseStatusLabel: "Status",
+      showcaseStatusLive: "Ao vivo",
+      showcaseStatusSetup: "Em configuracao",
       roadmapEyebrow: "Roadmap",
       roadmapTitle: "O que esta base ja prepara",
       roadmapDescription:
@@ -369,6 +388,16 @@ export const appContent: Record<AppLocale, {
           text: "Auth, Postgres, Storage, and RLS already fit the product direction for the MVP and beyond.",
         },
       ],
+      showcaseEyebrow: "Official account spotlight",
+      showcaseTitle: "LinkSites itself presented as a link tree",
+      showcaseDescription:
+        "Use this area as a live showcase of the company account. It can be updated like any other profile and works as a real product demo for new clients.",
+      showcaseBadges: ["Official account", "Shareable profile", "Live product demo"],
+      showcaseOfficialLabel: "Official profile",
+      showcaseLinksLabel: "Active links",
+      showcaseStatusLabel: "Status",
+      showcaseStatusLive: "Live",
+      showcaseStatusSetup: "Setting up",
       roadmapEyebrow: "Roadmap",
       roadmapTitle: "What this starter already prepares",
       roadmapDescription:

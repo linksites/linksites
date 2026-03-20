@@ -114,6 +114,21 @@ export const appContent: Record<AppLocale, {
     onboardingStepDone: string;
     onboardingStepPending: string;
     onboardingSteps: Record<"profile" | "bio" | "avatar" | "links" | "publish", string>;
+    discovery: {
+      label: string;
+      title: string;
+      description: string;
+      profileSingular: string;
+      profilePlural: string;
+      followerSingular: string;
+      followerPlural: string;
+      linkSingular: string;
+      linkPlural: string;
+      openProfile: string;
+      emptyBio: string;
+      emptyTitle: string;
+      emptyDescription: string;
+    };
     fields: {
       displayName: string;
       username: string;
@@ -332,6 +347,21 @@ export const appContent: Record<AppLocale, {
         avatar: "Adicionar avatar",
         links: "Publicar pelo menos 3 links ativos",
         publish: "Ativar a página pública",
+      },
+      discovery: {
+        label: "Rede",
+        title: "Perfis publicados na rede",
+        description: "Veja outros perfis públicos já criados no LinkSites e abra rapidamente as páginas que estão ativas.",
+        profileSingular: "perfil",
+        profilePlural: "perfis",
+        followerSingular: "seguidor",
+        followerPlural: "seguidores",
+        linkSingular: "link ativo",
+        linkPlural: "links ativos",
+        openProfile: "Ver perfil",
+        emptyBio: "Este perfil ainda não adicionou uma bio pública.",
+        emptyTitle: "Ainda não existem outros perfis publicados",
+        emptyDescription: "Assim que novos usuários publicarem suas páginas, esta área vai começar a mostrar a rede ativa.",
       },
       fields: {
         displayName: "Nome de exibição",
@@ -572,6 +602,21 @@ export const appContent: Record<AppLocale, {
         avatar: "Add an avatar",
         links: "Publish at least 3 active links",
         publish: "Turn on the public page",
+      },
+      discovery: {
+        label: "Network",
+        title: "Published profiles in the network",
+        description: "Browse other public profiles already created in LinkSites and open active pages quickly.",
+        profileSingular: "profile",
+        profilePlural: "profiles",
+        followerSingular: "follower",
+        followerPlural: "followers",
+        linkSingular: "active link",
+        linkPlural: "active links",
+        openProfile: "View profile",
+        emptyBio: "This profile has not added a public bio yet.",
+        emptyTitle: "There are no other published profiles yet",
+        emptyDescription: "As soon as new users publish their pages, this area will start showing the active network.",
       },
       fields: {
         displayName: "Display name",

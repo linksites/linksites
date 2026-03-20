@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { updateLinks, updateProfile } from "@/app/dashboard/actions";
 import { LanguageToggle } from "@/components/language-toggle";
+import { NetworkDiscoverySection } from "@/components/network-discovery-section";
 import { ProfilePreview } from "@/components/profile-preview";
 import { getProfileAnalytics } from "@/lib/analytics";
 import { appContent } from "@/data/app-content";
@@ -11,6 +12,7 @@ import { getServerLocale } from "@/lib/locale-server";
 import { themeCatalog } from "@/lib/mock-data";
 import { demoProfile } from "@/lib/mock-data";
 import { getProfileOnboarding } from "@/lib/onboarding";
+import { getNetworkProfiles } from "@/lib/profiles";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getCurrentViewer } from "@/lib/viewer";
 
@@ -79,6 +81,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const publicProfileUrl = `${appBaseUrl}/u/${profile.username}`;
   const analytics = await getProfileAnalytics(profile.id);
   const onboarding = getProfileOnboarding(profile);
+  const networkProfiles = await getNetworkProfiles(profile.id, 6);
   const analyticsCards = [
     {
       label: content.dashboard.analyticsViewsLabel,
@@ -271,6 +274,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 </div>
               </div>
             </div>
+
+            <NetworkDiscoverySection profiles={networkProfiles} locale={locale} />
 
             <div className="rounded-[2rem] border border-white/8 bg-[var(--panel)] p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">

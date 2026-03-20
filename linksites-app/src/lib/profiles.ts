@@ -3,7 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { ProfileWithLinks } from "@/lib/types";
+import type { ProfileWithLinks, PublicDirectoryProfile } from "@/lib/types";
 
 type ProfileRow = {
   id: string;
@@ -212,3 +212,64 @@ export const getFollowerCountByProfileId = cache(async (profileId: string): Prom
 
   return count;
 });
+
+export const getNetworkProfiles = cache(
+  async (excludeProfileId?: string, limit = 6): Promise<PublicDirectoryProfile[]> => {
+    if (!hasSupabaseEnv()) {
+      return [];
+    }
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase
+      .from("profiles")
+      .select("id, username, display_name, bio, avatar_url, theme_slug, is_published")
+      .eq("is_published", true)
+      .order("username", { ascending: true })
+      .limit(limit);
+
+    if (excludeProfileId) {
+      query = query.neq("id", excludeProfileId);
+    }
+
+    const { data: profiles, error } = await query;
+
+    if (error || !profiles?.length) {
+      return [];
+    }
+
+    const profileIds = profiles.map((profile) => profile.id);
+    const [{ data: links }, { data: follows }] = await Promise.all([
+      supabase
+        .from("links")
+        .select("profile_id")
+        .in("profile_id", profileIds)
+        .eq("is_active", true),
+      supabase.from("follows").select("followed_id").in("followed_id", profileIds),
+    ]);
+
+    const linksCountByProfileId = new Map<string, number>();
+    const followersCountByProfileId = new Map<string, number>();
+
+    (links ?? []).forEach((link) => {
+      linksCountByProfileId.set(link.profile_id, (linksCountByProfileId.get(link.profile_id) ?? 0) + 1);
+    });
+
+    (follows ?? []).forEach((follow) => {
+      followersCountByProfileId.set(
+        follow.followed_id,
+        (followersCountByProfileId.get(follow.followed_id) ?? 0) + 1,
+      );
+    });
+
+    return profiles.map((profile) => ({
+      id: profile.id,
+      username: profile.username,
+      displayName: profile.display_name,
+      bio: profile.bio,
+      avatarUrl: profile.avatar_url,
+      themeSlug: profile.theme_slug,
+      activeLinksCount: linksCountByProfileId.get(profile.id) ?? 0,
+      followersCount: followersCountByProfileId.get(profile.id) ?? 0,
+    }));
+  },
+);

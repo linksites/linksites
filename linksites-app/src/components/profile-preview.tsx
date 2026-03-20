@@ -244,12 +244,7 @@ export function ProfilePreview({
         </div>
 
         {socialEnabled ? (
-          <div className="mt-6 flex flex-col items-center gap-4">
-            <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78">
-              <strong className="text-white">{followersCount}</strong>{" "}
-              {getFollowersLabel(followersCount)}
-            </div>
-
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {!isLoading && supabase ? (
               <FollowButton
                 targetProfileId={profile.id}
@@ -257,6 +252,11 @@ export function ProfilePreview({
                 onFollowChange={handleFollowChange}
               />
             ) : null}
+
+            <div className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78">
+              <strong className="text-white">{followersCount}</strong>{" "}
+              {getFollowersLabel(followersCount)}
+            </div>
           </div>
         ) : null}
 

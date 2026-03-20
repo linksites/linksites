@@ -21,3 +21,14 @@ export type ProfileRecord = {
 export type ProfileWithLinks = ProfileRecord & {
   links: LinkItem[];
 };
+
+export type PublicDirectoryProfile = {
+  id: string;
+  username: string;
+  displayName: string;
+  bio: string;
+  avatarUrl: string | null;
+  themeSlug: ThemeName;
+  activeLinksCount: number;
+  followersCount: number;
+};

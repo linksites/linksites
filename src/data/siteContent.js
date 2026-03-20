@@ -17,7 +17,7 @@ export const siteContent = {
     ],
     header: {
       tagline: "SaaS de bio link e mini sites",
-      primaryCta: "Criar minha página",
+      primaryCta: "Abrir app",
       openMenuLabel: "Abrir menu",
       languageLabel: "Idioma",
       locales: [
@@ -180,9 +180,9 @@ export const siteContent = {
           text: "Instagram, WhatsApp, campanhas e apresentação comercial",
         },
       ],
-      sidebarLabel: "Próximo passo",
-      cta: "Comece grátis",
-      helper: "Fale no WhatsApp e receba o caminho mais rápido para publicar sua página.",
+      sidebarLabel: "Acesso ao app",
+      cta: "Abrir LinkSites App",
+      helper: "Se você já tiver sessão no app, seu dashboard abre direto. Se ainda não tiver conta, o LinkSites App leva você para criar e publicar sua página.",
     },
     footer: {
       left: "LinkSites 2026 - Uma startup do grupo Techlab Software",
@@ -236,7 +236,7 @@ export const siteContent = {
     ],
     header: {
       tagline: "Bio link and mini-site SaaS",
-      primaryCta: "Create my page",
+      primaryCta: "Open app",
       openMenuLabel: "Open menu",
       languageLabel: "Language",
       locales: [
@@ -399,9 +399,9 @@ export const siteContent = {
           text: "Instagram, WhatsApp, campaigns, and commercial presentation",
         },
       ],
-      sidebarLabel: "Next step",
-      cta: "Start free",
-      helper: "Talk to us on WhatsApp and get the fastest path to publish your page.",
+      sidebarLabel: "App access",
+      cta: "Open LinkSites App",
+      helper: "If you already have a session in the app, your dashboard opens right away. If not, LinkSites App takes you to sign in or create your page.",
     },
     footer: {
       left: "LinkSites 2026 - A startup from the Techlab Software group",

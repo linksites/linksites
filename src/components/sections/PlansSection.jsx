@@ -1,6 +1,6 @@
 import SectionTag from "../shared/SectionTag";
 
-export default function PlansSection({ content, visitCount }) {
+export default function PlansSection({ content, visitCount, appLinks }) {
   return (
     <section id="planos" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -64,7 +64,7 @@ export default function PlansSection({ content, visitCount }) {
             </div>
 
             <a
-              href="#contato"
+              href={appLinks.dashboardUrl}
               className={`mt-8 inline-flex min-h-[50px] w-full items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition hover:translate-y-[-1px] ${
                 plan.featured
                   ? "bg-gradient-to-r from-cyan-300 to-sky-400 text-slate-950"

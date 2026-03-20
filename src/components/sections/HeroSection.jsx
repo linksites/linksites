@@ -1,7 +1,7 @@
 import heroLogo from "../../../assets/logoLS.png";
 import SectionTag from "../shared/SectionTag";
 
-export default function HeroSection({ hero }) {
+export default function HeroSection({ hero, appLinks }) {
   return (
     <section className="relative overflow-hidden">
       <div className="mx-auto grid max-w-7xl gap-14 px-4 pb-20 pt-16 sm:px-6 md:pt-24 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:pb-28">
@@ -17,13 +17,13 @@ export default function HeroSection({ hero }) {
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-stretch">
             <a
-              href="#planos"
+              href={appLinks.dashboardUrl}
               className="inline-flex min-h-[54px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(74,222,255,0.18)] transition hover:translate-y-[-1px]"
             >
               {hero.primaryCta}
             </a>
             <a
-              href="#portfolio"
+              href={appLinks.showcaseUrl}
               className="inline-flex min-h-[54px] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-white/80 transition hover:border-cyan-300/30 hover:text-cyan-100"
             >
               {hero.secondaryCta}

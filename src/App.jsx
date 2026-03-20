@@ -180,6 +180,13 @@ export default function App() {
 
   const content = siteContent[locale] ?? siteContent.ptBR;
   const cases = localizedCases[locale] ?? localizedCases.ptBR;
+  const appBaseUrl = "https://linksites.vercel.app";
+  const appLinks = {
+    homeUrl: appBaseUrl,
+    loginUrl: `${appBaseUrl}/login`,
+    dashboardUrl: `${appBaseUrl}/dashboard`,
+    showcaseUrl: `${appBaseUrl}/u/linksitesapp`,
+  };
   const plansContent = {
     ...content.plans,
     items: content.plans.items.map((plan) => ({
@@ -524,6 +531,7 @@ export default function App() {
       <SiteHeader
         navItems={content.navItems}
         header={content.header}
+        appLinks={appLinks}
         locale={locale}
         setLocale={setLocale}
         menuOpen={menuOpen}
@@ -531,7 +539,7 @@ export default function App() {
       />
 
       <main id="inicio">
-        <HeroSection hero={content.hero} />
+        <HeroSection hero={content.hero} appLinks={appLinks} />
         <ServicesSection content={content.services} />
         <DifferentialsSection content={content.audiences} />
         <PortfolioSection
@@ -550,8 +558,8 @@ export default function App() {
           repoUpdateDates={repoUpdateDates}
           onProjectClick={handleProjectClick}
         />
-        <PlansSection content={plansContent} visitCount={visitCount} />
-        <ContactSection content={content.contact} />
+        <PlansSection content={plansContent} visitCount={visitCount} appLinks={appLinks} />
+        <ContactSection content={content.contact} appLinks={appLinks} />
       </main>
 
       <SiteFooter content={content.footer} />

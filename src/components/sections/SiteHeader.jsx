@@ -1,6 +1,6 @@
 import logo from "../../../assets/logolinksites.jpg";
 
-export default function SiteHeader({ navItems, header, locale, setLocale, menuOpen, setMenuOpen }) {
+export default function SiteHeader({ navItems, header, appLinks, locale, setLocale, menuOpen, setMenuOpen }) {
   return (
     <header className="sticky top-0 z-50 border-b border-white/8 bg-[rgba(6,12,22,0.72)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -51,7 +51,7 @@ export default function SiteHeader({ navItems, header, locale, setLocale, menuOp
             ))}
           </div>
           <a
-            href="#planos"
+            href={appLinks.dashboardUrl}
             className="inline-flex items-center rounded-full border border-cyan-300/25 bg-cyan-300/10 px-5 py-2.5 text-sm font-medium text-cyan-100 transition hover:border-cyan-200/40 hover:bg-cyan-300/16"
           >
             {header.primaryCta}

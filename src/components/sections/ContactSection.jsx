@@ -1,6 +1,6 @@
 import SectionTag from "../shared/SectionTag";
 
-export default function ContactSection({ content }) {
+export default function ContactSection({ content, appLinks }) {
   return (
     <section id="contato" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <div
@@ -25,9 +25,7 @@ export default function ContactSection({ content }) {
           <div className="min-w-[18rem] rounded-[1.8rem] border border-white/8 bg-[rgba(6,12,22,0.44)] p-6">
             <div className="text-[0.72rem] uppercase tracking-[0.24em] text-white/42">{content.sidebarLabel}</div>
             <a
-              href="https://wa.me/5591982460001"
-              target="_blank"
-              rel="noreferrer"
+              href={appLinks.dashboardUrl}
               className="mt-4 inline-flex min-h-[54px] w-full items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 to-sky-400 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(74,222,255,0.18)] transition hover:translate-y-[-1px]"
             >
               {content.cta}

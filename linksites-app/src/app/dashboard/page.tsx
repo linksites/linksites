@@ -208,7 +208,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 {usingMockData ? <Notice tone="info">{content.dashboard.mockReadonly}</Notice> : null}
               </div>
 
-              <form action={updateProfile} className="mt-6" encType="multipart/form-data">
+              <form action={updateProfile} className="mt-6">
                 <div className="grid gap-4 md:grid-cols-2">
                   {editorFields.map((field) => (
                     <label key={field.label} className="flex flex-col gap-2">

@@ -212,7 +212,7 @@ export const appContent: Record<AppLocale, {
       eyebrow: "Acessar o LinkSites",
       title: "Entre e acesse seu espaco de criador",
       description:
-        "Este e o primeiro ponto de entrada real do SaaS. Entre, crie sua conta ou use um magic link para acessar o dashboard com menos friccao.",
+        "Este e o primeiro ponto de entrada real do SaaS. Entre, crie sua conta ou use um magic link para acessar o dashboard com menos burocracia.",
       signInCard: "Entrar com senha",
       signUpCard: "Criar conta",
       magicTitle: "Prefere um magic link?",
@@ -426,7 +426,7 @@ export const appContent: Record<AppLocale, {
       eyebrow: "Access LinkSites",
       title: "Sign in and enter your creator workspace",
       description:
-        "This is the first real entry point of the SaaS. Sign in, create your account, or use a magic link to access your dashboard without friction.",
+        "This is the first real entry point of the SaaS. Sign in, create your account, or use a magic link to access your dashboard with less bureaucracy.",
       signInCard: "Sign in with password",
       signUpCard: "Create account",
       magicTitle: "Prefer a magic link?",

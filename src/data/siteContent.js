@@ -42,7 +42,7 @@ export const siteContent = {
     },
     services: {
       tag: "Como funciona",
-      title: "Da ideia ao link publicado com menos fricção.",
+      title: "Da ideia ao link publicado com menos burocracia.",
       description:
         "A home deixa de vender apenas desenvolvimento sob demanda e passa a mostrar o fluxo do produto: template, configuração, identidade visual e publicação rápida.",
       items: [
@@ -261,7 +261,7 @@ export const siteContent = {
     },
     services: {
       tag: "How it works",
-      title: "From idea to live link with less friction.",
+      title: "From idea to live link with less bureaucracy.",
       description:
         "The homepage stops selling only custom development and starts showing the product flow: template, setup, visual identity, and fast publishing.",
       items: [

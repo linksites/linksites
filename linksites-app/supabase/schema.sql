@@ -138,6 +138,18 @@ create table if not exists public.reactions (
   unique (post_id, user_id, type) -- Garante que um usuário não reaja com o mesmo tipo no mesmo post
 );
 
+create table if not exists public.comments (
+  id uuid primary key default gen_random_uuid(),
+  post_id uuid not null references public.posts(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  content text not null,
+  status text not null default 'pending',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  constraint comments_status_check check (status in ('pending', 'approved', 'rejected')),
+  constraint comments_content_length check (char_length(trim(content)) between 1 and 500)
+);
+
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   recipient_id uuid not null references public.profiles(id) on delete cascade,
@@ -178,11 +190,14 @@ create index if not exists analytics_events_profile_type_created_idx
   on public.analytics_events(profile_id, event_type, created_at desc);
 create index if not exists analytics_events_profile_session_idx
   on public.analytics_events(profile_id, session_id);
+create index if not exists comments_post_created_idx
+  on public.comments(post_id, created_at desc);
 
 drop trigger if exists themes_set_updated_at on public.themes;
 drop trigger if exists profiles_set_updated_at on public.profiles;
 drop trigger if exists links_set_updated_at on public.links;
 drop trigger if exists follows_sync_followers_count on public.follows;
+drop trigger if exists comments_set_updated_at on public.comments;
 
 create trigger profiles_set_updated_at
 before update on public.profiles
@@ -198,6 +213,11 @@ create trigger follows_sync_followers_count
 after insert or delete on public.follows
 for each row
 execute function public.sync_profile_followers_count();
+
+create trigger comments_set_updated_at
+before update on public.comments
+for each row
+execute function public.set_updated_at();
 
 update public.profiles as profile
 set followers_count = counts.followers_count
@@ -259,6 +279,7 @@ alter table public.user_presence enable row level security;
 alter table public.chat_rooms enable row level security;
 alter table public.chat_room_participants enable row level security;
 alter table public.reactions enable row level security;
+alter table public.comments enable row level security;
 alter table public.notifications enable row level security;
 alter table public.links enable row level security;
 alter table public.analytics_events enable row level security;
@@ -394,28 +415,36 @@ drop policy if exists "posts are readable by everyone" on public.posts;
 create policy "posts are readable by everyone"
 on public.posts
 for select
-using (true); -- Or restrict to published profiles if desired: (select is_published from public.profiles where id = user_id) = true
+using (
+  exists (
+    select 1
+    from public.profiles
+    where public.profiles.id = public.posts.user_id
+      and public.profiles.is_published = true
+  )
+  or auth.uid() = (select user_id from public.profiles where public.profiles.id = public.posts.user_id)
+);
 
 drop policy if exists "owners can create their own posts" on public.posts;
 create policy "owners can create their own posts"
 on public.posts
 for insert
 to authenticated
-with check (auth.uid() = (select user_id from public.profiles where id = user_id));
+with check (auth.uid() = (select user_id from public.profiles where public.profiles.id = public.posts.user_id));
 
 drop policy if exists "owners can update their own posts" on public.posts;
 create policy "owners can update their own posts"
 on public.posts
 for update
 to authenticated
-using (auth.uid() = (select user_id from public.profiles where id = user_id));
+using (auth.uid() = (select user_id from public.profiles where public.profiles.id = public.posts.user_id));
 
 drop policy if exists "owners can delete their own posts" on public.posts;
 create policy "owners can delete their own posts"
 on public.posts
 for delete
 to authenticated
-using (auth.uid() = (select user_id from public.profiles where id = user_id));
+using (auth.uid() = (select user_id from public.profiles where public.profiles.id = public.posts.user_id));
 
 -- Policies for 'user_presence' table
 drop policy if exists "users can view user presence" on public.user_presence;
@@ -429,14 +458,14 @@ create policy "owners can update their own presence"
 on public.user_presence
 for update
 to authenticated
-using (auth.uid() = (select user_id from public.profiles where id = user_id));
+using (auth.uid() = (select user_id from public.profiles where public.profiles.id = public.user_presence.user_id));
 
 drop policy if exists "owners can insert their own presence" on public.user_presence;
 create policy "owners can insert their own presence"
 on public.user_presence
 for insert
 to authenticated
-with check (auth.uid() = (select user_id from public.profiles where id = user_id));
+with check (auth.uid() = (select user_id from public.profiles where public.profiles.id = public.user_presence.user_id));
 
 -- Policies for 'chat_rooms' table
 drop policy if exists "authenticated users can view their chat rooms" on public.chat_rooms;
@@ -492,8 +521,9 @@ using (
   exists (
     select 1
     from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
     where public.posts.id = public.reactions.post_id
-      and public.posts.user_id = (select id from public.profiles where is_published = true)
+      and public.profiles.is_published = true
   )
   -- Ou permite ver suas próprias reações em qualquer post
   or auth.uid() = (select user_id from public.profiles where id = public.reactions.user_id)
@@ -515,6 +545,85 @@ for delete
 to authenticated
 using (auth.uid() = (select user_id from public.profiles where id = public.reactions.user_id));
 
+-- Policies for 'comments' table
+drop policy if exists "comments are readable when approved or owned" on public.comments;
+create policy "comments are readable when approved or owned"
+on public.comments
+for select
+using (
+  (
+    public.comments.status = 'approved'
+    and exists (
+      select 1
+      from public.posts
+      join public.profiles on public.profiles.id = public.posts.user_id
+      where public.posts.id = public.comments.post_id
+        and public.profiles.is_published = true
+    )
+  )
+  or auth.uid() = (select user_id from public.profiles where id = public.comments.user_id)
+  or auth.uid() = (
+    select public.profiles.user_id
+    from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
+    where public.posts.id = public.comments.post_id
+  )
+);
+
+drop policy if exists "authenticated users can create comments" on public.comments;
+create policy "authenticated users can create comments"
+on public.comments
+for insert
+to authenticated
+with check (
+  public.comments.status = 'pending'
+  and auth.uid() = (select user_id from public.profiles where id = public.comments.user_id)
+  and exists (
+    select 1
+    from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
+    where public.posts.id = public.comments.post_id
+      and public.profiles.is_published = true
+  )
+);
+
+drop policy if exists "post owners can moderate comments" on public.comments;
+create policy "post owners can moderate comments"
+on public.comments
+for update
+to authenticated
+using (
+  auth.uid() = (
+    select public.profiles.user_id
+    from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
+    where public.posts.id = public.comments.post_id
+  )
+)
+with check (
+  auth.uid() = (
+    select public.profiles.user_id
+    from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
+    where public.posts.id = public.comments.post_id
+  )
+);
+
+drop policy if exists "comment owners or post owners can delete comments" on public.comments;
+create policy "comment owners or post owners can delete comments"
+on public.comments
+for delete
+to authenticated
+using (
+  auth.uid() = (select user_id from public.profiles where id = public.comments.user_id)
+  or auth.uid() = (
+    select public.profiles.user_id
+    from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
+    where public.posts.id = public.comments.post_id
+  )
+);
+
 -- Policies for 'notifications' table
 drop policy if exists "owners can view their own notifications" on public.notifications;
 create policy "owners can view their own notifications"
@@ -531,6 +640,18 @@ using (auth.uid() = (select user_id from public.profiles where id = public.notif
 -- for insert
 -- to authenticated
 -- with check (auth.uid() = (select user_id from public.profiles where id = public.notifications.recipient_id));
+
+drop policy if exists "authenticated users can create follower notifications" on public.notifications;
+create policy "authenticated users can create follower notifications"
+on public.notifications
+for insert
+to authenticated
+with check (
+  public.notifications.type = 'new_follower'
+  and public.notifications.sender_id is not null
+  and public.notifications.sender_id <> public.notifications.recipient_id
+  and auth.uid() = (select user_id from public.profiles where id = public.notifications.sender_id)
+);
 
 drop policy if exists "owners can update their own notifications" on public.notifications;
 create policy "owners can update their own notifications"

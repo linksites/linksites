@@ -3,7 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { ProfileWithLinks, PublicDirectoryProfile } from "@/lib/types";
+import type { DiscoveryReason, ProfileWithLinks, PublicDirectoryProfile } from "@/lib/types";
 
 type ProfileRow = {
   id: string;
@@ -24,8 +24,76 @@ type LinkRow = {
 };
 
 type NetworkProfileRow = ProfileRow & {
+  created_at: string;
   followers_count?: number | null;
 };
+
+function resolveDiscoveryReason({
+  bio,
+  avatarUrl,
+  activeLinksCount,
+  followersCount,
+  isFollowing,
+}: {
+  bio: string;
+  avatarUrl: string | null;
+  activeLinksCount: number;
+  followersCount: number;
+  isFollowing: boolean;
+}): DiscoveryReason {
+  if (isFollowing) {
+    return "following";
+  }
+
+  if (followersCount >= 10) {
+    return "trending";
+  }
+
+  if (activeLinksCount >= 5) {
+    return "link_rich";
+  }
+
+  if (avatarUrl || bio.trim().length >= 48) {
+    return "complete";
+  }
+
+  return "new";
+}
+
+function resolveDiscoveryScore({
+  bio,
+  avatarUrl,
+  activeLinksCount,
+  followersCount,
+  isFollowing,
+}: {
+  bio: string;
+  avatarUrl: string | null;
+  activeLinksCount: number;
+  followersCount: number;
+  isFollowing: boolean;
+}) {
+  let score = 0;
+
+  score += Math.min(activeLinksCount, 6) * 5;
+  score += Math.min(followersCount, 20) * 2;
+
+  if (bio.trim().length >= 48) {
+    score += 14;
+  } else if (bio.trim().length >= 24) {
+    score += 8;
+  }
+
+  if (avatarUrl) {
+    score += 10;
+  }
+
+  if (isFollowing) {
+    score += 12;
+  }
+
+  return score;
+}
 
 function mapProfile(profile: ProfileRow, links: LinkRow[], options?: { onlyActive?: boolean }): ProfileWithLinks {
   return {
@@ -228,20 +296,45 @@ export const getFollowerCountByProfileId = cache(async (profileId: string): Prom
 });
 
 export const getNetworkProfiles = cache(
-  async (excludeProfileId?: string, limit = 6): Promise<PublicDirectoryProfile[]> => {
+  async ({
+    viewerProfileId,
+    excludeProfileId,
+    limit = 6,
+    scope = "all",
+  }: {
+    viewerProfileId?: string;
+    excludeProfileId?: string;
+    limit?: number;
+    scope?: "all" | "following" | "recommended";
+  }): Promise<PublicDirectoryProfile[]> => {
     if (!hasSupabaseEnv()) {
       return [];
     }
 
     const supabase = await createSupabaseServerClient();
+    const candidateLimit = Math.max(limit * 8, 32);
+    const { data: followingRows } = viewerProfileId
+      ? await supabase
+          .from("follows")
+          .select("followed_id")
+          .eq("follower_id", viewerProfileId)
+      : { data: null };
+    const followingProfileIds = new Set((followingRows ?? []).map((follow) => follow.followed_id));
+
+    if (scope === "following" && !followingProfileIds.size) {
+      return [];
+    }
+
     let query = supabase
       .from("profiles")
-      .select("id, username, display_name, bio, avatar_url, theme_slug, is_published, followers_count")
+      .select("id, username, display_name, bio, avatar_url, theme_slug, is_published, created_at, followers_count")
       .eq("is_published", true)
       .order("username", { ascending: true })
-      .limit(limit);
+      .limit(scope === "following" ? Math.max(limit, followingProfileIds.size) : candidateLimit);
 
-    if (excludeProfileId) {
+    if (scope === "following") {
+      query = query.in("id", [...followingProfileIds]);
+    } else if (excludeProfileId) {
       query = query.neq("id", excludeProfileId);
     }
 
@@ -255,12 +348,14 @@ export const getNetworkProfiles = cache(
 
       let fallbackQuery = supabase
         .from("profiles")
-        .select("id, username, display_name, bio, avatar_url, theme_slug, is_published")
+        .select("id, username, display_name, bio, avatar_url, theme_slug, is_published, created_at")
         .eq("is_published", true)
         .order("username", { ascending: true })
-        .limit(limit);
+        .limit(scope === "following" ? Math.max(limit, followingProfileIds.size) : candidateLimit);
 
-      if (excludeProfileId) {
+      if (scope === "following") {
+        fallbackQuery = fallbackQuery.in("id", [...followingProfileIds]);
+      } else if (excludeProfileId) {
         fallbackQuery = fallbackQuery.neq("id", excludeProfileId);
       }
 
@@ -301,17 +396,65 @@ export const getNetworkProfiles = cache(
       });
     }
 
-    return (profiles as NetworkProfileRow[]).map((profile) => ({
-      id: profile.id,
-      username: profile.username,
-      displayName: profile.display_name,
-      bio: profile.bio,
-      avatarUrl: profile.avatar_url,
-      themeSlug: profile.theme_slug,
-      activeLinksCount: linksCountByProfileId.get(profile.id) ?? 0,
-      followersCount: useStoredFollowersCount
-        ? profile.followers_count ?? 0
-        : followersCountByProfileId.get(profile.id) ?? 0,
-    }));
+    return (profiles as NetworkProfileRow[])
+      .map((profile) => {
+        const activeLinksCount = linksCountByProfileId.get(profile.id) ?? 0;
+        const followersCount = useStoredFollowersCount
+          ? profile.followers_count ?? 0
+          : followersCountByProfileId.get(profile.id) ?? 0;
+        const isFollowing = followingProfileIds.has(profile.id);
+        const discoveryReason = resolveDiscoveryReason({
+          bio: profile.bio,
+          avatarUrl: profile.avatar_url,
+          activeLinksCount,
+          followersCount,
+          isFollowing,
+        });
+        const discoveryScore = resolveDiscoveryScore({
+          bio: profile.bio,
+          avatarUrl: profile.avatar_url,
+          activeLinksCount,
+          followersCount,
+          isFollowing,
+        });
+
+        return {
+          id: profile.id,
+          username: profile.username,
+          displayName: profile.display_name,
+          bio: profile.bio,
+          avatarUrl: profile.avatar_url,
+          themeSlug: profile.theme_slug,
+          createdAt: profile.created_at,
+          activeLinksCount,
+          followersCount,
+          isFollowing,
+          discoveryReason,
+          discoveryScore,
+        };
+      })
+      .sort((left, right) => {
+        if (right.discoveryScore !== left.discoveryScore) {
+          return right.discoveryScore - left.discoveryScore;
+        }
+
+        if (right.followersCount !== left.followersCount) {
+          return right.followersCount - left.followersCount;
+        }
+
+        return left.username.localeCompare(right.username);
+      })
+      .filter((profile) => {
+        if (scope === "recommended") {
+          return !profile.isFollowing;
+        }
+
+        if (scope === "following") {
+          return profile.isFollowing;
+        }
+
+        return true;
+      })
+      .slice(0, limit);
   },
 );

@@ -6,14 +6,23 @@ import { ensureProfileForUser, normalizeUsernameInput } from "@/lib/profiles";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-function buildDashboardUrl(kind: "error" | "message", value: string) {
-  return `/dashboard?${kind}=${encodeURIComponent(value)}`;
+function normalizeDashboardRedirectTarget(value: string | null) {
+  if (!value || !value.startsWith("/dashboard")) {
+    return "/dashboard";
+  }
+
+  return value;
+}
+
+function buildDashboardUrl(kind: "error" | "message", value: string, redirectTo = "/dashboard") {
+  return `${redirectTo}?${kind}=${encodeURIComponent(value)}`;
 }
 
 const USERNAME_PATTERN = /^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])?$/;
 const HTTP_URL_PATTERN = /^https?:\/\/.+/i;
 const AVATAR_BUCKET = "avatars";
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const MAX_POST_LENGTH = 280;
 const ALLOWED_AVATAR_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -88,9 +97,9 @@ async function uploadAvatar({
   return data.publicUrl;
 }
 
-async function getEditableProfile() {
+async function getEditableProfile(redirectTo = "/dashboard") {
   if (!hasSupabaseEnv()) {
-    redirect(buildDashboardUrl("error", "mock_mode_readonly"));
+    redirect(buildDashboardUrl("error", "mock_mode_readonly", redirectTo));
   }
 
   const supabase = await createSupabaseServerClient();
@@ -105,14 +114,31 @@ async function getEditableProfile() {
   const ensuredProfile = await ensureProfileForUser(user);
 
   if (!ensuredProfile) {
-    redirect(buildDashboardUrl("error", "profile_save_failed"));
+    redirect(buildDashboardUrl("error", "profile_save_failed", redirectTo));
   }
 
   return { supabase, user, profile: ensuredProfile };
 }
 
+type LinkMutation = {
+  id?: string;
+  title: string;
+  url: string;
+  position: number;
+  isActive: boolean;
+};
+
+function normalizeLinkPosition(value: number, fallback: number) {
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+
+  return Math.max(0, Math.trunc(value));
+}
+
 export async function updateProfile(formData: FormData) {
-  const { supabase, user, profile: ensuredProfile } = await getEditableProfile();
+  const redirectTo = normalizeDashboardRedirectTarget(String(formData.get("redirectTo") ?? ""));
+  const { supabase, user, profile: ensuredProfile } = await getEditableProfile(redirectTo);
 
   const displayName = String(formData.get("displayName") ?? "").trim();
   const username = normalizeUsernameInput(String(formData.get("username") ?? "").trim());
@@ -124,15 +150,15 @@ export async function updateProfile(formData: FormData) {
   const isPublished = formData.get("isPublished") === "true";
 
   if (!displayName) {
-    redirect(buildDashboardUrl("error", "invalid_display_name"));
+    redirect(buildDashboardUrl("error", "invalid_display_name", redirectTo));
   }
 
   if (!USERNAME_PATTERN.test(username)) {
-    redirect(buildDashboardUrl("error", "invalid_username"));
+    redirect(buildDashboardUrl("error", "invalid_username", redirectTo));
   }
 
   if (avatarUrlInput && !HTTP_URL_PATTERN.test(avatarUrlInput)) {
-    redirect(buildDashboardUrl("error", "invalid_avatar_url"));
+    redirect(buildDashboardUrl("error", "invalid_avatar_url", redirectTo));
   }
 
   const uploadedAvatar =
@@ -142,7 +168,7 @@ export async function updateProfile(formData: FormData) {
 
   if (uploadedAvatar) {
     if (!ALLOWED_AVATAR_TYPES.has(uploadedAvatar.type) || uploadedAvatar.size > MAX_AVATAR_BYTES) {
-      redirect(buildDashboardUrl("error", "invalid_avatar_file"));
+      redirect(buildDashboardUrl("error", "invalid_avatar_file", redirectTo));
     }
   }
 
@@ -157,7 +183,7 @@ export async function updateProfile(formData: FormData) {
         currentAvatarUrl: ensuredProfile.avatarUrl,
       });
     } catch {
-      redirect(buildDashboardUrl("error", "avatar_upload_failed"));
+      redirect(buildDashboardUrl("error", "avatar_upload_failed", redirectTo));
     }
   } else if (removeAvatar) {
     const existingPath = extractStoragePath(ensuredProfile.avatarUrl);
@@ -182,10 +208,10 @@ export async function updateProfile(formData: FormData) {
 
   if (error) {
     if (error.code === "23505") {
-      redirect(buildDashboardUrl("error", "username_taken"));
+      redirect(buildDashboardUrl("error", "username_taken", redirectTo));
     }
 
-    redirect(buildDashboardUrl("error", "profile_save_failed"));
+    redirect(buildDashboardUrl("error", "profile_save_failed", redirectTo));
   }
 
   revalidatePath("/", "layout");
@@ -196,62 +222,57 @@ export async function updateProfile(formData: FormData) {
     revalidatePath(`/u/${ensuredProfile.username}`);
   }
 
-  redirect(buildDashboardUrl("message", "profile_saved"));
+  redirect(buildDashboardUrl("message", "profile_saved", redirectTo));
 }
 
 export async function updateLinks(formData: FormData) {
-  const { supabase, profile } = await getEditableProfile();
+  const redirectTo = normalizeDashboardRedirectTarget(String(formData.get("redirectTo") ?? ""));
+  const { supabase, profile } = await getEditableProfile(redirectTo);
   const existingIds = formData
     .getAll("existingLinkIds")
     .map((value) => String(value))
     .filter(Boolean);
+  const linksToDelete = new Set<string>();
+  const existingLinksToUpdate: LinkMutation[] = [];
 
-  for (const linkId of existingIds) {
+  for (const [index, linkId] of existingIds.entries()) {
     if (getBooleanFormValue(formData, `remove-${linkId}`)) {
-      const { error } = await supabase.from("links").delete().eq("id", linkId).eq("profile_id", profile.id);
-
-      if (error) {
-        redirect(buildDashboardUrl("error", "links_save_failed"));
-      }
-
+      linksToDelete.add(linkId);
       continue;
     }
 
     const title = String(formData.get(`title-${linkId}`) ?? "").trim();
     const url = String(formData.get(`url-${linkId}`) ?? "").trim();
-    const position = Number(formData.get(`position-${linkId}`) ?? 0);
+    const position = normalizeLinkPosition(Number(formData.get(`position-${linkId}`) ?? index), index);
     const isActive = getBooleanFormValue(formData, `isActive-${linkId}`);
 
     if (!title) {
-      redirect(buildDashboardUrl("error", "invalid_link_title"));
+      redirect(buildDashboardUrl("error", "invalid_link_title", redirectTo));
     }
 
     if (!HTTP_URL_PATTERN.test(url)) {
-      redirect(buildDashboardUrl("error", "invalid_link_url"));
+      redirect(buildDashboardUrl("error", "invalid_link_url", redirectTo));
     }
 
-    const { error } = await supabase
-      .from("links")
-      .update({
-        title,
-        url,
-        position: Number.isFinite(position) ? position : 0,
-        is_active: isActive,
-      })
-      .eq("id", linkId)
-      .eq("profile_id", profile.id);
-
-    if (error) {
-      redirect(buildDashboardUrl("error", "links_save_failed"));
-    }
+    existingLinksToUpdate.push({
+      id: linkId,
+      title,
+      url,
+      position,
+      isActive,
+    });
   }
 
-  const newSlots = Number(formData.get("newLinkSlots") ?? 0);
+  const newSlots = normalizeLinkPosition(Number(formData.get("newLinkSlots") ?? 0), 0);
+  const newLinksToInsert: LinkMutation[] = [];
 
   for (let index = 0; index < newSlots; index += 1) {
     const title = String(formData.get(`new-title-${index}`) ?? "").trim();
     const url = String(formData.get(`new-url-${index}`) ?? "").trim();
-    const position = Number(formData.get(`new-position-${index}`) ?? existingIds.length + index);
+    const position = normalizeLinkPosition(
+      Number(formData.get(`new-position-${index}`) ?? existingLinksToUpdate.length + index),
+      existingLinksToUpdate.length + index,
+    );
     const isActive = getBooleanFormValue(formData, `new-isActive-${index}`);
 
     if (!title && !url) {
@@ -259,23 +280,70 @@ export async function updateLinks(formData: FormData) {
     }
 
     if (!title) {
-      redirect(buildDashboardUrl("error", "invalid_link_title"));
+      redirect(buildDashboardUrl("error", "invalid_link_title", redirectTo));
     }
 
     if (!HTTP_URL_PATTERN.test(url)) {
-      redirect(buildDashboardUrl("error", "invalid_link_url"));
+      redirect(buildDashboardUrl("error", "invalid_link_url", redirectTo));
     }
 
-    const { error } = await supabase.from("links").insert({
-      profile_id: profile.id,
+    newLinksToInsert.push({
       title,
       url,
-      position: Number.isFinite(position) ? position : existingIds.length + index,
-      is_active: isActive,
+      position,
+      isActive,
     });
+  }
+
+  const normalizedLinks = [...existingLinksToUpdate, ...newLinksToInsert]
+    .sort((left, right) => left.position - right.position)
+    .map((link, index) => ({
+      ...link,
+      position: index,
+    }));
+
+  const existingUpdates = normalizedLinks.filter((link): link is LinkMutation & { id: string } => Boolean(link.id));
+  const newInserts = normalizedLinks.filter((link) => !link.id);
+  const updateResults = await Promise.all(
+    existingUpdates.map((link) =>
+      supabase
+        .from("links")
+        .update({
+          title: link.title,
+          url: link.url,
+          position: link.position,
+          is_active: link.isActive,
+        })
+        .eq("id", link.id)
+        .eq("profile_id", profile.id),
+    ),
+  );
+
+  if (updateResults.some((result) => result.error)) {
+    redirect(buildDashboardUrl("error", "links_save_failed", redirectTo));
+  }
+
+  if (newInserts.length) {
+    const { error } = await supabase.from("links").insert(
+      newInserts.map((link) => ({
+        profile_id: profile.id,
+        title: link.title,
+        url: link.url,
+        position: link.position,
+        is_active: link.isActive,
+      })),
+    );
 
     if (error) {
-      redirect(buildDashboardUrl("error", "links_save_failed"));
+      redirect(buildDashboardUrl("error", "links_save_failed", redirectTo));
+    }
+  }
+
+  if (linksToDelete.size) {
+    const { error } = await supabase.from("links").delete().eq("profile_id", profile.id).in("id", [...linksToDelete]);
+
+    if (error) {
+      redirect(buildDashboardUrl("error", "links_save_failed", redirectTo));
     }
   }
 
@@ -283,5 +351,60 @@ export async function updateLinks(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath(`/u/${profile.username}`);
 
-  redirect(buildDashboardUrl("message", "links_saved"));
+  redirect(buildDashboardUrl("message", "links_saved", redirectTo));
+}
+
+export async function createPost(formData: FormData) {
+  const redirectTo = normalizeDashboardRedirectTarget(String(formData.get("redirectTo") ?? ""));
+  const { supabase, profile } = await getEditableProfile(redirectTo);
+  const content = String(formData.get("content") ?? "").trim();
+
+  if (!content) {
+    redirect(buildDashboardUrl("error", "invalid_post_content", redirectTo));
+  }
+
+  if (content.length > MAX_POST_LENGTH) {
+    redirect(buildDashboardUrl("error", "invalid_post_length", redirectTo));
+  }
+
+  const { error } = await supabase.from("posts").insert({
+    user_id: profile.id,
+    content,
+  });
+
+  if (error) {
+    redirect(buildDashboardUrl("error", "post_save_failed", redirectTo));
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/network");
+  revalidatePath("/dashboard/posts");
+  revalidatePath(`/u/${profile.username}`);
+
+  redirect(buildDashboardUrl("message", "post_saved", redirectTo));
+}
+
+export async function deletePost(formData: FormData) {
+  const redirectTo = normalizeDashboardRedirectTarget(String(formData.get("redirectTo") ?? ""));
+  const { supabase, profile } = await getEditableProfile(redirectTo);
+  const postId = String(formData.get("postId") ?? "").trim();
+
+  if (!postId) {
+    redirect(buildDashboardUrl("error", "post_delete_failed", redirectTo));
+  }
+
+  const { error } = await supabase.from("posts").delete().eq("id", postId).eq("user_id", profile.id);
+
+  if (error) {
+    redirect(buildDashboardUrl("error", "post_delete_failed", redirectTo));
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/network");
+  revalidatePath("/dashboard/posts");
+  revalidatePath(`/u/${profile.username}`);
+
+  redirect(buildDashboardUrl("message", "post_deleted", redirectTo));
 }

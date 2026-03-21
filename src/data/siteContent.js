@@ -167,22 +167,22 @@ export const siteContent = {
     },
     contact: {
       tag: "Comece agora",
-      title: "Comece grátis com a visão do seu LinkSites.",
+      title: "Crie grátis seu cartão digital com árvore de links.",
       description:
-        "Entre para a lista de espera do MVP, veja uma demonstração guiada e descubra como sua bio pode evoluir para uma página profissional com mais identidade e conversão.",
+        "Escolha seu nome, defina sua bio e crie sua árvore de links com custo zero. Reúna tudo em uma página profissional, personalizada e pronta para fortalecer sua identidade e gerar mais conversão.",
       cards: [
         {
-          label: "Acesso inicial",
-          text: "Lista de espera com onboarding guiado",
+          label: "Custo zero",
+          text: "Criação gratuita para começar agora, sem pagar nada",
         },
         {
-          label: "Uso ideal",
-          text: "Instagram, WhatsApp, campanhas e apresentação comercial",
+          label: "Do seu jeito",
+          text: "Escolha nome, bio e links para Instagram, WhatsApp e campanhas",
         },
       ],
       sidebarLabel: "Acesso ao app",
       cta: "Abrir LinkSites App",
-      helper: "Se você já tiver sessão no app, seu dashboard abre direto. Se ainda não tiver conta, o LinkSites App leva você para criar e publicar sua página.",
+      helper: "Crie sua conta gratuita em segundos, monte seu cartão digital com árvore de links e publique sua página profissional imediatamente.",
     },
     footer: {
       left: "LinkSites 2026 - Uma startup do grupo Techlab Software",

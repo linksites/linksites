@@ -1,0 +1,118 @@
+import Image from "next/image";
+import Link from "next/link";
+import FollowButton from "@/components/FollowButton";
+import type { AppLocale } from "@/lib/locale";
+import type { PublicDirectoryProfile } from "@/lib/types";
+
+type SocialConnectionsPanelProps = {
+  profiles: PublicDirectoryProfile[];
+  locale: AppLocale;
+  title: string;
+  description: string;
+  emptyTitle: string;
+  emptyDescription: string;
+};
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+export function SocialConnectionsPanel({
+  profiles,
+  locale,
+  title,
+  description,
+  emptyTitle,
+  emptyDescription,
+}: SocialConnectionsPanelProps) {
+  const copy =
+    locale === "ptBR"
+      ? {
+          label: "Conexoes",
+          followers: "seguidores",
+          links: "links",
+          openProfile: "Ver perfil",
+        }
+      : {
+          label: "Connections",
+          followers: "followers",
+          links: "links",
+          openProfile: "View profile",
+        };
+
+  return (
+    <section className="dashboard-panel rounded-[1.8rem] border border-white/8 bg-[var(--panel)] p-5">
+      <div className="max-w-2xl">
+        <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.label}</div>
+        <h2 className="mt-2 font-[var(--font-display)] text-2xl font-semibold text-white">{title}</h2>
+        <p className="mt-3 text-sm leading-7 text-white/60">{description}</p>
+      </div>
+
+      {profiles.length ? (
+        <div className="mt-5 grid gap-3">
+          {profiles.map((profile) => (
+            <article key={profile.id} className="rounded-[1.3rem] border border-white/8 bg-white/4 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-slate-950 text-sm font-semibold text-white">
+                    {profile.avatarUrl ? (
+                      <Image
+                        src={profile.avatarUrl}
+                        alt={profile.displayName}
+                        fill
+                        sizes="48px"
+                        className="rounded-full object-cover object-center"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center">
+                        {getInitials(profile.displayName)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <h3 className="truncate text-base font-semibold text-white">{profile.displayName}</h3>
+                    <p className="mt-1 truncate text-sm text-white/60">@{profile.username}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/70">
+                        {profile.followersCount} {copy.followers}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/70">
+                        {profile.activeLinksCount} {copy.links}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <FollowButton
+                    targetProfileId={profile.id}
+                    initialIsFollowing={profile.isFollowing}
+                    locale={locale}
+                    className="min-h-11"
+                  />
+                  <Link
+                    href={`/u/${profile.username}`}
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
+                  >
+                    {copy.openProfile}
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-5 rounded-[1.4rem] border border-dashed border-white/12 bg-white/3 px-5 py-6">
+          <p className="text-sm font-semibold text-white">{emptyTitle}</p>
+          <p className="mt-2 text-sm leading-7 text-white/60">{emptyDescription}</p>
+        </div>
+      )}
+    </section>
+  );
+}

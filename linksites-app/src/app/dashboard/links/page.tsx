@@ -1,16 +1,15 @@
-import { DashboardAnalyticsSummary } from "@/components/dashboard/dashboard-analytics-summary";
 import { DashboardFrame } from "@/components/dashboard/dashboard-frame";
-import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
+import { DashboardLinksEditor } from "@/components/dashboard/dashboard-links-editor";
 import { getDashboardPageData } from "@/lib/dashboard";
 
-type DashboardPageProps = {
+type DashboardLinksPageProps = {
   searchParams: Promise<{
     error?: string;
     message?: string;
   }>;
 };
 
-export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+export default async function DashboardLinksPage({ searchParams }: DashboardLinksPageProps) {
   const data = await getDashboardPageData(await searchParams);
 
   return (
@@ -24,24 +23,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       publicProfileUrl={data.publicProfileUrl}
       usingMockData={data.usingMockData}
       networkProfiles={data.networkProfiles}
-      currentPath="/dashboard"
+      currentPath="/dashboard/links"
       asideAnalytics={data.analytics}
     >
-      <DashboardOverview
+      <DashboardLinksEditor
         content={data.content.dashboard}
-        viewerEmail={data.viewer.user?.email ?? null}
-        sessionAuthenticated={Boolean(data.viewer.user)}
-        usingMockData={data.usingMockData}
         profile={data.profile}
-        publishedDescription={data.publishedDescription}
-        publicProfileUrl={data.publicProfileUrl}
-        onboarding={data.onboarding}
-      />
-
-      <DashboardAnalyticsSummary
-        content={data.content.dashboard}
-        analytics={data.analytics}
-        locale={data.locale}
+        usingMockData={data.usingMockData}
+        redirectTo="/dashboard/links"
       />
     </DashboardFrame>
   );

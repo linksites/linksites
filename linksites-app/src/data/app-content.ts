@@ -168,8 +168,6 @@ export const appContent: Record<AppLocale, {
     backHome: string;
     followersSingular: string;
     followersPlural: string;
-    openInBrowser: string;
-    openInBrowserHint: string;
   };
   notFound: {
     title: string;
@@ -414,16 +412,20 @@ export const appContent: Record<AppLocale, {
         avatar_upload_failed: "Não foi possível enviar a foto de perfil agora.",
         invalid_link_title: "Cada link precisa ter um título antes de salvar.",
         invalid_link_url: "Cada link precisa usar uma URL válida com http:// ou https://.",
+        post_saved: "Post publicado com sucesso.",
+        post_deleted: "Post removido com sucesso.",
+        post_save_failed: "Não foi possível publicar esse post agora.",
+        post_delete_failed: "Não foi possível remover esse post agora.",
+        invalid_post_content: "Escreva um texto antes de publicar o post.",
+        invalid_post_length: "O post precisa ter no máximo 280 caracteres.",
         unauthorized: "Entre novamente para continuar editando seu perfil.",
         mock_mode_readonly: "O modo mock não permite salvar alterações reais.",
       },
     },
     publicProfile: {
-      backHome: "Voltar para o dashboard",
+      backHome: "Voltar para o Dashboard",
       followersSingular: "seguidor",
       followersPlural: "seguidores",
-      openInBrowser: "Abrir no navegador",
-      openInBrowserHint: "Se o perfil abrir dentro do Instagram ou do X, toque aqui para tentar abrir no navegador do aparelho.",
     },
     notFound: {
       title: "Este perfil ainda não existe",
@@ -669,6 +671,12 @@ export const appContent: Record<AppLocale, {
         avatar_upload_failed: "We could not upload your profile photo right now.",
         invalid_link_title: "Each link needs a title before saving.",
         invalid_link_url: "Each link must use a valid URL with http:// or https://.",
+        post_saved: "Post published successfully.",
+        post_deleted: "Post removed successfully.",
+        post_save_failed: "We could not publish this post right now.",
+        post_delete_failed: "We could not remove this post right now.",
+        invalid_post_content: "Write something before publishing the post.",
+        invalid_post_length: "Posts must be 280 characters or less.",
         unauthorized: "Sign in again to keep editing your profile.",
         mock_mode_readonly: "Mock mode does not allow saving real changes.",
       },
@@ -677,8 +685,6 @@ export const appContent: Record<AppLocale, {
       backHome: "Back to dashboard",
       followersSingular: "follower",
       followersPlural: "followers",
-      openInBrowser: "Open in browser",
-      openInBrowserHint: "If this profile opens inside Instagram or X, tap here to try opening it in your device browser.",
     },
     notFound: {
       title: "This profile does not exist yet",

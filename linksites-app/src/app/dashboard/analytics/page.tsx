@@ -1,17 +1,9 @@
 import { DashboardAnalyticsSummary } from "@/components/dashboard/dashboard-analytics-summary";
 import { DashboardFrame } from "@/components/dashboard/dashboard-frame";
-import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { getDashboardPageData } from "@/lib/dashboard";
 
-type DashboardPageProps = {
-  searchParams: Promise<{
-    error?: string;
-    message?: string;
-  }>;
-};
-
-export default async function DashboardPage({ searchParams }: DashboardPageProps) {
-  const data = await getDashboardPageData(await searchParams);
+export default async function DashboardAnalyticsPage() {
+  const data = await getDashboardPageData();
 
   return (
     <DashboardFrame
@@ -24,20 +16,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       publicProfileUrl={data.publicProfileUrl}
       usingMockData={data.usingMockData}
       networkProfiles={data.networkProfiles}
-      currentPath="/dashboard"
+      currentPath="/dashboard/analytics"
       asideAnalytics={data.analytics}
     >
-      <DashboardOverview
-        content={data.content.dashboard}
-        viewerEmail={data.viewer.user?.email ?? null}
-        sessionAuthenticated={Boolean(data.viewer.user)}
-        usingMockData={data.usingMockData}
-        profile={data.profile}
-        publishedDescription={data.publishedDescription}
-        publicProfileUrl={data.publicProfileUrl}
-        onboarding={data.onboarding}
-      />
-
       <DashboardAnalyticsSummary
         content={data.content.dashboard}
         analytics={data.analytics}

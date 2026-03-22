@@ -10,6 +10,38 @@ begin
 end;
 $$;
 
+create or replace function public.is_current_user_room_participant(room_uuid uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.chat_room_participants
+    join public.profiles on public.profiles.id = public.chat_room_participants.profile_id
+    where public.chat_room_participants.room_id = room_uuid
+      and public.profiles.user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.is_current_user_chat_room_creator(room_uuid uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.chat_rooms
+    join public.profiles on public.profiles.id = public.chat_rooms.creator_profile_id
+    where public.chat_rooms.id = room_uuid
+      and public.profiles.user_id = auth.uid()
+  );
+$$;
+
 create table if not exists public.themes (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
@@ -53,6 +85,29 @@ create table if not exists public.follows (
   followed_id uuid not null references public.profiles(id) on delete cascade,
   created_at timestamptz not null default timezone('utc', now()),
   primary key (follower_id, followed_id)
+);
+
+create table if not exists public.friend_requests (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references public.profiles(id) on delete cascade,
+  recipient_id uuid not null references public.profiles(id) on delete cascade,
+  status text not null default 'pending',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  constraint friend_requests_status_check check (status in ('pending', 'accepted', 'rejected', 'cancelled')),
+  constraint friend_requests_distinct_profiles check (sender_id <> recipient_id)
+);
+
+create unique index if not exists friend_requests_pending_unique_idx
+  on public.friend_requests(sender_id, recipient_id)
+  where status = 'pending';
+
+create table if not exists public.friendships (
+  user_one_id uuid not null references public.profiles(id) on delete cascade,
+  user_two_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default timezone('utc', now()),
+  primary key (user_one_id, user_two_id),
+  constraint friendships_distinct_users check (user_one_id <> user_two_id)
 );
 
 create or replace function public.sync_profile_followers_count()
@@ -107,6 +162,7 @@ create table if not exists public.user_presence (
 create table if not exists public.chat_rooms (
   id uuid primary key default gen_random_uuid(),
   name text, -- Nome do grupo (opcional para DMs)
+  creator_profile_id uuid references public.profiles(id) on delete set null,
   is_group_chat boolean not null default false,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
@@ -117,6 +173,7 @@ create table if not exists public.chat_room_participants (
   room_id uuid not null references public.chat_rooms(id) on delete cascade,
   profile_id uuid not null references public.profiles(id) on delete cascade,
   joined_at timestamptz not null default timezone('utc', now()),
+  last_read_at timestamptz,
   primary key (room_id, profile_id)
 );
 
@@ -136,6 +193,13 @@ create table if not exists public.reactions (
   type text not null, -- e.g., 'like', 'heart', 'emoji_id'
   created_at timestamptz not null default timezone('utc', now()),
   unique (post_id, user_id, type) -- Garante que um usuário não reaja com o mesmo tipo no mesmo post
+);
+
+create table if not exists public.saved_posts (
+  post_id uuid not null references public.posts(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default timezone('utc', now()),
+  primary key (post_id, user_id)
 );
 
 create table if not exists public.comments (
@@ -192,11 +256,17 @@ create index if not exists analytics_events_profile_session_idx
   on public.analytics_events(profile_id, session_id);
 create index if not exists comments_post_created_idx
   on public.comments(post_id, created_at desc);
+create index if not exists saved_posts_user_created_idx
+  on public.saved_posts(user_id, created_at desc);
+create index if not exists saved_posts_post_idx
+  on public.saved_posts(post_id);
 
 drop trigger if exists themes_set_updated_at on public.themes;
 drop trigger if exists profiles_set_updated_at on public.profiles;
 drop trigger if exists links_set_updated_at on public.links;
 drop trigger if exists follows_sync_followers_count on public.follows;
+drop trigger if exists friend_requests_set_updated_at on public.friend_requests;
+drop trigger if exists chat_rooms_set_updated_at on public.chat_rooms;
 drop trigger if exists comments_set_updated_at on public.comments;
 
 create trigger profiles_set_updated_at
@@ -216,6 +286,16 @@ execute function public.sync_profile_followers_count();
 
 create trigger comments_set_updated_at
 before update on public.comments
+for each row
+execute function public.set_updated_at();
+
+create trigger friend_requests_set_updated_at
+before update on public.friend_requests
+for each row
+execute function public.set_updated_at();
+
+create trigger chat_rooms_set_updated_at
+before update on public.chat_rooms
 for each row
 execute function public.set_updated_at();
 
@@ -274,11 +354,14 @@ set
 alter table public.themes enable row level security;
 alter table public.profiles enable row level security;
 alter table public.follows enable row level security;
+alter table public.friend_requests enable row level security;
+alter table public.friendships enable row level security;
 alter table public.posts enable row level security;
 alter table public.user_presence enable row level security;
 alter table public.chat_rooms enable row level security;
 alter table public.chat_room_participants enable row level security;
 alter table public.reactions enable row level security;
+alter table public.saved_posts enable row level security;
 alter table public.comments enable row level security;
 alter table public.notifications enable row level security;
 alter table public.links enable row level security;
@@ -410,6 +493,69 @@ using (
   auth.uid() = (select user_id from public.profiles where id = follower_id)
 );
 
+drop policy if exists "users can view their own friend requests" on public.friend_requests;
+create policy "users can view their own friend requests"
+on public.friend_requests
+for select
+to authenticated
+using (
+  auth.uid() = (select user_id from public.profiles where id = sender_id)
+  or auth.uid() = (select user_id from public.profiles where id = recipient_id)
+);
+
+drop policy if exists "authenticated users can send friend requests" on public.friend_requests;
+create policy "authenticated users can send friend requests"
+on public.friend_requests
+for insert
+to authenticated
+with check (
+  auth.uid() = (select user_id from public.profiles where id = sender_id)
+);
+
+drop policy if exists "participants can update friend requests" on public.friend_requests;
+create policy "participants can update friend requests"
+on public.friend_requests
+for update
+to authenticated
+using (
+  auth.uid() = (select user_id from public.profiles where id = sender_id)
+  or auth.uid() = (select user_id from public.profiles where id = recipient_id)
+)
+with check (
+  auth.uid() = (select user_id from public.profiles where id = sender_id)
+  or auth.uid() = (select user_id from public.profiles where id = recipient_id)
+);
+
+drop policy if exists "participants can view their friendships" on public.friendships;
+create policy "participants can view their friendships"
+on public.friendships
+for select
+to authenticated
+using (
+  auth.uid() = (select user_id from public.profiles where id = user_one_id)
+  or auth.uid() = (select user_id from public.profiles where id = user_two_id)
+);
+
+drop policy if exists "participants can create friendships" on public.friendships;
+create policy "participants can create friendships"
+on public.friendships
+for insert
+to authenticated
+with check (
+  auth.uid() = (select user_id from public.profiles where id = user_one_id)
+  or auth.uid() = (select user_id from public.profiles where id = user_two_id)
+);
+
+drop policy if exists "participants can remove friendships" on public.friendships;
+create policy "participants can remove friendships"
+on public.friendships
+for delete
+to authenticated
+using (
+  auth.uid() = (select user_id from public.profiles where id = user_one_id)
+  or auth.uid() = (select user_id from public.profiles where id = user_two_id)
+);
+
 -- Policies for 'posts' table
 drop policy if exists "posts are readable by everyone" on public.posts;
 create policy "posts are readable by everyone"
@@ -474,12 +620,8 @@ on public.chat_rooms
 for select
 to authenticated
 using (
-  exists (
-    select 1
-    from public.chat_room_participants
-    where chat_room_participants.room_id = chat_rooms.id
-      and chat_room_participants.profile_id = (select id from public.profiles where user_id = auth.uid())
-  )
+  creator_profile_id = (select id from public.profiles where user_id = auth.uid())
+  or public.is_current_user_room_participant(id)
 );
 
 drop policy if exists "authenticated users can create chat rooms" on public.chat_rooms;
@@ -487,7 +629,23 @@ create policy "authenticated users can create chat rooms"
 on public.chat_rooms
 for insert
 to authenticated
-with check (true); -- A lógica de quem pode criar um grupo ou DM será controlada na aplicação.
+with check (
+  creator_profile_id = (select id from public.profiles where user_id = auth.uid())
+); -- A lógica de quem pode criar um grupo ou DM será controlada na aplicação.
+
+drop policy if exists "participants can update their chat rooms" on public.chat_rooms;
+create policy "participants can update their chat rooms"
+on public.chat_rooms
+for update
+to authenticated
+using (
+  creator_profile_id = (select id from public.profiles where user_id = auth.uid())
+  or public.is_current_user_room_participant(id)
+)
+with check (
+  creator_profile_id = (select id from public.profiles where user_id = auth.uid())
+  or public.is_current_user_room_participant(id)
+);
 
 -- Policies for 'chat_room_participants' table
 drop policy if exists "authenticated users can view their chat room participants" on public.chat_room_participants;
@@ -496,12 +654,8 @@ on public.chat_room_participants
 for select
 to authenticated
 using (
-  exists (
-    select 1
-    from public.chat_room_participants as p
-    where p.room_id = chat_room_participants.room_id
-      and p.profile_id = (select id from public.profiles where user_id = auth.uid())
-  )
+  profile_id = (select id from public.profiles where user_id = auth.uid())
+  or public.is_current_user_room_participant(room_id)
 );
 
 drop policy if exists "authenticated users can add themselves to chat rooms" on public.chat_room_participants;
@@ -509,7 +663,21 @@ create policy "authenticated users can add themselves to chat rooms"
 on public.chat_room_participants
 for insert
 to authenticated
-with check (profile_id = (select id from public.profiles where user_id = auth.uid()));
+with check (
+  public.is_current_user_chat_room_creator(room_id)
+);
+
+drop policy if exists "participants can update their own chat room row" on public.chat_room_participants;
+create policy "participants can update their own chat room row"
+on public.chat_room_participants
+for update
+to authenticated
+using (
+  profile_id = (select id from public.profiles where user_id = auth.uid())
+)
+with check (
+  profile_id = (select id from public.profiles where user_id = auth.uid())
+);
 
 -- Policies for 'reactions' table
 drop policy if exists "reactions are readable by everyone" on public.reactions;
@@ -544,6 +712,36 @@ on public.reactions
 for delete
 to authenticated
 using (auth.uid() = (select user_id from public.profiles where id = public.reactions.user_id));
+
+drop policy if exists "owners can view their own saved posts" on public.saved_posts;
+create policy "owners can view their own saved posts"
+on public.saved_posts
+for select
+to authenticated
+using (auth.uid() = (select user_id from public.profiles where id = public.saved_posts.user_id));
+
+drop policy if exists "authenticated users can save posts" on public.saved_posts;
+create policy "authenticated users can save posts"
+on public.saved_posts
+for insert
+to authenticated
+with check (
+  auth.uid() = (select user_id from public.profiles where id = public.saved_posts.user_id)
+  and exists (
+    select 1
+    from public.posts
+    join public.profiles on public.profiles.id = public.posts.user_id
+    where public.posts.id = public.saved_posts.post_id
+      and public.profiles.is_published = true
+  )
+);
+
+drop policy if exists "owners can unsave their own posts" on public.saved_posts;
+create policy "owners can unsave their own posts"
+on public.saved_posts
+for delete
+to authenticated
+using (auth.uid() = (select user_id from public.profiles where id = public.saved_posts.user_id));
 
 -- Policies for 'comments' table
 drop policy if exists "comments are readable when approved or owned" on public.comments;
@@ -647,7 +845,7 @@ on public.notifications
 for insert
 to authenticated
 with check (
-  public.notifications.type = 'new_follower'
+  public.notifications.type in ('new_follower', 'post_like', 'new_comment')
   and public.notifications.sender_id is not null
   and public.notifications.sender_id <> public.notifications.recipient_id
   and auth.uid() = (select user_id from public.profiles where id = public.notifications.sender_id)

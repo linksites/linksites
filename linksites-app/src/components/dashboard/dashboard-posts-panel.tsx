@@ -47,14 +47,17 @@ export function DashboardPostsPanel({
           label: "Posts",
           title: "Posts curtos para movimentar sua rede",
           description:
-            "Publique atualizacoes rapidas para aparecer no seu perfil publico e alimentar a atividade dos perfis que seguem voce.",
+            "Publique atualizações rápidas para aparecer no seu perfil público e alimentar a atividade dos perfis que seguem você.",
           cta: "Publicar post",
-          placeholder: "Escreva uma atualizacao curta, uma novidade, um convite ou um contexto rapido para seus links.",
-          helper: "Ate 280 caracteres por post.",
-          emptyTitle: "Voce ainda nao publicou nenhum post",
-          emptyDescription: "Seu primeiro post ja ajuda o perfil publico a parecer vivo e abre a camada de feed na rede.",
+          placeholder: "Escreva uma atualização curta, uma novidade, um convite ou um contexto rápido para seus links.",
+          helper: "Até 280 caracteres por post.",
+          emptyTitle: "Você ainda não publicou nenhum post",
+          emptyDescription: "Seu primeiro post já ajuda o perfil público a parecer vivo e alimenta o feed da sua rede.",
           delete: "Remover",
-          mockReadonly: "O modo mock nao salva posts reais. Conecte o Supabase para publicar no banco.",
+          likes: "curtidas",
+          comments: "comentários",
+          saves: "salvos",
+          mockReadonly: "O modo mock não salva posts reais. Conecte o Supabase para publicar no banco.",
         }
       : {
           label: "Posts",
@@ -67,6 +70,9 @@ export function DashboardPostsPanel({
           emptyTitle: "You have not published any posts yet",
           emptyDescription: "Your first post already makes the public profile feel alive and unlocks the feed layer in the network.",
           delete: "Remove",
+          likes: "likes",
+          comments: "comments",
+          saves: "saves",
           mockReadonly: "Mock mode does not save real posts. Connect Supabase to publish to the database.",
         };
 
@@ -123,10 +129,13 @@ export function DashboardPostsPanel({
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/82">{post.content}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/70">
-                      {post.reactionCount} likes
+                      {post.reactionCount} {copy.likes}
                     </div>
                     <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/70">
-                      {post.commentCount} comments
+                      {post.commentCount} {copy.comments}
+                    </div>
+                    <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/70">
+                      {post.savedCount} {copy.saves}
                     </div>
                   </div>
                 </div>

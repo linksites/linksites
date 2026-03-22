@@ -8,9 +8,14 @@ import type { PendingCommentItem } from "@/lib/types";
 type PendingCommentsPanelProps = {
   items: PendingCommentItem[];
   locale: AppLocale;
+  mode?: "pending" | "approved";
 };
 
-export function PendingCommentsPanel({ items, locale }: PendingCommentsPanelProps) {
+export function PendingCommentsPanel({
+  items,
+  locale,
+  mode = "pending",
+}: PendingCommentsPanelProps) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -18,30 +23,43 @@ export function PendingCommentsPanel({ items, locale }: PendingCommentsPanelProp
     () =>
       locale === "ptBR"
         ? {
-            label: "Moderacao",
-            title: "Comentarios aguardando aprovacao",
-            description: "Aprove, rejeite ou remova o que entrar na fila antes de aparecer no perfil publico.",
+            label: "Moderação",
+            title: mode === "pending" ? "Comentários aguardando aprovação" : "Comentários aprovados",
+            description:
+              mode === "pending"
+                ? "Aprove, rejeite ou remova o que entrar na fila antes de aparecer no perfil público."
+                : "Remova comentários já aprovados quando quiser limpar o post ou ocultar alguma interação.",
             approve: "Aprovar",
             reject: "Rejeitar",
             remove: "Excluir",
-            pendingEmptyTitle: "Nenhum comentario pendente",
-            pendingEmptyDescription: "Quando novos comentarios chegarem, eles vao aparecer aqui para moderacao.",
+            pendingEmptyTitle:
+              mode === "pending" ? "Nenhum comentário pendente" : "Nenhum comentário aprovado",
+            pendingEmptyDescription:
+              mode === "pending"
+                ? "Quando novos comentários chegarem, eles vão aparecer aqui para moderação."
+                : "Quando comentários forem aprovados, eles vão aparecer aqui para remoção rápida.",
             fromPost: "No post",
-            failed: "Nao foi possivel atualizar esse comentario agora.",
+            failed: "Não foi possível atualizar este comentário agora.",
           }
         : {
             label: "Moderation",
-            title: "Comments waiting for approval",
-            description: "Approve, reject, or remove what enters the queue before it appears on the public profile.",
+            title: mode === "pending" ? "Comments waiting for approval" : "Approved comments",
+            description:
+              mode === "pending"
+                ? "Approve, reject, or remove what enters the queue before it appears on the public profile."
+                : "Remove comments that were already approved whenever you want to clean up a post.",
             approve: "Approve",
             reject: "Reject",
             remove: "Delete",
-            pendingEmptyTitle: "No pending comments",
-            pendingEmptyDescription: "As new comments arrive, they will appear here for moderation.",
+            pendingEmptyTitle: mode === "pending" ? "No pending comments" : "No approved comments",
+            pendingEmptyDescription:
+              mode === "pending"
+                ? "As new comments arrive, they will appear here for moderation."
+                : "As comments get approved, they will show up here for quick removal.",
             fromPost: "On post",
             failed: "We could not update this comment right now.",
           },
-    [locale],
+    [locale, mode],
   );
 
   async function handleAction(commentId: string, action: "approve" | "reject" | "delete") {
@@ -94,22 +112,26 @@ export function PendingCommentsPanel({ items, locale }: PendingCommentsPanelProp
               </p>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/80">{item.content}</p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleAction(item.id, "approve")}
-                  disabled={busyId === item.id}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px disabled:opacity-60"
-                >
-                  {copy.approve}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAction(item.id, "reject")}
-                  disabled={busyId === item.id}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm font-medium text-white/72 transition hover:border-white/16 hover:text-white disabled:opacity-60"
-                >
-                  {copy.reject}
-                </button>
+                {mode === "pending" ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleAction(item.id, "approve")}
+                      disabled={busyId === item.id}
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px disabled:opacity-60"
+                    >
+                      {copy.approve}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAction(item.id, "reject")}
+                      disabled={busyId === item.id}
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm font-medium text-white/72 transition hover:border-white/16 hover:text-white disabled:opacity-60"
+                    >
+                      {copy.reject}
+                    </button>
+                  </>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => handleAction(item.id, "delete")}

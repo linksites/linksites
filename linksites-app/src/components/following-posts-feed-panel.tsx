@@ -12,10 +12,10 @@ export function FollowingPostsFeedPanel({ posts, locale }: FollowingPostsFeedPan
     locale === "ptBR"
       ? {
           label: "Feed",
-          title: "Atividade dos perfis que voce segue",
-          description: "Um feed leve para acompanhar quem publicou algo novo sem sair da camada de descoberta.",
+          title: "Atividade dos perfis que você segue",
+          description: "Um feed leve para acompanhar quem publicou algo novo sem sair da sua rede.",
           emptyTitle: "Nenhum post recente dos perfis seguidos",
-          emptyDescription: "Quando os perfis da sua rede publicarem atualizacoes, elas vao aparecer aqui.",
+          emptyDescription: "Quando os perfis da sua rede publicarem atualizações, elas vão aparecer aqui.",
         }
       : {
           label: "Feed",

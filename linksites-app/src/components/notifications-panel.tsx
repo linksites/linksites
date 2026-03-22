@@ -11,6 +11,7 @@ type NotificationsPanelProps = {
   notifications: SocialNotification[];
   unreadCount: number;
   locale: AppLocale;
+  profileUsername?: string;
   title?: string;
   description?: string;
 };
@@ -34,6 +35,7 @@ export function NotificationsPanel({
   notifications,
   unreadCount,
   locale,
+  profileUsername,
   title,
   description,
 }: NotificationsPanelProps) {
@@ -44,19 +46,22 @@ export function NotificationsPanel({
     () =>
       locale === "ptBR"
         ? {
-            label: "Notificacoes",
+            label: "Notificações",
             title: title ?? "Movimento da sua rede",
             description:
               description ?? "Acompanhe novos seguidores e limpe a fila quando quiser manter o painel em dia.",
-            unread: "nao lidas",
+            unread: "não lidas",
             markAllRead: "Marcar tudo como lido",
             working: "Atualizando...",
-            emptyTitle: "Nenhuma notificacao ainda",
-            emptyDescription: "Quando alguem seguir seu perfil, essa area vai registrar o movimento aqui.",
-            followerText: "comecou a seguir voce.",
+            emptyTitle: "Nenhuma notificação ainda",
+            emptyDescription: "Quando sua rede reagir aos seus posts ou seguir seu perfil, esta área vai registrar esse movimento aqui.",
+            followerText: "começou a seguir você.",
+            likeText: "curtiu um dos seus posts.",
+            commentText: "comentou em um dos seus posts.",
             openProfile: "Abrir perfil",
+            openPost: "Abrir post",
             genericSender: "Um perfil da rede",
-            updateFailed: "Nao foi possivel atualizar as notificacoes agora.",
+            updateFailed: "Não foi possível atualizar as notificações agora.",
           }
         : {
             label: "Notifications",
@@ -67,9 +72,12 @@ export function NotificationsPanel({
             markAllRead: "Mark all as read",
             working: "Updating...",
             emptyTitle: "No notifications yet",
-            emptyDescription: "As soon as someone follows your profile, this area will register the movement here.",
+            emptyDescription: "As your network reacts to your posts or follows your profile, this area will capture the movement here.",
             followerText: "started following you.",
+            likeText: "liked one of your posts.",
+            commentText: "commented on one of your posts.",
             openProfile: "Open profile",
+            openPost: "Open post",
             genericSender: "A profile from the network",
             updateFailed: "We could not update notifications right now.",
           },
@@ -135,6 +143,14 @@ export function NotificationsPanel({
         <div className="mt-5 grid gap-3">
           {notifications.map((notification) => {
             const senderName = notification.sender?.displayName ?? copy.genericSender;
+            const messageText =
+              notification.type === "post_like"
+                ? copy.likeText
+                : notification.type === "new_comment"
+                  ? copy.commentText
+                  : copy.followerText;
+            const postHref =
+              notification.entityId && profileUsername ? `/u/${profileUsername}#post-${notification.entityId}` : null;
 
             return (
               <article
@@ -162,7 +178,7 @@ export function NotificationsPanel({
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm leading-6 text-white">
-                        <span className="font-semibold">{senderName}</span> {copy.followerText}
+                        <span className="font-semibold">{senderName}</span> {messageText}
                       </p>
                       {!notification.read ? (
                         <span className="rounded-full border border-cyan-300/18 bg-cyan-300/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-cyan-100">
@@ -173,14 +189,24 @@ export function NotificationsPanel({
                     <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/40">
                       {formatTimestamp(notification.createdAt, locale)}
                     </p>
-                    {notification.sender ? (
-                      <Link
-                        href={`/u/${notification.sender.username}`}
-                        className="mt-3 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/72 transition hover:border-white/16 hover:text-white"
-                      >
-                        {copy.openProfile}
-                      </Link>
-                    ) : null}
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      {notification.sender ? (
+                        <Link
+                          href={`/u/${notification.sender.username}`}
+                          className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/72 transition hover:border-white/16 hover:text-white"
+                        >
+                          {copy.openProfile}
+                        </Link>
+                      ) : null}
+                      {postHref ? (
+                        <Link
+                          href={postHref}
+                          className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-sm text-cyan-100 transition hover:-translate-y-px"
+                        >
+                          {copy.openPost}
+                        </Link>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </article>

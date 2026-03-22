@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { FriendRequestButton } from "@/components/friend-request-button";
 import FollowButton from "@/components/FollowButton";
 import { appContent } from "@/data/app-content";
 import type { AppLocale } from "@/lib/locale";
@@ -28,7 +29,7 @@ function getReasonLabel(locale: AppLocale, reason: DiscoveryReason, isFollowing:
   if (locale === "ptBR") {
     switch (effectiveReason) {
       case "following":
-        return "Voce ja acompanha";
+        return "Você já acompanha";
       case "trending":
         return "Perfil em alta";
       case "link_rich":
@@ -62,6 +63,7 @@ export function NetworkProfileCard({
   const content = appContent[locale].dashboard.discovery;
   const [isFollowing, setIsFollowing] = useState(profile.isFollowing);
   const [followersCount, setFollowersCount] = useState(profile.followersCount);
+  const [friendshipStatus, setFriendshipStatus] = useState(profile.friendshipStatus);
 
   function handleFollowChange(nextState: { isFollowing: boolean; followersCount: number | null }) {
     setIsFollowing(nextState.isFollowing);
@@ -121,7 +123,7 @@ export function NetworkProfileCard({
         </div>
       </div>
 
-      <div className={`mt-5 grid gap-3 ${compact ? "grid-cols-1" : "sm:grid-cols-2"}`}>
+      <div className={`mt-5 grid gap-3 ${compact ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
         <FollowButton
           targetProfileId={profile.id}
           initialIsFollowing={isFollowing}
@@ -129,9 +131,16 @@ export function NetworkProfileCard({
           locale={locale}
           className="min-h-11 w-full"
         />
+        <FriendRequestButton
+          targetProfileId={profile.id}
+          initialStatus={friendshipStatus}
+          onStatusChange={setFriendshipStatus}
+          locale={locale}
+          className="min-h-11 w-full"
+        />
         <Link
           href={`/u/${profile.username}`}
-          className="inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
+          className="inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-center text-sm font-medium leading-tight whitespace-normal text-cyan-100 transition hover:-translate-y-px"
         >
           {content.openProfile}
         </Link>

@@ -1,0 +1,348 @@
+import { hasSupabaseEnv } from "@/lib/supabase/env";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type {
+  DirectConversation,
+  DirectConversationOpenResult,
+  DirectMessage,
+  PublicDirectoryProfile,
+} from "@/lib/types";
+
+type ProfileRow = {
+  id: string;
+  username: string;
+  display_name: string;
+  bio: string;
+  avatar_url: string | null;
+  theme_slug: "midnight-grid" | "sunset-signal";
+  created_at: string;
+  followers_count?: number | null;
+};
+
+type MessageRow = {
+  id: string;
+  room_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+};
+
+type ParticipantRow = {
+  room_id: string;
+  profile_id: string;
+  last_read_at: string | null;
+};
+
+type RoomRow = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  is_group_chat: boolean;
+};
+
+function sortFriendPair(left: string, right: string) {
+  return [left, right].sort() as [string, string];
+}
+
+function formatSupabaseError(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return null;
+  }
+
+  const candidate = error as {
+    code?: string;
+    message?: string;
+    details?: string;
+    hint?: string;
+  };
+
+  return JSON.stringify({
+    code: candidate.code ?? null,
+    message: candidate.message ?? null,
+    details: candidate.details ?? null,
+    hint: candidate.hint ?? null,
+  });
+}
+
+async function hydrateProfiles(profileIds: string[]): Promise<Map<string, PublicDirectoryProfile>> {
+  if (!hasSupabaseEnv()) {
+    return new Map();
+  }
+
+  const ids = [...new Set(profileIds.filter(Boolean))];
+
+  if (!ids.length) {
+    return new Map();
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, bio, avatar_url, theme_slug, created_at, followers_count")
+    .in("id", ids);
+  const { data: links } = await supabase
+    .from("links")
+    .select("profile_id")
+    .in("profile_id", ids)
+    .eq("is_active", true);
+
+  const linksCountByProfileId = new Map<string, number>();
+  (links ?? []).forEach((link) => {
+    linksCountByProfileId.set(link.profile_id, (linksCountByProfileId.get(link.profile_id) ?? 0) + 1);
+  });
+
+  return new Map(
+    ((profiles ?? []) as ProfileRow[]).map((profile) => [
+      profile.id,
+      {
+        id: profile.id,
+        username: profile.username,
+        displayName: profile.display_name,
+        bio: profile.bio,
+        avatarUrl: profile.avatar_url,
+        themeSlug: profile.theme_slug,
+        createdAt: profile.created_at,
+        activeLinksCount: linksCountByProfileId.get(profile.id) ?? 0,
+        followersCount: profile.followers_count ?? 0,
+        isFollowing: false,
+        isFriend: true,
+        friendshipStatus: "friends",
+        discoveryReason: "following",
+        discoveryScore: 0,
+      },
+    ]),
+  );
+}
+
+export async function ensureDirectConversation({
+  viewerProfileId,
+  targetProfileId,
+}: {
+  viewerProfileId: string;
+  targetProfileId: string;
+}): Promise<DirectConversationOpenResult> {
+  if (!hasSupabaseEnv()) {
+    return { ok: false, reason: "room_create_failed" };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const [userOneId, userTwoId] = sortFriendPair(viewerProfileId, targetProfileId);
+  const { data: friendship } = await supabase
+    .from("friendships")
+    .select("user_one_id")
+    .eq("user_one_id", userOneId)
+    .eq("user_two_id", userTwoId)
+    .maybeSingle();
+
+  if (!friendship) {
+    return { ok: false, reason: "not_friends" };
+  }
+
+  const { data: myRooms } = await supabase
+    .from("chat_room_participants")
+    .select("room_id")
+    .eq("profile_id", viewerProfileId);
+
+  const roomIds = (myRooms ?? []).map((row) => row.room_id);
+
+  if (roomIds.length) {
+    const { data: targetRooms } = await supabase
+      .from("chat_room_participants")
+      .select("room_id")
+      .eq("profile_id", targetProfileId)
+      .in("room_id", roomIds);
+
+    const sharedRoomIds = (targetRooms ?? []).map((row) => row.room_id);
+
+    if (sharedRoomIds.length) {
+      const { data: room } = await supabase
+        .from("chat_rooms")
+        .select("id")
+        .in("id", sharedRoomIds)
+        .eq("is_group_chat", false)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (room) {
+        return { ok: true, roomId: room.id };
+      }
+    }
+  }
+
+  const roomId = crypto.randomUUID();
+  const { error: roomError } = await supabase.from("chat_rooms").insert({
+    id: roomId,
+    creator_profile_id: viewerProfileId,
+    is_group_chat: false,
+  });
+
+  if (roomError) {
+    const debugMessage = formatSupabaseError(roomError);
+    console.error("Erro ao criar sala de conversa:", debugMessage ?? roomError);
+    return { ok: false, reason: "room_create_failed", debugMessage: debugMessage ?? undefined };
+  }
+
+  const { error: selfParticipantError } = await supabase.from("chat_room_participants").insert({
+    room_id: roomId,
+    profile_id: viewerProfileId,
+    last_read_at: new Date().toISOString(),
+  });
+
+  if (selfParticipantError) {
+    const debugMessage = formatSupabaseError(selfParticipantError);
+    console.error("Erro ao adicionar o participante atual na conversa:", debugMessage ?? selfParticipantError);
+    await supabase.from("chat_rooms").delete().eq("id", roomId);
+    return { ok: false, reason: "self_participant_failed", debugMessage: debugMessage ?? undefined };
+  }
+
+  const { error: targetParticipantError } = await supabase.from("chat_room_participants").insert({
+    room_id: roomId,
+    profile_id: targetProfileId,
+  });
+
+  if (targetParticipantError) {
+    const debugMessage = formatSupabaseError(targetParticipantError);
+    console.error("Erro ao adicionar o amigo na conversa:", debugMessage ?? targetParticipantError);
+    await supabase.from("chat_room_participants").delete().eq("room_id", roomId);
+    await supabase.from("chat_rooms").delete().eq("id", roomId);
+    return { ok: false, reason: "target_participant_failed", debugMessage: debugMessage ?? undefined };
+  }
+
+  return { ok: true, roomId };
+}
+
+export async function getInboxConversations({
+  profileId,
+}: {
+  profileId: string;
+}): Promise<DirectConversation[]> {
+  if (!hasSupabaseEnv()) {
+    return [];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: participantRows } = await supabase
+    .from("chat_room_participants")
+    .select("room_id, profile_id, last_read_at")
+    .eq("profile_id", profileId);
+
+  if (!participantRows?.length) {
+    return [];
+  }
+
+  const roomIds = participantRows.map((row) => row.room_id);
+  const lastReadByRoomId = new Map(
+    (participantRows as ParticipantRow[]).map((row) => [row.room_id, row.last_read_at]),
+  );
+  const [{ data: roomRows }, { data: allParticipantRows }, { data: messageRows }] = await Promise.all([
+    supabase.from("chat_rooms").select("id, created_at, updated_at, is_group_chat").in("id", roomIds),
+    supabase.from("chat_room_participants").select("room_id, profile_id, last_read_at").in("room_id", roomIds),
+    supabase
+      .from("messages")
+      .select("id, room_id, sender_id, content, created_at")
+      .in("room_id", roomIds)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const directRooms = ((roomRows ?? []) as RoomRow[]).filter((room) => !room.is_group_chat);
+
+  if (!directRooms.length) {
+    return [];
+  }
+
+  const otherParticipantIds = ((allParticipantRows ?? []) as ParticipantRow[])
+    .filter((row) => row.profile_id !== profileId)
+    .map((row) => row.profile_id);
+  const profilesById = await hydrateProfiles(otherParticipantIds);
+  const otherParticipantByRoomId = new Map<string, string>();
+
+  ((allParticipantRows ?? []) as ParticipantRow[]).forEach((row) => {
+    if (row.profile_id !== profileId && !otherParticipantByRoomId.has(row.room_id)) {
+      otherParticipantByRoomId.set(row.room_id, row.profile_id);
+    }
+  });
+
+  const latestMessageByRoomId = new Map<string, MessageRow>();
+  const unreadCountByRoomId = new Map<string, number>();
+
+  ((messageRows ?? []) as MessageRow[]).forEach((message) => {
+    if (!latestMessageByRoomId.has(message.room_id)) {
+      latestMessageByRoomId.set(message.room_id, message);
+    }
+
+    const lastReadAt = lastReadByRoomId.get(message.room_id);
+    const isUnread = message.sender_id !== profileId && (!lastReadAt || message.created_at > lastReadAt);
+
+    if (isUnread) {
+      unreadCountByRoomId.set(message.room_id, (unreadCountByRoomId.get(message.room_id) ?? 0) + 1);
+    }
+  });
+
+  return directRooms
+    .map((room) => {
+      const otherParticipantId = otherParticipantByRoomId.get(room.id);
+      const lastMessage = latestMessageByRoomId.get(room.id) ?? null;
+
+      return {
+        id: room.id,
+        createdAt: room.created_at,
+        updatedAt: room.updated_at,
+        otherParticipant: otherParticipantId ? profilesById.get(otherParticipantId) ?? null : null,
+        lastMessagePreview: lastMessage?.content ?? null,
+        lastMessageAt: lastMessage?.created_at ?? null,
+        unreadCount: unreadCountByRoomId.get(room.id) ?? 0,
+      };
+    })
+    .filter((conversation) => conversation.otherParticipant)
+    .sort((left, right) =>
+      (right.lastMessageAt ?? right.updatedAt).localeCompare(left.lastMessageAt ?? left.updatedAt),
+    );
+}
+
+export async function getConversationThread({
+  profileId,
+  roomId,
+}: {
+  profileId: string;
+  roomId: string;
+}): Promise<{
+  conversation: DirectConversation | null;
+  messages: DirectMessage[];
+}> {
+  if (!hasSupabaseEnv()) {
+    return {
+      conversation: null,
+      messages: [],
+    };
+  }
+
+  const conversations = await getInboxConversations({ profileId });
+  const conversation = conversations.find((item) => item.id === roomId) ?? null;
+
+  if (!conversation) {
+    return {
+      conversation: null,
+      messages: [],
+    };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: rows } = await supabase
+    .from("messages")
+    .select("id, room_id, sender_id, content, created_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: true });
+  const senderIds = ((rows ?? []) as MessageRow[]).map((message) => message.sender_id);
+  const profilesById = await hydrateProfiles(senderIds);
+
+  return {
+    conversation,
+    messages: ((rows ?? []) as MessageRow[]).map((message) => ({
+      id: message.id,
+      content: message.content,
+      createdAt: message.created_at,
+      isOwnMessage: message.sender_id === profileId,
+      sender: profilesById.get(message.sender_id) ?? null,
+    })),
+  };
+}

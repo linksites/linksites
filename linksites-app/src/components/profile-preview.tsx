@@ -25,6 +25,45 @@ function getInitials(name: string) {
     .join("");
 }
 
+function getLinkCtaLabel(url: string, locale: AppLocale, fallback: string) {
+  try {
+    if (url.startsWith("mailto:")) {
+      return locale === "ptBR" ? "Enviar email" : "Send email";
+    }
+
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.replace(/^www\./, "").toLowerCase();
+
+    if (hostname.includes("wa.me") || hostname.includes("whatsapp.com")) {
+      return locale === "ptBR" ? "Conversar" : "Chat";
+    }
+
+    if (
+      hostname.includes("instagram.com") ||
+      hostname.includes("tiktok.com") ||
+      hostname.includes("facebook.com") ||
+      hostname.includes("linkedin.com") ||
+      hostname.includes("x.com") ||
+      hostname.includes("twitter.com") ||
+      hostname.includes("threads.net")
+    ) {
+      return locale === "ptBR" ? "Ver perfil" : "View profile";
+    }
+
+    if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+      return locale === "ptBR" ? "Assistir" : "Watch";
+    }
+
+    if (hostname.includes("spotify.com") || hostname.includes("deezer.com")) {
+      return locale === "ptBR" ? "Ouvir" : "Listen";
+    }
+
+    return locale === "ptBR" ? "Acessar" : "Visit";
+  } catch {
+    return fallback;
+  }
+}
+
 function getAnalyticsSessionId() {
   try {
     const existingValue = window.localStorage.getItem(ANALYTICS_SESSION_KEY);
@@ -162,7 +201,9 @@ export function ProfilePreview({
               style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
             >
               <span>{link.title}</span>
-              <span className="text-[var(--accent)]">{content.shared.previewOpen}</span>
+              <span className="text-[var(--accent)]">
+                {getLinkCtaLabel(link.url, locale, content.shared.previewOpen)}
+              </span>
             </a>
           ))}
         </div>

@@ -2,8 +2,10 @@ import Link from "next/link";
 import type { OnboardingSummary } from "@/lib/onboarding";
 import type { ProfileWithLinks } from "@/lib/types";
 import type { DashboardCopy } from "@/components/dashboard/dashboard-types";
+import type { AppLocale } from "@/lib/locale";
 
 type DashboardSidebarProps = {
+  locale: AppLocale;
   content: DashboardCopy;
   profile: ProfileWithLinks;
   onboarding: OnboardingSummary;
@@ -12,17 +14,8 @@ type DashboardSidebarProps = {
   currentPath: string;
 };
 
-const sectionLinks = [
-  { href: "/dashboard", label: "Overview", description: "Status, onboarding e link publico" },
-  { href: "/dashboard/analytics", label: "Analytics", description: "Leitura rapida da performance" },
-  { href: "/dashboard/profile", label: "Perfil", description: "Identidade, tema e publicacao" },
-  { href: "/dashboard/links", label: "Links", description: "Botoes, ordem e visibilidade" },
-  { href: "/dashboard/posts", label: "Posts", description: "Atualizacoes curtas e feed publico" },
-  { href: "/dashboard/network", label: "Rede", description: "Preview social e descoberta" },
-  { href: "/dashboard/notifications", label: "Notificacoes", description: "Seguidores novos e fila social" },
-];
-
 export function DashboardSidebar({
+  locale,
   content,
   profile,
   onboarding,
@@ -30,6 +23,29 @@ export function DashboardSidebar({
   usingMockData,
   currentPath,
 }: DashboardSidebarProps) {
+  const sectionLinks =
+    locale === "ptBR"
+      ? [
+          { href: "/dashboard", label: "Visão geral", description: "Status, onboarding e link público" },
+          { href: "/dashboard/analytics", label: "Analytics", description: "Leitura rápida da performance" },
+          { href: "/dashboard/profile", label: "Perfil", description: "Identidade, tema e publicação" },
+          { href: "/dashboard/links", label: "Links", description: "Botões, ordem e visibilidade" },
+          { href: "/dashboard/posts", label: "Posts", description: "Atualizações curtas e feed público" },
+          { href: "/dashboard/network", label: "Rede", description: "Descoberta, conexões e atividade" },
+          { href: "/dashboard/notifications", label: "Notificações", description: "Seguidores, alertas e fila social" },
+          { href: "/dashboard/messages", label: "Mensagens", description: "Conversas privadas entre amigos" },
+        ]
+      : [
+          { href: "/dashboard", label: "Overview", description: "Status, onboarding, and public link" },
+          { href: "/dashboard/analytics", label: "Analytics", description: "Quick performance read" },
+          { href: "/dashboard/profile", label: "Profile", description: "Identity, theme, and publishing" },
+          { href: "/dashboard/links", label: "Links", description: "Buttons, order, and visibility" },
+          { href: "/dashboard/posts", label: "Posts", description: "Short updates and public feed" },
+          { href: "/dashboard/network", label: "Network", description: "Social layer and discovery" },
+          { href: "/dashboard/notifications", label: "Notifications", description: "Followers, alerts, and social queue" },
+          { href: "/dashboard/messages", label: "Messages", description: "Private conversations between friends" },
+        ];
+
   return (
     <aside className="dashboard-panel rounded-[1.8rem] border border-white/8 bg-[var(--panel)] p-5">
       <div className="rounded-[1.4rem] border border-white/8 bg-white/4 p-4">

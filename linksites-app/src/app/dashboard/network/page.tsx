@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { DashboardFrame } from "@/components/dashboard/dashboard-frame";
+import { FriendRequestsPanel } from "@/components/friend-requests-panel";
 import { FollowingPostsFeedPanel } from "@/components/following-posts-feed-panel";
 import { NetworkDiscoverySection } from "@/components/network-discovery-section";
 import { NetworkActivityPanel } from "@/components/network-activity-panel";
 import { NotificationsPanel } from "@/components/notifications-panel";
+import { SavedPostsPanel } from "@/components/saved-posts-panel";
 import { SocialConnectionsPanel } from "@/components/social-connections-panel";
 import { getDashboardPageData } from "@/lib/dashboard";
 import { getNetworkProfiles } from "@/lib/profiles";
 import type { AppLocale } from "@/lib/locale";
 import {
+  getFriendRequests,
+  getFriends,
   getFollowingPostsFeed,
   getNetworkActivity,
   getNotifications,
+  getSavedPosts,
   getSocialConnections,
   getUnreadNotificationsCount,
 } from "@/lib/social";
@@ -21,6 +26,7 @@ type DashboardNetworkPageProps = {
   searchParams: Promise<{
     error?: string;
     message?: string;
+    tab?: string;
     view?: string;
     sort?: string;
   }>;
@@ -28,6 +34,15 @@ type DashboardNetworkPageProps = {
 
 type NetworkView = "all" | "following" | "recommended";
 type NetworkSort = "smart" | "followers" | "links" | "new";
+type NetworkTab = "discover" | "feed" | "saved";
+
+function resolveTab(value?: string): NetworkTab {
+  if (value === "feed" || value === "saved") {
+    return value;
+  }
+
+  return "discover";
+}
 
 function resolveView(value?: string): NetworkView {
   if (value === "following" || value === "recommended") {
@@ -82,8 +97,12 @@ function sortProfiles(profiles: PublicDirectoryProfile[], sort: NetworkSort) {
   });
 }
 
-function createQueryString(view: NetworkView, sort: NetworkSort) {
+function createQueryString(tab: NetworkTab, view: NetworkView, sort: NetworkSort) {
   const params = new URLSearchParams();
+
+  if (tab !== "discover") {
+    params.set("tab", tab);
+  }
 
   if (view !== "all") {
     params.set("view", view);
@@ -101,13 +120,17 @@ function getNetworkCopy(locale: AppLocale) {
   if (locale === "ptBR") {
     return {
       stats: {
-        visible: "Visiveis agora",
+        visible: "Visíveis agora",
         following: "Na sua rede",
         recommended: "Recomendados",
       },
       filters: {
-        view: "Visao",
-        sort: "Ordenacao",
+        tabs: "Abas",
+        discoverTab: "Descoberta",
+        feedTab: "Feed",
+        savedTab: "Salvos",
+        view: "Visão",
+        sort: "Ordenação",
         all: "Tudo",
         following: "Seguindo",
         recommended: "Recomendados",
@@ -119,32 +142,40 @@ function getNetworkCopy(locale: AppLocale) {
       mainSections: {
         all: {
           title: "Toda a rede publicada",
-          description: "Misture perfis que voce ja segue com novas sugestoes e encontre criadores mais fortes para abrir ou acompanhar.",
-          emptyTitle: "Ainda nao encontramos perfis para mostrar aqui",
+          description: "Misture perfis que você já segue com novas sugestões e encontre criadores mais fortes para abrir ou acompanhar.",
+          emptyTitle: "Ainda não encontramos perfis para mostrar aqui",
           emptyDescription: "Quando mais pessoas publicarem seus perfis, esta grade vai ganhar novos criadores para descobrir.",
         },
         following: {
-          title: "Perfis que voce ja segue",
-          description: "Acompanhe sua propria rede e retorne rapido para os criadores que ja fazem parte da sua curadoria.",
-          emptyTitle: "Voce ainda nao segue ninguem",
-          emptyDescription: "Use os cards recomendados abaixo para comecar a montar sua rede dentro do LinkSites.",
+          title: "Perfis que você já segue",
+          description: "Acompanhe sua própria rede e volte rápido para os criadores que já fazem parte da sua curadoria.",
+          emptyTitle: "Você ainda não segue ninguém",
+          emptyDescription: "Use os cards recomendados abaixo para começar a montar sua rede dentro do LinkSites.",
         },
         recommended: {
-          title: "Recomendados para voce",
-          description: "Uma lista focada em perfis com mais potencial de descoberta para transformar esta area no inicio da sua rede.",
-          emptyTitle: "Nao ha recomendacoes novas por enquanto",
-          emptyDescription: "Quando novos perfis forem publicados ou sua rede crescer, esta lista volta a ganhar sugestoes.",
+          title: "Recomendados para você",
+          description: "Uma lista focada em perfis com mais potencial de descoberta para transformar esta área no início da sua rede.",
+          emptyTitle: "Não há recomendações novas por enquanto",
+          emptyDescription: "Quando novos perfis forem publicados ou sua rede crescer, esta lista volta a ganhar sugestões.",
         },
       },
       highlights: {
         followingTitle: "Seguindo",
-        followingDescription: "Perfis que ja estao conectados com voce e merecem retorno rapido.",
+        followingDescription: "Perfis que já estão conectados com você e merecem retorno rápido.",
         followingEmptyTitle: "Nenhum perfil seguido ainda",
         followingEmptyDescription: "Comece pelos recomendados para construir a sua primeira rede.",
         recommendedTitle: "Recomendados",
-        recommendedDescription: "Sugestoes para ampliar alcance, repertorio e conexoes dentro do produto.",
-        recommendedEmptyTitle: "Sem sugestoes novas agora",
+        recommendedDescription: "Sugestões para ampliar alcance, repertório e conexões dentro do produto.",
+        recommendedEmptyTitle: "Sem sugestões novas agora",
         recommendedEmptyDescription: "Publique mais perfis e a descoberta vai ficar mais rica.",
+      },
+      feed: {
+        title: "Feed da sua rede",
+        description: "Acompanhe publicações recentes dos perfis que você segue e use os salvos para guardar o que merece retorno.",
+      },
+      saved: {
+        title: "Posts salvos",
+        description: "Seu acervo pessoal de posts guardados para revisitar, responder ou transformar em referência dentro da rede.",
       },
     };
   }
@@ -156,6 +187,10 @@ function getNetworkCopy(locale: AppLocale) {
       recommended: "Recommended",
     },
     filters: {
+      tabs: "Tabs",
+      discoverTab: "Discovery",
+      feedTab: "Feed",
+      savedTab: "Saved",
       view: "View",
       sort: "Sort",
       all: "All",
@@ -196,18 +231,27 @@ function getNetworkCopy(locale: AppLocale) {
       recommendedEmptyTitle: "No fresh suggestions right now",
       recommendedEmptyDescription: "Publish more profiles and discovery will become richer here.",
     },
+    feed: {
+      title: "Your network feed",
+      description: "Follow fresh posts from profiles you already follow and keep the best ones close with saved posts.",
+    },
+    saved: {
+      title: "Saved posts",
+      description: "Your personal collection of posts kept to revisit, reply to, or use as references inside the network.",
+    },
   };
 }
 
 export default async function DashboardNetworkPage({ searchParams }: DashboardNetworkPageProps) {
   const params = await searchParams;
+  const selectedTab = resolveTab(params.tab);
   const selectedView = resolveView(params.view);
   const selectedSort = resolveSort(params.sort);
   const data = await getDashboardPageData(params, { networkLimit: 6, networkScope: "recommended" });
   const copy = getNetworkCopy(data.locale);
   const viewerProfileId = data.profile.id;
 
-  const [mainProfilesRaw, followingProfilesRaw, recommendedProfilesRaw, followers, notifications, unreadCount, activity, followingFeed] =
+  const [mainProfilesRaw, followingProfilesRaw, recommendedProfilesRaw, followers, notifications, unreadCount, activity, followingFeed, savedPosts, friendRequests, friends] =
     await Promise.all([
       getNetworkProfiles({
         viewerProfileId,
@@ -249,6 +293,21 @@ export default async function DashboardNetworkPage({ searchParams }: DashboardNe
         viewerProfileId,
         limit: 8,
       }),
+      getSavedPosts({
+        profileId: viewerProfileId,
+        viewerProfileId,
+        limit: 6,
+      }),
+      getFriendRequests({
+        profileId: viewerProfileId,
+        viewerProfileId,
+        limit: 6,
+      }),
+      getFriends({
+        profileId: viewerProfileId,
+        viewerProfileId,
+        limit: 6,
+      }),
     ]);
 
   const mainProfiles = sortProfiles(mainProfilesRaw, selectedSort);
@@ -260,6 +319,11 @@ export default async function DashboardNetworkPage({ searchParams }: DashboardNe
     { key: "following" as const, label: copy.filters.following },
     { key: "recommended" as const, label: copy.filters.recommended },
   ];
+  const tabOptions = [
+    { key: "discover" as const, label: copy.filters.discoverTab },
+    { key: "feed" as const, label: copy.filters.feedTab },
+    { key: "saved" as const, label: copy.filters.savedTab },
+  ];
   const sortOptions = [
     { key: "smart" as const, label: copy.filters.smart },
     { key: "followers" as const, label: copy.filters.followers },
@@ -270,13 +334,13 @@ export default async function DashboardNetworkPage({ searchParams }: DashboardNe
     data.locale === "ptBR"
       ? {
           followersTitle: "Seguidores para cultivar",
-          followersDescription: "Perfis que ja se aproximaram de voce e podem virar relacao mais forte dentro da rede.",
+          followersDescription: "Perfis que já se aproximaram de você e podem virar uma relação mais forte dentro da rede.",
           followersEmptyTitle: "Sem seguidores por enquanto",
-          followersEmptyDescription: "Quando novos perfis seguirem voce, esta lista vai comecar a ganhar movimento.",
-          followingTitle: "Sua base de seguindo",
-          followingDescription: "Os perfis que voce ja acompanha para manter a rede viva e com retorno constante.",
-          followingEmptyTitle: "Voce ainda nao segue perfis",
-          followingEmptyDescription: "Comece pelos recomendados acima para formar sua primeira camada social.",
+          followersEmptyDescription: "Quando novos perfis seguirem você, esta lista vai começar a ganhar movimento.",
+          followingTitle: "Perfis que você segue",
+          followingDescription: "Os perfis que você já acompanha para manter a rede viva e com retorno constante.",
+          followingEmptyTitle: "Você ainda não segue perfis",
+          followingEmptyDescription: "Comece pelos recomendados acima para formar sua primeira rede de conexões.",
         }
       : {
           followersTitle: "Followers to nurture",
@@ -333,17 +397,17 @@ export default async function DashboardNetworkPage({ searchParams }: DashboardNe
       </section>
 
       <section className="dashboard-panel rounded-[2rem] border border-white/8 bg-[var(--panel)] p-6">
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <div className="grid gap-6">
           <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.filters.view}</div>
+            <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.filters.tabs}</div>
             <div className="mt-4 flex flex-wrap gap-3">
-              {filterOptions.map((option) => {
-                const isActive = selectedView === option.key;
+              {tabOptions.map((option) => {
+                const isActive = selectedTab === option.key;
 
                 return (
                   <Link
                     key={option.key}
-                    href={createQueryString(option.key, selectedSort)}
+                    href={createQueryString(option.key, selectedView, selectedSort)}
                     className={[
                       "rounded-full border px-4 py-2 text-sm font-medium transition",
                       isActive
@@ -358,69 +422,130 @@ export default async function DashboardNetworkPage({ searchParams }: DashboardNe
             </div>
           </div>
 
-          <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.filters.sort}</div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {sortOptions.map((option) => {
-                const isActive = selectedSort === option.key;
+          {selectedTab === "discover" ? (
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+              <div>
+                <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.filters.view}</div>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {filterOptions.map((option) => {
+                    const isActive = selectedView === option.key;
 
-                return (
-                  <Link
-                    key={option.key}
-                    href={createQueryString(selectedView, option.key)}
-                    className={[
-                      "rounded-full border px-4 py-2 text-sm font-medium transition",
-                      isActive
-                        ? "border-cyan-300/24 bg-cyan-300/14 text-cyan-100"
-                        : "border-white/10 bg-white/4 text-white/64 hover:border-white/16 hover:text-white",
-                    ].join(" ")}
-                  >
-                    {option.label}
-                  </Link>
-                );
-              })}
+                    return (
+                      <Link
+                        key={option.key}
+                        href={createQueryString(selectedTab, option.key, selectedSort)}
+                        className={[
+                          "rounded-full border px-4 py-2 text-sm font-medium transition",
+                          isActive
+                            ? "border-cyan-300/24 bg-cyan-300/14 text-cyan-100"
+                            : "border-white/10 bg-white/4 text-white/64 hover:border-white/16 hover:text-white",
+                        ].join(" ")}
+                      >
+                        {option.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.filters.sort}</div>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {sortOptions.map((option) => {
+                    const isActive = selectedSort === option.key;
+
+                    return (
+                      <Link
+                        key={option.key}
+                        href={createQueryString(selectedTab, selectedView, option.key)}
+                        className={[
+                          "rounded-full border px-4 py-2 text-sm font-medium transition",
+                          isActive
+                            ? "border-cyan-300/24 bg-cyan-300/14 text-cyan-100"
+                            : "border-white/10 bg-white/4 text-white/64 hover:border-white/16 hover:text-white",
+                        ].join(" ")}
+                      >
+                        {option.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </section>
 
-      <NetworkDiscoverySection
-        profiles={mainProfiles}
-        locale={data.locale}
-        variant="grid"
-        title={mainSection.title}
-        description={mainSection.description}
-        emptyTitle={mainSection.emptyTitle}
-        emptyDescription={mainSection.emptyDescription}
-      />
+      {selectedTab === "discover" ? (
+        <>
+          <NetworkDiscoverySection
+            profiles={mainProfiles}
+            locale={data.locale}
+            variant="grid"
+            title={mainSection.title}
+            description={mainSection.description}
+            emptyTitle={mainSection.emptyTitle}
+            emptyDescription={mainSection.emptyDescription}
+          />
+
+          <section className="grid gap-6 xl:grid-cols-2">
+            <NetworkDiscoverySection
+              profiles={followingProfiles}
+              locale={data.locale}
+              variant="stack"
+              title={copy.highlights.followingTitle}
+              description={copy.highlights.followingDescription}
+              emptyTitle={copy.highlights.followingEmptyTitle}
+              emptyDescription={copy.highlights.followingEmptyDescription}
+            />
+            <NetworkDiscoverySection
+              profiles={recommendedProfiles}
+              locale={data.locale}
+              variant="stack"
+              title={copy.highlights.recommendedTitle}
+              description={copy.highlights.recommendedDescription}
+              emptyTitle={copy.highlights.recommendedEmptyTitle}
+              emptyDescription={copy.highlights.recommendedEmptyDescription}
+            />
+          </section>
+        </>
+      ) : null}
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <NetworkDiscoverySection
-          profiles={followingProfiles}
+        <NotificationsPanel
+          notifications={notifications}
+          unreadCount={unreadCount}
           locale={data.locale}
-          variant="stack"
-          title={copy.highlights.followingTitle}
-          description={copy.highlights.followingDescription}
-          emptyTitle={copy.highlights.followingEmptyTitle}
-          emptyDescription={copy.highlights.followingEmptyDescription}
+          profileUsername={data.profile.username}
         />
-        <NetworkDiscoverySection
-          profiles={recommendedProfiles}
-          locale={data.locale}
-          variant="stack"
-          title={copy.highlights.recommendedTitle}
-          description={copy.highlights.recommendedDescription}
-          emptyTitle={copy.highlights.recommendedEmptyTitle}
-          emptyDescription={copy.highlights.recommendedEmptyDescription}
-        />
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-2">
-        <NotificationsPanel notifications={notifications} unreadCount={unreadCount} locale={data.locale} />
         <NetworkActivityPanel items={activity} locale={data.locale} />
       </section>
 
-      <FollowingPostsFeedPanel posts={followingFeed} locale={data.locale} />
+      {selectedTab === "feed" ? (
+        <FollowingPostsFeedPanel posts={followingFeed} locale={data.locale} />
+      ) : null}
+
+      {selectedTab === "saved" ? <SavedPostsPanel posts={savedPosts} locale={data.locale} /> : null}
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <FriendRequestsPanel items={friendRequests} locale={data.locale} />
+        <SocialConnectionsPanel
+          profiles={friends}
+          locale={data.locale}
+          title={data.locale === "ptBR" ? "Amigos aprovados" : "Approved friends"}
+          description={
+            data.locale === "ptBR"
+              ? "Perfis que já podem abrir conversas privadas com você quando as mensagens chegarem."
+              : "Profiles that can already enter the private layer with you once messaging goes live."
+          }
+          emptyTitle={data.locale === "ptBR" ? "Sem amigos aprovados ainda" : "No approved friends yet"}
+          emptyDescription={
+            data.locale === "ptBR"
+              ? "Aceite pedidos ou envie novas amizades para preparar sua rede privada."
+              : "Accept requests or send new friendship invites to prepare your private network."
+          }
+        />
+      </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
         <SocialConnectionsPanel

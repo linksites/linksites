@@ -5,3 +5,5 @@ coverage/
 *.log
 tmp-home.png
 .DS_Store
+
+.vercel

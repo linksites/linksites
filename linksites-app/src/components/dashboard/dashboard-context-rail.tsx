@@ -20,18 +20,31 @@ export function DashboardContextRail({
   analytics,
   analyticsContent,
 }: DashboardContextRailProps) {
+  const copy =
+    locale === "ptBR"
+      ? {
+          preview: "Preview",
+          previewDescription: "Veja como seu perfil público está ficando em tempo real.",
+          live: "ao vivo",
+        }
+      : {
+          preview: "Preview",
+          previewDescription: "See how your public profile is shaping up in real time.",
+          live: "live",
+        };
+
   return (
     <section id="network" className="space-y-6">
       <div className="dashboard-panel rounded-[1.8rem] border border-white/8 bg-[var(--panel)] p-4">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-white/42">Preview</div>
+            <div className="text-xs uppercase tracking-[0.24em] text-white/42">{copy.preview}</div>
             <p className="mt-2 text-sm leading-6 text-white/62">
-              Veja como sua pagina publica esta ficando em tempo real.
+              {copy.previewDescription}
             </p>
           </div>
           <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--accent)]">
-            live
+            {copy.live}
           </div>
         </div>
         <div className="flex justify-center">

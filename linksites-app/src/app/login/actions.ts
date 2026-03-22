@@ -3,10 +3,28 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAppBaseUrl } from "@/lib/app-url";
+import { sanitizeNextPath } from "@/lib/auth-redirect";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-function buildMessageUrl(path: string, key: "error" | "message", value: string) {
-  return `${path}?${key}=${encodeURIComponent(value)}`;
+function buildMessageUrl(
+  path: string,
+  key: "error" | "message",
+  value: string,
+  options?: { next?: string; mode?: string },
+) {
+  const searchParams = new URLSearchParams({
+    [key]: value,
+  });
+
+  if (options?.next) {
+    searchParams.set("next", options.next);
+  }
+
+  if (options?.mode) {
+    searchParams.set("mode", options.mode);
+  }
+
+  return `${path}?${searchParams.toString()}`;
 }
 
 function resolveAuthFeedbackKey(
@@ -81,9 +99,11 @@ function resolveAuthFeedbackKey(
 export async function login(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
+  const next = sanitizeNextPath(String(formData.get("next") ?? ""));
+  const mode = String(formData.get("mode") ?? "").trim() || "signin";
 
   if (!email || !password) {
-    redirect(buildMessageUrl("/login", "error", "missing_credentials"));
+    redirect(buildMessageUrl("/login", "error", "missing_credentials", { next, mode }));
   }
 
   const supabase = await createSupabaseServerClient();
@@ -93,58 +113,68 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect(buildMessageUrl("/login", "error", resolveAuthFeedbackKey("login", error)));
+    redirect(buildMessageUrl("/login", "error", resolveAuthFeedbackKey("login", error), { next, mode }));
   }
 
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect(next);
 }
 
 export async function signup(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
   const appBaseUrl = await getAppBaseUrl();
+  const next = sanitizeNextPath(String(formData.get("next") ?? ""));
+  const mode = String(formData.get("mode") ?? "").trim() || "signup";
 
   if (!email || !password) {
-    redirect(buildMessageUrl("/login", "error", "missing_signup_credentials"));
+    redirect(buildMessageUrl("/login", "error", "missing_signup_credentials", { next, mode }));
   }
 
   const supabase = await createSupabaseServerClient();
+  const emailRedirectTo = new URL("/auth/confirm", appBaseUrl);
+  emailRedirectTo.searchParams.set("next", next);
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${appBaseUrl}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: emailRedirectTo.toString(),
     },
   });
 
   if (error) {
-    redirect(buildMessageUrl("/login", "error", resolveAuthFeedbackKey("signup", error)));
+    redirect(buildMessageUrl("/login", "error", resolveAuthFeedbackKey("signup", error), { next, mode }));
   }
 
   revalidatePath("/", "layout");
-  redirect(buildMessageUrl("/login", "message", "check_email"));
+  redirect(buildMessageUrl("/login", "message", "check_email", { next, mode }));
 }
 
 export async function magicLink(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const appBaseUrl = await getAppBaseUrl();
+  const next = sanitizeNextPath(String(formData.get("next") ?? ""));
+  const mode = String(formData.get("mode") ?? "").trim() || "signin";
 
   if (!email) {
-    redirect(buildMessageUrl("/login", "error", "missing_magic_email"));
+    redirect(buildMessageUrl("/login", "error", "missing_magic_email", { next, mode }));
   }
 
   const supabase = await createSupabaseServerClient();
+  const emailRedirectTo = new URL("/auth/confirm", appBaseUrl);
+  emailRedirectTo.searchParams.set("next", next);
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${appBaseUrl}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: emailRedirectTo.toString(),
     },
   });
 
   if (error) {
-    redirect(buildMessageUrl("/login", "error", resolveAuthFeedbackKey("magic", error)));
+    redirect(buildMessageUrl("/login", "error", resolveAuthFeedbackKey("magic", error), { next, mode }));
   }
 
-  redirect(buildMessageUrl("/login", "message", "magic_link_sent"));
+  redirect(buildMessageUrl("/login", "message", "magic_link_sent", { next, mode }));
 }

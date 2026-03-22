@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FriendRequestButton } from "@/components/friend-request-button";
 import FollowButton from "@/components/FollowButton";
+import { StartConversationButton } from "@/components/start-conversation-button";
 import type { AppLocale } from "@/lib/locale";
 import type { PublicDirectoryProfile } from "@/lib/types";
 
@@ -32,16 +34,18 @@ export function SocialConnectionsPanel({
   const copy =
     locale === "ptBR"
       ? {
-          label: "Conexoes",
+          label: "Conexões",
           followers: "seguidores",
           links: "links",
           openProfile: "Ver perfil",
+          friends: "Amigos",
         }
       : {
           label: "Connections",
           followers: "followers",
           links: "links",
           openProfile: "View profile",
+          friends: "Friends",
         };
 
   return (
@@ -96,6 +100,25 @@ export function SocialConnectionsPanel({
                     locale={locale}
                     className="min-h-11"
                   />
+                  {profile.isFriend ? (
+                    <>
+                      <span className="inline-flex min-h-11 items-center justify-center rounded-full border border-emerald-300/24 bg-emerald-300/12 px-4 py-2 text-sm font-medium text-emerald-100">
+                        {copy.friends}
+                      </span>
+                      <StartConversationButton
+                        targetProfileId={profile.id}
+                        locale={locale}
+                        className="min-h-11"
+                      />
+                    </>
+                  ) : (
+                    <FriendRequestButton
+                      targetProfileId={profile.id}
+                      initialStatus={profile.friendshipStatus}
+                      locale={locale}
+                      className="min-h-11"
+                    />
+                  )}
                   <Link
                     href={`/u/${profile.username}`}
                     className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"

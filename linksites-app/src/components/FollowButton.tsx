@@ -31,8 +31,8 @@ export default function FollowButton({
           following: "Seguindo",
           loading: "Aguarde...",
           signInRequired: "Entre para seguir perfis.",
-          missingProfile: "Nao foi possivel localizar seu perfil.",
-          updateFailed: "Nao foi possivel atualizar esse follow agora.",
+          missingProfile: "Não foi possível localizar seu perfil.",
+          updateFailed: "Não foi possível atualizar esse vínculo agora.",
         }
       : {
           follow: "Follow",
@@ -98,13 +98,13 @@ export default function FollowButton({
   };
 
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="flex w-full flex-col items-stretch gap-2">
       <button
         type="button"
         onClick={handleToggleFollow}
         disabled={isLoading}
         className={clsx(
-          "rounded-full px-4 py-2 font-medium transition-colors disabled:opacity-50",
+          "inline-flex min-h-11 w-full items-center justify-center rounded-full px-4 py-2 text-center text-sm font-medium leading-tight whitespace-normal transition-colors disabled:opacity-50",
           isFollowing
             ? "border border-[var(--muted)] bg-[var(--muted)] text-[var(--text)] hover:bg-opacity-80"
             : "bg-[var(--accent)] text-black hover:bg-opacity-90",

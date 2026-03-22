@@ -2,7 +2,7 @@ import { DashboardFrame } from "@/components/dashboard/dashboard-frame";
 import { DashboardPostsPanel } from "@/components/dashboard/dashboard-posts-panel";
 import { PendingCommentsPanel } from "@/components/pending-comments-panel";
 import { getDashboardPageData } from "@/lib/dashboard";
-import { getPendingCommentsForProfile, getProfilePosts } from "@/lib/social";
+import { getCommentsForProfile, getProfilePosts } from "@/lib/social";
 
 type DashboardPostsPageProps = {
   searchParams: Promise<{
@@ -18,9 +18,16 @@ export default async function DashboardPostsPage({ searchParams }: DashboardPost
     viewerProfileId: data.profile.id,
     limit: 12,
   });
-  const pendingComments = await getPendingCommentsForProfile({
+  const pendingComments = await getCommentsForProfile({
     profileId: data.profile.id,
     viewerProfileId: data.profile.id,
+    status: "pending",
+    limit: 12,
+  });
+  const approvedComments = await getCommentsForProfile({
+    profileId: data.profile.id,
+    viewerProfileId: data.profile.id,
+    status: "approved",
     limit: 12,
   });
 
@@ -47,7 +54,8 @@ export default async function DashboardPostsPage({ searchParams }: DashboardPost
         redirectTo="/dashboard/posts"
       />
 
-      <PendingCommentsPanel items={pendingComments} locale={data.locale} />
+      <PendingCommentsPanel items={pendingComments} locale={data.locale} mode="pending" />
+      <PendingCommentsPanel items={approvedComments} locale={data.locale} mode="approved" />
     </DashboardFrame>
   );
 }

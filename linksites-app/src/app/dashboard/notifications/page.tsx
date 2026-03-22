@@ -1,9 +1,12 @@
 import { DashboardFrame } from "@/components/dashboard/dashboard-frame";
+import { FriendRequestsPanel } from "@/components/friend-requests-panel";
 import { NetworkActivityPanel } from "@/components/network-activity-panel";
 import { NotificationsPanel } from "@/components/notifications-panel";
 import { SocialConnectionsPanel } from "@/components/social-connections-panel";
 import { getDashboardPageData } from "@/lib/dashboard";
 import {
+  getFriendRequests,
+  getFriends,
   getNetworkActivity,
   getNotifications,
   getSocialConnections,
@@ -12,7 +15,7 @@ import {
 
 export default async function DashboardNotificationsPage() {
   const data = await getDashboardPageData(undefined, { networkLimit: 6, networkScope: "recommended" });
-  const [notifications, unreadCount, followers, following, activity] = await Promise.all([
+  const [notifications, unreadCount, followers, following, activity, friendRequests, friends] = await Promise.all([
     getNotifications({
       profileId: data.profile.id,
       viewerProfileId: data.profile.id,
@@ -36,18 +39,28 @@ export default async function DashboardNotificationsPage() {
       viewerProfileId: data.profile.id,
       limit: 8,
     }),
+    getFriendRequests({
+      profileId: data.profile.id,
+      viewerProfileId: data.profile.id,
+      limit: 6,
+    }),
+    getFriends({
+      profileId: data.profile.id,
+      viewerProfileId: data.profile.id,
+      limit: 6,
+    }),
   ]);
   const copy =
     data.locale === "ptBR"
       ? {
           followersTitle: "Seguidores recentes",
-          followersDescription: "Perfis que passaram a acompanhar o que voce publica e podem merecer um follow de volta.",
+          followersDescription: "Perfis que passaram a acompanhar o que você publica e podem merecer que você siga de volta.",
           followersEmptyTitle: "Ainda sem seguidores recentes",
-          followersEmptyDescription: "Quando novos perfis seguirem voce, esta lista vai aparecer aqui.",
-          followingTitle: "Perfis que voce acompanha",
-          followingDescription: "Sua base atual de conexoes para voltar rapido a quem ja faz parte da sua rede.",
-          followingEmptyTitle: "Voce ainda nao acompanha ninguem",
-          followingEmptyDescription: "Use a aba Rede para descobrir perfis e comecar a construir sua curadoria.",
+          followersEmptyDescription: "Quando novos perfis seguirem você, esta lista vai aparecer aqui.",
+          followingTitle: "Perfis que você acompanha",
+          followingDescription: "Sua base atual de conexões para voltar rápido a quem já faz parte da sua rede.",
+          followingEmptyTitle: "Você ainda não acompanha ninguém",
+          followingEmptyDescription: "Use a aba Rede para descobrir perfis e começar a construir sua curadoria.",
         }
       : {
           followersTitle: "Recent followers",
@@ -74,7 +87,32 @@ export default async function DashboardNotificationsPage() {
       currentPath="/dashboard/notifications"
       asideAnalytics={data.analytics}
     >
-      <NotificationsPanel notifications={notifications} unreadCount={unreadCount} locale={data.locale} />
+      <NotificationsPanel
+        notifications={notifications}
+        unreadCount={unreadCount}
+        locale={data.locale}
+        profileUsername={data.profile.username}
+      />
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <FriendRequestsPanel items={friendRequests} locale={data.locale} />
+        <SocialConnectionsPanel
+          profiles={friends}
+          locale={data.locale}
+          title={data.locale === "ptBR" ? "Amigos aprovados" : "Approved friends"}
+          description={
+            data.locale === "ptBR"
+              ? "Sua rede de amigos, pronta para conversas privadas nas próximas entregas."
+              : "Your closest layer of the network, ready for private conversations in the next releases."
+          }
+          emptyTitle={data.locale === "ptBR" ? "Sem amigos aprovados ainda" : "No approved friends yet"}
+          emptyDescription={
+            data.locale === "ptBR"
+              ? "Aceite pedidos ou envie amizades na aba Rede para começar esse grupo."
+              : "Accept requests or send friendship invites in the Network tab to start this inner circle."
+          }
+        />
+      </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
         <SocialConnectionsPanel

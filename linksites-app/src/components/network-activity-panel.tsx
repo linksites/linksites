@@ -32,11 +32,13 @@ export function NetworkActivityPanel({ items, locale, title, description }: Netw
           label: "Atividade",
           title: title ?? "Atividade recente da rede",
           description:
-            description ?? "Um panorama leve do que esta se movendo entre seguidores, perfis novos e conexoes que valem revisita.",
+            description ?? "Um panorama leve do que está se movendo entre seguidores, perfis novos e conexões que valem revisita.",
           emptyTitle: "Sem atividade recente por enquanto",
-          emptyDescription: "Conforme sua rede crescer, este painel vai destacar novos seguidores e perfis frescos.",
-          newFollower: "comecou a seguir voce.",
-          newProfileFollowing: "esta disponivel na sua rede e vale uma nova visita.",
+          emptyDescription: "Conforme sua rede crescer, este painel vai destacar seguidores, reações e perfis frescos.",
+          newFollower: "começou a seguir você.",
+          postLike: "curtiu um dos seus posts.",
+          newComment: "comentou em um dos seus posts.",
+          newProfileFollowing: "está disponível na sua rede e vale uma nova visita.",
           newProfileRecommended: "entrou recentemente na rede e pode combinar com seu perfil.",
           openProfile: "Abrir perfil",
           genericProfile: "Um perfil da rede",
@@ -48,8 +50,10 @@ export function NetworkActivityPanel({ items, locale, title, description }: Netw
           description:
             description ?? "A lightweight snapshot of movement across followers, fresh profiles, and connections worth revisiting.",
           emptyTitle: "No recent activity yet",
-          emptyDescription: "As your network grows, this panel will highlight new followers and fresh profiles.",
+          emptyDescription: "As your network grows, this panel will highlight followers, reactions, and fresh profiles.",
           newFollower: "started following you.",
+          postLike: "liked one of your posts.",
+          newComment: "commented on one of your posts.",
           newProfileFollowing: "is now available inside your network and worth revisiting.",
           newProfileRecommended: "joined the network recently and may fit your profile.",
           openProfile: "Open profile",
@@ -72,9 +76,13 @@ export function NetworkActivityPanel({ items, locale, title, description }: Netw
             const message =
               item.type === "new_follower"
                 ? copy.newFollower
-                : item.source === "following"
-                  ? copy.newProfileFollowing
-                  : copy.newProfileRecommended;
+                : item.type === "post_like"
+                  ? copy.postLike
+                  : item.type === "new_comment"
+                    ? copy.newComment
+                    : item.source === "following"
+                      ? copy.newProfileFollowing
+                      : copy.newProfileRecommended;
 
             return (
               <article key={item.id} className="rounded-[1.3rem] border border-white/8 bg-white/4 p-4">

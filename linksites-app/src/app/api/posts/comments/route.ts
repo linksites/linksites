@@ -80,6 +80,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "comment_create_failed" }, { status: 400 });
   }
 
+  if (post.user_id !== myProfile.id) {
+    await supabase.from("notifications").insert({
+      recipient_id: post.user_id,
+      sender_id: myProfile.id,
+      type: "new_comment",
+      entity_id: postId,
+    });
+  }
+
   const { data: ownerProfile } = await supabase
     .from("profiles")
     .select("username")
@@ -88,6 +97,7 @@ export async function POST(request: Request) {
 
   revalidatePath("/dashboard/network");
   revalidatePath("/dashboard/posts");
+  revalidatePath("/dashboard/notifications");
   if (ownerProfile?.username) {
     revalidatePath(`/u/${ownerProfile.username}`);
   }

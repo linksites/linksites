@@ -52,6 +52,7 @@ export function DashboardFrame({
         <DashboardShell
           sidebar={
             <DashboardSidebar
+              locale={locale}
               content={dashboardContent}
               profile={profile}
               onboarding={onboarding}

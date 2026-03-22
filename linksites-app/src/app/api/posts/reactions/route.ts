@@ -91,6 +91,15 @@ export async function POST(request: Request) {
     if (error) {
       return NextResponse.json({ ok: false, error: "reaction_create_failed" }, { status: 400 });
     }
+
+    if (post.user_id !== myProfile.id) {
+      await supabase.from("notifications").insert({
+        recipient_id: post.user_id,
+        sender_id: myProfile.id,
+        type: "post_like",
+        entity_id: postId,
+      });
+    }
   }
 
   const { count } = await supabase
@@ -108,6 +117,7 @@ export async function POST(request: Request) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/network");
   revalidatePath("/dashboard/posts");
+  revalidatePath("/dashboard/notifications");
   if (ownerProfile?.username) {
     revalidatePath(`/u/${ownerProfile.username}`);
   }

@@ -16,9 +16,9 @@ export function PublicProfilePostsSection({
   const copy =
     locale === "ptBR"
       ? {
-          label: "Atualizacoes",
+          label: "Atualizações",
           title: "Posts recentes",
-          description: "Uma camada curta de contexto para mostrar novidades, lancamentos e movimentos por tras dos links.",
+          description: "Uma camada curta de contexto para mostrar novidades, lançamentos e movimentos por trás dos links.",
         }
       : {
           label: "Updates",
@@ -45,6 +45,7 @@ export function PublicProfilePostsSection({
             post={post}
             locale={locale}
             showAuthor={false}
+            showProfileLink={false}
             canComment={canComment}
           />
         ))}

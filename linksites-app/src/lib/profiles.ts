@@ -3,7 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { demoProfile } from "@/lib/mock-data";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { DiscoveryReason, ProfileWithLinks, PublicDirectoryProfile } from "@/lib/types";
+import type { DiscoveryReason, FriendshipStatus, ProfileWithLinks, PublicDirectoryProfile } from "@/lib/types";
 
 type ProfileRow = {
   id: string;
@@ -295,18 +295,17 @@ export const getFollowerCountByProfileId = cache(async (profileId: string): Prom
   return count;
 });
 
-export const getNetworkProfiles = cache(
-  async ({
-    viewerProfileId,
-    excludeProfileId,
-    limit = 6,
-    scope = "all",
-  }: {
-    viewerProfileId?: string;
-    excludeProfileId?: string;
-    limit?: number;
-    scope?: "all" | "following" | "recommended";
-  }): Promise<PublicDirectoryProfile[]> => {
+export async function getNetworkProfiles({
+  viewerProfileId,
+  excludeProfileId,
+  limit = 6,
+  scope = "all",
+}: {
+  viewerProfileId?: string;
+  excludeProfileId?: string;
+  limit?: number;
+  scope?: "all" | "following" | "recommended";
+}): Promise<PublicDirectoryProfile[]> {
     if (!hasSupabaseEnv()) {
       return [];
     }
@@ -320,6 +319,37 @@ export const getNetworkProfiles = cache(
           .eq("follower_id", viewerProfileId)
       : { data: null };
     const followingProfileIds = new Set((followingRows ?? []).map((follow) => follow.followed_id));
+    const { data: friendshipRows } = viewerProfileId
+      ? await supabase
+          .from("friendships")
+          .select("user_one_id, user_two_id")
+          .or(`user_one_id.eq.${viewerProfileId},user_two_id.eq.${viewerProfileId}`)
+      : { data: null };
+    const { data: sentRequestRows } = viewerProfileId
+      ? await supabase
+          .from("friend_requests")
+          .select("recipient_id")
+          .eq("sender_id", viewerProfileId)
+          .eq("status", "pending")
+      : { data: null };
+    const { data: receivedRequestRows } = viewerProfileId
+      ? await supabase
+          .from("friend_requests")
+          .select("sender_id")
+          .eq("recipient_id", viewerProfileId)
+          .eq("status", "pending")
+      : { data: null };
+    const friendProfileIds = new Set<string>();
+    const sentFriendRequestIds = new Set((sentRequestRows ?? []).map((request) => request.recipient_id));
+    const receivedFriendRequestIds = new Set((receivedRequestRows ?? []).map((request) => request.sender_id));
+
+    (friendshipRows ?? []).forEach((friendship) => {
+      const friendId = friendship.user_one_id === viewerProfileId ? friendship.user_two_id : friendship.user_one_id;
+
+      if (friendId) {
+        friendProfileIds.add(friendId);
+      }
+    });
 
     if (scope === "following" && !followingProfileIds.size) {
       return [];
@@ -403,6 +433,16 @@ export const getNetworkProfiles = cache(
           ? profile.followers_count ?? 0
           : followersCountByProfileId.get(profile.id) ?? 0;
         const isFollowing = followingProfileIds.has(profile.id);
+        const isFriend = friendProfileIds.has(profile.id);
+        let friendshipStatus: FriendshipStatus = "none";
+
+        if (isFriend) {
+          friendshipStatus = "friends";
+        } else if (receivedFriendRequestIds.has(profile.id)) {
+          friendshipStatus = "request_received";
+        } else if (sentFriendRequestIds.has(profile.id)) {
+          friendshipStatus = "request_sent";
+        }
         const discoveryReason = resolveDiscoveryReason({
           bio: profile.bio,
           avatarUrl: profile.avatar_url,
@@ -429,6 +469,8 @@ export const getNetworkProfiles = cache(
           activeLinksCount,
           followersCount,
           isFollowing,
+          isFriend,
+          friendshipStatus,
           discoveryReason,
           discoveryScore,
         };
@@ -456,5 +498,4 @@ export const getNetworkProfiles = cache(
         return true;
       })
       .slice(0, limit);
-  },
-);
+}

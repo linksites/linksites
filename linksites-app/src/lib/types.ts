@@ -1,6 +1,7 @@
 export type ThemeName = "midnight-grid" | "sunset-signal";
 
 export type DiscoveryReason = "following" | "trending" | "link_rich" | "complete" | "new";
+export type FriendshipStatus = "none" | "request_sent" | "request_received" | "friends";
 
 export type LinkItem = {
   id: string;
@@ -35,21 +36,24 @@ export type PublicDirectoryProfile = {
   activeLinksCount: number;
   followersCount: number;
   isFollowing: boolean;
+  isFriend: boolean;
+  friendshipStatus: FriendshipStatus;
   discoveryReason: DiscoveryReason;
   discoveryScore: number;
 };
 
-export type SocialNotificationType = "new_follower";
+export type SocialNotificationType = "new_follower" | "post_like" | "new_comment";
 
 export type SocialNotification = {
   id: string;
   type: SocialNotificationType;
   read: boolean;
   createdAt: string;
+  entityId: string | null;
   sender: PublicDirectoryProfile | null;
 };
 
-export type NetworkActivityType = "new_follower" | "new_profile";
+export type NetworkActivityType = "new_follower" | "post_like" | "new_comment" | "new_profile";
 
 export type NetworkActivityItem = {
   id: string;
@@ -68,7 +72,9 @@ export type SocialPost = {
   author: PublicDirectoryProfile | null;
   reactionCount: number;
   commentCount: number;
+  savedCount: number;
   viewerHasReacted: boolean;
+  viewerHasSaved: boolean;
   comments: SocialComment[];
 };
 
@@ -91,3 +97,44 @@ export type PendingCommentItem = {
   postId: string;
   postContentPreview: string;
 };
+
+export type FriendRequestItem = {
+  id: string;
+  createdAt: string;
+  sender: PublicDirectoryProfile | null;
+};
+
+export type DirectConversation = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  otherParticipant: PublicDirectoryProfile | null;
+  lastMessagePreview: string | null;
+  lastMessageAt: string | null;
+  unreadCount: number;
+};
+
+export type DirectMessage = {
+  id: string;
+  content: string;
+  createdAt: string;
+  isOwnMessage: boolean;
+  sender: PublicDirectoryProfile | null;
+};
+
+export type DirectConversationOpenFailureReason =
+  | "not_friends"
+  | "room_create_failed"
+  | "self_participant_failed"
+  | "target_participant_failed";
+
+export type DirectConversationOpenResult =
+  | {
+      ok: true;
+      roomId: string;
+    }
+  | {
+      ok: false;
+      reason: DirectConversationOpenFailureReason;
+      debugMessage?: string;
+    };

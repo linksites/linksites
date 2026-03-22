@@ -4,6 +4,7 @@ import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   DiscoveryReason,
+  FriendRequestItem,
   NetworkActivityItem,
   PendingCommentItem,
   ProfileWithLinks,
@@ -27,8 +28,9 @@ type SocialProfileRow = {
 type NotificationRow = {
   id: string;
   sender_id: string | null;
-  type: "new_follower";
+  type: "new_follower" | "post_like" | "new_comment";
   read: boolean;
+  entity_id: string | null;
   created_at: string;
 };
 
@@ -46,12 +48,25 @@ type ReactionRow = {
   type: string;
 };
 
+type SavedPostRow = {
+  post_id: string;
+  user_id: string;
+};
+
 type CommentRow = {
   id: string;
   post_id: string;
   user_id: string;
   content: string;
   status: "pending" | "approved" | "rejected";
+  created_at: string;
+};
+
+type FriendRequestRow = {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  status: "pending" | "accepted" | "rejected" | "cancelled";
   created_at: string;
 };
 
@@ -227,21 +242,23 @@ async function hydrateDirectoryProfilesByIds({
         isFollowing,
       });
 
-      return {
-        id: profile.id,
-        username: profile.username,
-        displayName: profile.display_name,
-        bio: profile.bio,
-        avatarUrl: profile.avatar_url,
-        themeSlug: profile.theme_slug,
-        createdAt: profile.created_at,
-        activeLinksCount,
-        followersCount,
-        isFollowing,
-        discoveryReason,
-        discoveryScore,
-      };
-    })
+        return {
+          id: profile.id,
+          username: profile.username,
+          displayName: profile.display_name,
+          bio: profile.bio,
+          avatarUrl: profile.avatar_url,
+          themeSlug: profile.theme_slug,
+          createdAt: profile.created_at,
+          activeLinksCount,
+          followersCount,
+          isFollowing,
+          isFriend: false,
+          friendshipStatus: "none" as const,
+          discoveryReason,
+          discoveryScore,
+        };
+      })
     .sort((left, right) => {
       if (right.followersCount !== left.followersCount) {
         return right.followersCount - left.followersCount;
@@ -269,12 +286,13 @@ async function enrichPosts({
   const supabase = await createSupabaseServerClient();
   const postIds = posts.map((post) => post.id);
   const authorIds = posts.map((post) => post.user_id);
-  const [authors, reactionsResponse, commentsResponse] = await Promise.all([
+  const [authors, reactionsResponse, savedPostsResponse, commentsResponse] = await Promise.all([
     hydrateDirectoryProfilesByIds({
       profileIds: authorIds,
       viewerProfileId,
     }),
     supabase.from("reactions").select("post_id, user_id, type").in("post_id", postIds).eq("type", "like"),
+    supabase.from("saved_posts").select("post_id, user_id").in("post_id", postIds),
     supabase
       .from("comments")
       .select("id, post_id, user_id, content, status, created_at")
@@ -285,9 +303,12 @@ async function enrichPosts({
 
   const authorsById = new Map(authors.map((profile) => [profile.id, profile]));
   const reactions = (reactionsResponse.data ?? []) as ReactionRow[];
+  const savedPosts = (savedPostsResponse.data ?? []) as SavedPostRow[];
   const comments = (commentsResponse.data ?? []) as CommentRow[];
   const reactionCountByPostId = new Map<string, number>();
   const viewerReactedPostIds = new Set<string>();
+  const saveCountByPostId = new Map<string, number>();
+  const viewerSavedPostIds = new Set<string>();
   const commentCountByPostId = new Map<string, number>();
   const approvedCommentsByPostId = new Map<string, CommentRow[]>();
   const commentAuthors = await hydrateDirectoryProfilesByIds({
@@ -299,8 +320,16 @@ async function enrichPosts({
   reactions.forEach((reaction) => {
     reactionCountByPostId.set(reaction.post_id, (reactionCountByPostId.get(reaction.post_id) ?? 0) + 1);
 
-    if (viewerProfileId && reaction.user_id === viewerProfileId) {
-      viewerReactedPostIds.add(reaction.post_id);
+      if (viewerProfileId && reaction.user_id === viewerProfileId) {
+        viewerReactedPostIds.add(reaction.post_id);
+      }
+    });
+
+  savedPosts.forEach((savedPost) => {
+    saveCountByPostId.set(savedPost.post_id, (saveCountByPostId.get(savedPost.post_id) ?? 0) + 1);
+
+    if (viewerProfileId && savedPost.user_id === viewerProfileId) {
+      viewerSavedPostIds.add(savedPost.post_id);
     }
   });
 
@@ -326,7 +355,9 @@ async function enrichPosts({
       author: authorsById.get(post.user_id) ?? null,
       reactionCount: reactionCountByPostId.get(post.id) ?? 0,
       commentCount: commentCountByPostId.get(post.id) ?? 0,
+      savedCount: saveCountByPostId.get(post.id) ?? 0,
       viewerHasReacted: viewerReactedPostIds.has(post.id),
+      viewerHasSaved: viewerSavedPostIds.has(post.id),
       comments: postComments,
     };
   });
@@ -384,6 +415,86 @@ export const getSocialConnections = cache(
   },
 );
 
+export async function getFriendRequests({
+  profileId,
+  viewerProfileId,
+  limit = 8,
+}: {
+  profileId: string;
+  viewerProfileId?: string;
+  limit?: number;
+}): Promise<FriendRequestItem[]> {
+    if (!hasSupabaseEnv()) {
+      return [];
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { data: rows, error } = await supabase
+      .from("friend_requests")
+      .select("id, sender_id, recipient_id, status, created_at")
+      .eq("recipient_id", profileId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error || !rows?.length) {
+      return [];
+    }
+
+    const senderIds = rows.map((row) => row.sender_id);
+    const senders = await hydrateDirectoryProfilesByIds({
+      profileIds: senderIds,
+      viewerProfileId,
+    });
+    const sendersById = new Map(senders.map((profile) => [profile.id, profile]));
+
+  return (rows as FriendRequestRow[]).map((request) => ({
+      id: request.id,
+      createdAt: request.created_at,
+      sender: sendersById.get(request.sender_id) ?? null,
+    }));
+}
+
+export async function getFriends({
+  profileId,
+  viewerProfileId,
+  limit = 8,
+}: {
+  profileId: string;
+  viewerProfileId?: string;
+  limit?: number;
+}): Promise<PublicDirectoryProfile[]> {
+    if (!hasSupabaseEnv()) {
+      return [];
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { data: rows, error } = await supabase
+      .from("friendships")
+      .select("user_one_id, user_two_id")
+      .or(`user_one_id.eq.${profileId},user_two_id.eq.${profileId}`)
+      .limit(limit * 2);
+
+    if (error || !rows?.length) {
+      return [];
+    }
+
+    const friendIds = rows.map((friendship) =>
+      friendship.user_one_id === profileId ? friendship.user_two_id : friendship.user_one_id,
+    );
+
+    const profiles = await hydrateDirectoryProfilesByIds({
+      profileIds: friendIds,
+      viewerProfileId,
+    });
+
+  return profiles.slice(0, limit).map((profile) => ({
+    ...profile,
+    isFriend: true,
+    friendshipStatus: "friends" as const,
+  }));
+}
+
 export const getNotifications = cache(
   async ({
     profileId,
@@ -401,7 +512,7 @@ export const getNotifications = cache(
     const supabase = await createSupabaseServerClient();
     const { data: rows, error } = await supabase
       .from("notifications")
-      .select("id, sender_id, type, read, created_at")
+      .select("id, sender_id, type, read, entity_id, created_at")
       .eq("recipient_id", profileId)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -424,6 +535,7 @@ export const getNotifications = cache(
       type: notification.type,
       read: notification.read,
       createdAt: notification.created_at,
+      entityId: notification.entity_id,
       sender: notification.sender_id ? sendersById.get(notification.sender_id) ?? null : null,
     }));
   },
@@ -524,14 +636,64 @@ export const getFollowingPostsFeed = cache(
   },
 );
 
-export const getPendingCommentsForProfile = cache(
+export const getSavedPosts = cache(
   async ({
     profileId,
     viewerProfileId,
+    limit = 8,
+  }: {
+    profileId: string;
+    viewerProfileId?: string;
+    limit?: number;
+  }): Promise<SocialPost[]> => {
+    if (!hasSupabaseEnv()) {
+      return [];
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { data: savedRows, error: savedError } = await supabase
+      .from("saved_posts")
+      .select("post_id, created_at")
+      .eq("user_id", profileId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (savedError || !savedRows?.length) {
+      return [];
+    }
+
+    const orderedPostIds = savedRows.map((savedRow) => savedRow.post_id);
+    const { data: rows, error } = await supabase
+      .from("posts")
+      .select("id, user_id, content, created_at, updated_at")
+      .in("id", orderedPostIds);
+
+    if (error || !rows?.length) {
+      return [];
+    }
+
+    const posts = await enrichPosts({
+      posts: rows as PostRow[],
+      viewerProfileId,
+    });
+    const postsById = new Map(posts.map((post) => [post.id, post]));
+
+    return orderedPostIds
+      .map((postId) => postsById.get(postId))
+      .filter((post): post is SocialPost => Boolean(post?.author));
+  },
+);
+
+export const getCommentsForProfile = cache(
+  async ({
+    profileId,
+    viewerProfileId,
+    status,
     limit = 12,
   }: {
     profileId: string;
     viewerProfileId?: string;
+    status: "pending" | "approved";
     limit?: number;
   }): Promise<PendingCommentItem[]> => {
     if (!hasSupabaseEnv()) {
@@ -556,7 +718,7 @@ export const getPendingCommentsForProfile = cache(
       .from("comments")
       .select("id, post_id, user_id, content, status, created_at")
       .in("post_id", postIds)
-      .eq("status", "pending")
+      .eq("status", status)
       .order("created_at", { ascending: false })
       .limit(limit);
 
@@ -606,7 +768,7 @@ export const getNetworkActivity = cache(
     return [
       ...notifications.map((notification) => ({
         id: `notification-${notification.id}`,
-        type: "new_follower" as const,
+        type: notification.type,
         createdAt: notification.createdAt,
         profile: notification.sender,
         read: notification.read,

@@ -32,7 +32,6 @@ export function StartConversationButton({
           loading: "Abrindo...",
           failed: "Não foi possível abrir a conversa agora.",
           notFriends: "A conversa privada só está disponível entre amigos aprovados.",
-          participantFailed: "A conversa foi criada parcialmente. Tente novamente em alguns segundos.",
           unauthorized: "Sua sessão expirou. Entre novamente para continuar.",
         }
       : {
@@ -40,7 +39,6 @@ export function StartConversationButton({
           loading: "Opening...",
           failed: "We could not open this conversation right now.",
           notFriends: "Private chat is only available between approved friends.",
-          participantFailed: "The room started partially. Please try again in a few seconds.",
           unauthorized: "Your session expired. Sign in again to continue.",
         };
 
@@ -77,11 +75,6 @@ export function StartConversationButton({
 
         if (result.error === "not_friends") {
           setErrorMessage(copy.notFriends);
-          return;
-        }
-
-        if (result.error === "self_participant_failed" || result.error === "target_participant_failed") {
-          setErrorMessage(copy.participantFailed);
           return;
         }
 

@@ -39,9 +39,10 @@ type RoomRow = {
   is_group_chat: boolean;
 };
 
-function sortFriendPair(left: string, right: string) {
-  return [left, right].sort() as [string, string];
-}
+type OpenDirectConversationRow = {
+  room_id: string | null;
+  reason: "not_friends" | "room_create_failed" | null;
+};
 
 function formatSupabaseError(error: unknown) {
   if (!error || typeof error !== "object") {
@@ -125,90 +126,27 @@ export async function ensureDirectConversation({
   }
 
   const supabase = await createSupabaseServerClient();
-  const [userOneId, userTwoId] = sortFriendPair(viewerProfileId, targetProfileId);
-  const { data: friendship } = await supabase
-    .from("friendships")
-    .select("user_one_id")
-    .eq("user_one_id", userOneId)
-    .eq("user_two_id", userTwoId)
-    .maybeSingle();
-
-  if (!friendship) {
-    return { ok: false, reason: "not_friends" };
-  }
-
-  const { data: myRooms } = await supabase
-    .from("chat_room_participants")
-    .select("room_id")
-    .eq("profile_id", viewerProfileId);
-
-  const roomIds = (myRooms ?? []).map((row) => row.room_id);
-
-  if (roomIds.length) {
-    const { data: targetRooms } = await supabase
-      .from("chat_room_participants")
-      .select("room_id")
-      .eq("profile_id", targetProfileId)
-      .in("room_id", roomIds);
-
-    const sharedRoomIds = (targetRooms ?? []).map((row) => row.room_id);
-
-    if (sharedRoomIds.length) {
-      const { data: room } = await supabase
-        .from("chat_rooms")
-        .select("id")
-        .in("id", sharedRoomIds)
-        .eq("is_group_chat", false)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (room) {
-        return { ok: true, roomId: room.id };
-      }
-    }
-  }
-
-  const roomId = crypto.randomUUID();
-  const { error: roomError } = await supabase.from("chat_rooms").insert({
-    id: roomId,
-    creator_profile_id: viewerProfileId,
-    is_group_chat: false,
+  const { data, error } = await supabase.rpc("open_direct_conversation", {
+    viewer_profile_id: viewerProfileId,
+    target_profile_id: targetProfileId,
   });
 
-  if (roomError) {
-    const debugMessage = formatSupabaseError(roomError);
-    console.error("Erro ao criar sala de conversa:", debugMessage ?? roomError);
+  if (error) {
+    const debugMessage = formatSupabaseError(error);
+    console.error("Erro ao abrir conversa direta:", debugMessage ?? error);
     return { ok: false, reason: "room_create_failed", debugMessage: debugMessage ?? undefined };
   }
 
-  const { error: selfParticipantError } = await supabase.from("chat_room_participants").insert({
-    room_id: roomId,
-    profile_id: viewerProfileId,
-    last_read_at: new Date().toISOString(),
-  });
+  const [result] = ((data ?? []) as OpenDirectConversationRow[]);
 
-  if (selfParticipantError) {
-    const debugMessage = formatSupabaseError(selfParticipantError);
-    console.error("Erro ao adicionar o participante atual na conversa:", debugMessage ?? selfParticipantError);
-    await supabase.from("chat_rooms").delete().eq("id", roomId);
-    return { ok: false, reason: "self_participant_failed", debugMessage: debugMessage ?? undefined };
+  if (!result?.room_id) {
+    return {
+      ok: false,
+      reason: result?.reason === "not_friends" ? "not_friends" : "room_create_failed",
+    };
   }
 
-  const { error: targetParticipantError } = await supabase.from("chat_room_participants").insert({
-    room_id: roomId,
-    profile_id: targetProfileId,
-  });
-
-  if (targetParticipantError) {
-    const debugMessage = formatSupabaseError(targetParticipantError);
-    console.error("Erro ao adicionar o amigo na conversa:", debugMessage ?? targetParticipantError);
-    await supabase.from("chat_room_participants").delete().eq("room_id", roomId);
-    await supabase.from("chat_rooms").delete().eq("id", roomId);
-    return { ok: false, reason: "target_participant_failed", debugMessage: debugMessage ?? undefined };
-  }
-
-  return { ok: true, roomId };
+  return { ok: true, roomId: result.room_id };
 }
 
 export async function getInboxConversations({

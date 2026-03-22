@@ -124,9 +124,7 @@ export type DirectMessage = {
 
 export type DirectConversationOpenFailureReason =
   | "not_friends"
-  | "room_create_failed"
-  | "self_participant_failed"
-  | "target_participant_failed";
+  | "room_create_failed";
 
 export type DirectConversationOpenResult =
   | {

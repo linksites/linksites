@@ -31,6 +31,7 @@ export function ConversationThread({
           description: "As mensagens privadas vão aparecer aqui quando você abrir uma conversa.",
           emptyTitle: "Nenhuma conversa aberta",
           emptyDescription: "Use os botões de mensagem nas amizades aprovadas para iniciar um chat privado.",
+          ready: "Conversa pronta para começar",
         }
       : {
           label: "Conversation",
@@ -38,6 +39,7 @@ export function ConversationThread({
           description: "Private messages will appear here once you open a conversation.",
           emptyTitle: "No conversation open",
           emptyDescription: "Use the message buttons on approved friendships to start a private chat.",
+          ready: "Conversation ready to start",
         };
 
   useEffect(() => {
@@ -72,41 +74,41 @@ export function ConversationThread({
       </h2>
       <p className="mt-3 text-sm leading-7 text-white/60">{copy.description}</p>
 
-      <div className="mt-5 flex max-h-[28rem] flex-col gap-3 overflow-y-auto pr-1">
-        {messages.length ? (
-          messages.map((message) => (
-            <article
-              key={message.id}
-              className={`w-fit max-w-[80%] min-w-0 overflow-hidden rounded-[1.3rem] border p-4 ${
-                message.isOwnMessage
-                  ? "ml-auto border-cyan-300/18 bg-cyan-300/10"
-                  : "border-white/8 bg-white/4"
-              }`}
-            >
-              <div className="flex flex-col gap-3">
-                <p className="whitespace-pre-wrap break-words text-sm leading-7 text-white/82 [overflow-wrap:anywhere]">
-                  {message.content}
-                </p>
-                <div
-                  className={`flex items-center text-xs uppercase tracking-[0.18em] text-white/40 ${
-                    message.isOwnMessage ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <span>{formatTimestamp(message.createdAt, locale)}</span>
+      <div className="mx-auto mt-5 flex w-full max-w-[42rem] flex-col">
+        <div className="flex max-h-[28rem] flex-col gap-3 overflow-y-auto px-1">
+          {messages.length ? (
+            messages.map((message) => (
+              <article
+                key={message.id}
+                className={`w-fit max-w-[82%] min-w-0 overflow-hidden rounded-[1.3rem] border p-4 ${
+                  message.isOwnMessage
+                    ? "ml-auto border-cyan-300/18 bg-cyan-300/10"
+                    : "border-white/8 bg-white/4"
+                }`}
+              >
+                <div className="flex flex-col gap-3">
+                  <p className="whitespace-pre-wrap break-words text-sm leading-7 text-white/82 [overflow-wrap:anywhere]">
+                    {message.content}
+                  </p>
+                  <div
+                    className={`flex items-center text-xs uppercase tracking-[0.18em] text-white/40 ${
+                      message.isOwnMessage ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <span>{formatTimestamp(message.createdAt, locale)}</span>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))
-        ) : (
-          <div className="rounded-[1.3rem] border border-dashed border-white/12 bg-white/3 px-5 py-6">
-            <p className="text-sm font-semibold text-white">
-              {locale === "ptBR" ? "Conversa pronta para começar" : "Conversation ready to start"}
-            </p>
-          </div>
-        )}
-      </div>
+              </article>
+            ))
+          ) : (
+            <div className="rounded-[1.3rem] border border-dashed border-white/12 bg-white/3 px-5 py-6 text-center">
+              <p className="text-sm font-semibold text-white">{copy.ready}</p>
+            </div>
+          )}
+        </div>
 
-      <MessageComposer roomId={conversation.id} locale={locale} />
+        <MessageComposer roomId={conversation.id} locale={locale} />
+      </div>
     </section>
   );
 }

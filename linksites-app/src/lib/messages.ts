@@ -40,7 +40,7 @@ type RoomRow = {
 };
 
 type OpenDirectConversationRow = {
-  room_id: string | null;
+  opened_room_id: string | null;
   reason: "not_friends" | "room_create_failed" | null;
 };
 
@@ -139,14 +139,14 @@ export async function ensureDirectConversation({
 
   const [result] = ((data ?? []) as OpenDirectConversationRow[]);
 
-  if (!result?.room_id) {
+  if (!result?.opened_room_id) {
     return {
       ok: false,
       reason: result?.reason === "not_friends" ? "not_friends" : "room_create_failed",
     };
   }
 
-  return { ok: true, roomId: result.room_id };
+  return { ok: true, roomId: result.opened_room_id };
 }
 
 export async function getInboxConversations({

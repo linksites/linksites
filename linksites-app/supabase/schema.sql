@@ -258,7 +258,7 @@ create table if not exists public.analytics_events (
 
 create or replace function public.open_direct_conversation(viewer_profile_id uuid, target_profile_id uuid)
 returns table (
-  room_id uuid,
+  opened_room_id uuid,
   reason text
 )
 language plpgsql

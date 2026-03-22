@@ -16,10 +16,10 @@ with room_pair_keys as (
   select
     public.chat_rooms.id as room_id,
     case
-      when count(distinct public.chat_room_participants.profile_id) = 2 then
+      when count(public.chat_room_participants.profile_id) = 2 then
         public.build_direct_pair_key(
-          min(public.chat_room_participants.profile_id),
-          max(public.chat_room_participants.profile_id)
+          (array_agg(public.chat_room_participants.profile_id order by public.chat_room_participants.profile_id))[1],
+          (array_agg(public.chat_room_participants.profile_id order by public.chat_room_participants.profile_id))[2]
         )
       else null
     end as pair_key

@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AppLocale } from "@/lib/locale";
 
 type StartConversationButtonProps = {
@@ -29,18 +29,24 @@ export function StartConversationButton({
     locale === "ptBR"
       ? {
           label: "Mensagem",
-          loading: "Abrindo...",
+          loading: "Abrindo conversa...",
+          hint: "Preparando sua caixa de entrada privada.",
           failed: "Não foi possível abrir a conversa agora.",
           notFriends: "A conversa privada só está disponível entre amigos aprovados.",
           unauthorized: "Sua sessão expirou. Entre novamente para continuar.",
         }
       : {
           label: "Message",
-          loading: "Opening...",
+          loading: "Opening conversation...",
+          hint: "Preparing your private inbox.",
           failed: "We could not open this conversation right now.",
           notFriends: "Private chat is only available between approved friends.",
           unauthorized: "Your session expired. Sign in again to continue.",
         };
+
+  useEffect(() => {
+    router.prefetch("/dashboard/messages");
+  }, [router]);
 
   async function handleOpenConversation() {
     try {
@@ -97,13 +103,19 @@ export function StartConversationButton({
         type="button"
         onClick={handleOpenConversation}
         disabled={isLoading}
+        aria-busy={isLoading}
         className={clsx(
-          "inline-flex min-h-11 w-full items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-center text-sm font-medium leading-tight whitespace-normal text-cyan-100 transition disabled:opacity-50",
+          "inline-flex min-h-11 w-full items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-center text-sm font-medium leading-tight whitespace-normal text-cyan-100 transition disabled:cursor-wait disabled:opacity-50",
+          isLoading && "border-cyan-300/28 bg-cyan-300/14",
           className,
         )}
       >
-        {isLoading ? copy.loading : copy.label}
+        <span className="inline-flex items-center gap-2">
+          {isLoading ? <span className="h-2 w-2 rounded-full bg-cyan-100/90" /> : null}
+          <span>{isLoading ? copy.loading : copy.label}</span>
+        </span>
       </button>
+      {isLoading ? <p className="text-xs text-cyan-100/70">{copy.hint}</p> : null}
       {errorMessage ? <p className="text-sm text-rose-200">{errorMessage}</p> : null}
     </div>
   );

@@ -8,6 +8,8 @@ type SendMessagePayload = {
   content?: string;
 };
 
+const MAX_MESSAGE_LENGTH = 1000;
+
 function sanitizeId(value?: string | null, maxLength = 64) {
   const normalized = value?.trim();
 
@@ -36,6 +38,10 @@ export async function POST(request: Request) {
 
   if (!roomId || !content) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
+  }
+
+  if (content.length > MAX_MESSAGE_LENGTH) {
+    return NextResponse.json({ ok: false, error: "message_too_long" }, { status: 400 });
   }
 
   const supabase = await createSupabaseServerClient();
@@ -87,4 +93,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true });
 }
-

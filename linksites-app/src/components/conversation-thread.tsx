@@ -28,10 +28,10 @@ export function ConversationThread({
       ? {
           label: "Conversa",
           title: "Selecione um amigo para conversar",
-          description: "As mensagens privadas vao aparecer aqui quando voce abrir uma conversa.",
+          description: "As mensagens privadas vão aparecer aqui quando você abrir uma conversa.",
           emptyTitle: "Nenhuma conversa aberta",
-          emptyDescription: "Use os botoes de mensagem nas amizades aprovadas para iniciar um chat privado.",
-          ready: "Conversa pronta para comecar",
+          emptyDescription: "Use os botões de mensagem nas amizades aprovadas para iniciar um chat privado.",
+          ready: "Conversa pronta para começar",
         }
       : {
           label: "Conversation",

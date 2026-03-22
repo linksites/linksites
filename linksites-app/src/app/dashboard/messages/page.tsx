@@ -24,7 +24,10 @@ export default async function DashboardMessagesPage({ searchParams }: DashboardM
     viewerProfileId: data.profile.id,
     limit: 8,
   });
-  const activeRoomId = params.room ?? conversations[0]?.id ?? undefined;
+  const requestedRoomId = params.room?.trim() || undefined;
+  const activeRoomId = conversations.some((conversation) => conversation.id === requestedRoomId)
+    ? requestedRoomId
+    : conversations[0]?.id ?? undefined;
   const { conversation, messages } = activeRoomId
     ? await getConversationThread({
         profileId: data.profile.id,

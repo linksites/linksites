@@ -21,12 +21,16 @@ export function MessageComposer({ roomId, locale }: MessageComposerProps) {
           placeholder: "Escreva uma mensagem privada curta e direta.",
           send: "Enviar mensagem",
           loading: "Enviando...",
-          failed: "Nao foi possivel enviar esta mensagem agora.",
+          tooLong: "A mensagem precisa ter no máximo 1000 caracteres.",
+          unauthorized: "Sua sessão expirou. Entre novamente para continuar.",
+          failed: "Não foi possível enviar esta mensagem agora.",
         }
       : {
           placeholder: "Write a short, direct private message.",
           send: "Send message",
           loading: "Sending...",
+          tooLong: "Messages must be 1000 characters or less.",
+          unauthorized: "Your session expired. Sign in again to continue.",
           failed: "We could not send this message right now.",
         };
 
@@ -64,9 +68,19 @@ export function MessageComposer({ roomId, locale }: MessageComposerProps) {
           content,
         }),
       });
-      const result = (await response.json()) as { ok?: boolean };
+      const result = (await response.json()) as { ok?: boolean; error?: string };
 
       if (!response.ok || !result.ok) {
+        if (result.error === "message_too_long") {
+          setErrorMessage(copy.tooLong);
+          return;
+        }
+
+        if (result.error === "unauthorized") {
+          setErrorMessage(copy.unauthorized);
+          return;
+        }
+
         setErrorMessage(copy.failed);
         return;
       }

@@ -21,7 +21,7 @@ export function MessageComposer({ roomId, locale }: MessageComposerProps) {
           placeholder: "Escreva uma mensagem privada curta e direta.",
           send: "Enviar mensagem",
           loading: "Enviando...",
-          failed: "Não foi possível enviar esta mensagem agora.",
+          failed: "Nao foi possivel enviar esta mensagem agora.",
         }
       : {
           placeholder: "Write a short, direct private message.",
@@ -84,7 +84,7 @@ export function MessageComposer({ roomId, locale }: MessageComposerProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-5 space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-[1.2rem] border border-white/8 bg-[var(--panel)]/55 p-3 sm:p-4">
       <textarea
         ref={textareaRef}
         rows={3}
@@ -92,13 +92,13 @@ export function MessageComposer({ roomId, locale }: MessageComposerProps) {
         maxLength={1000}
         onChange={(event) => setContent(event.target.value)}
         placeholder={copy.placeholder}
-        className="min-h-[7rem] w-full resize-none rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-sm leading-7 text-white outline-none whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+        className="min-h-[7rem] w-full resize-none rounded-[1.1rem] border border-white/10 bg-white/4 px-4 py-3 text-sm leading-7 text-white outline-none whitespace-pre-wrap break-words transition focus:border-cyan-300/26 focus:bg-white/5 [overflow-wrap:anywhere]"
       />
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
           disabled={isLoading || !content.trim()}
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-300/28 bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition disabled:opacity-50"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-cyan-300/28 bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:opacity-50 sm:w-auto sm:min-w-[11rem]"
         >
           {isLoading ? copy.loading : copy.send}
         </button>

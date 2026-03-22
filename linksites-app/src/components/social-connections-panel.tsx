@@ -34,7 +34,7 @@ export function SocialConnectionsPanel({
   const copy =
     locale === "ptBR"
       ? {
-          label: "Conexões",
+          label: "Conexoes",
           followers: "seguidores",
           links: "links",
           openProfile: "Ver perfil",
@@ -59,7 +59,10 @@ export function SocialConnectionsPanel({
       {profiles.length ? (
         <div className="mt-5 grid gap-3">
           {profiles.map((profile) => (
-            <article key={profile.id} className="rounded-[1.3rem] border border-white/8 bg-white/4 p-4">
+            <article
+              key={profile.id}
+              className="rounded-[1.35rem] border border-white/8 bg-white/4 p-4 transition duration-300 hover:-translate-y-px hover:border-cyan-300/16 hover:bg-white/5"
+            >
               <div className="flex min-w-0 items-start gap-3">
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-slate-950 text-sm font-semibold text-white">
                   {profile.avatarUrl ? (
@@ -81,7 +84,7 @@ export function SocialConnectionsPanel({
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-base font-semibold text-white">{profile.displayName}</h3>
                   <p className="mt-1 truncate text-sm text-white/60">@{profile.username}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-white/70">
                       {profile.followersCount} {copy.followers}
                     </span>
@@ -92,49 +95,51 @@ export function SocialConnectionsPanel({
                 </div>
               </div>
 
-              <div className="mt-5 flex w-full max-w-[24rem] flex-col gap-3">
-                <FollowButton
-                  targetProfileId={profile.id}
-                  initialIsFollowing={profile.isFollowing}
-                  locale={locale}
-                  className="min-h-11 w-full"
-                />
+              <div className="mt-5 rounded-[1.15rem] border border-white/7 bg-slate-950/12 p-3">
+                <div className="flex w-full max-w-[24rem] flex-col gap-3">
+                  <FollowButton
+                    targetProfileId={profile.id}
+                    initialIsFollowing={profile.isFollowing}
+                    locale={locale}
+                    className="min-h-11 w-full"
+                  />
 
-                {profile.isFriend ? (
-                  <>
-                    <StartConversationButton
-                      targetProfileId={profile.id}
-                      locale={locale}
-                      className="min-h-11 w-full"
-                    />
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="inline-flex min-h-11 min-w-[6.25rem] items-center justify-center rounded-full border border-emerald-300/24 bg-emerald-300/12 px-4 py-2 text-sm font-medium text-emerald-100">
-                        {copy.friends}
-                      </span>
+                  {profile.isFriend ? (
+                    <>
+                      <StartConversationButton
+                        targetProfileId={profile.id}
+                        locale={locale}
+                        className="min-h-11 w-full"
+                      />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="inline-flex min-h-11 min-w-[6.25rem] items-center justify-center rounded-full border border-emerald-300/24 bg-emerald-300/12 px-4 py-2 text-sm font-medium text-emerald-100">
+                          {copy.friends}
+                        </span>
+                        <Link
+                          href={`/u/${profile.username}`}
+                          className="inline-flex min-h-11 min-w-[5.75rem] items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
+                        >
+                          {copy.openProfile}
+                        </Link>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <FriendRequestButton
+                        targetProfileId={profile.id}
+                        initialStatus={profile.friendshipStatus}
+                        locale={locale}
+                        className="min-h-11 w-full"
+                      />
                       <Link
                         href={`/u/${profile.username}`}
-                        className="inline-flex min-h-11 min-w-[5.75rem] items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
+                        className="inline-flex min-h-11 min-w-[5.75rem] items-center justify-center self-start rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
                       >
                         {copy.openProfile}
                       </Link>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <FriendRequestButton
-                      targetProfileId={profile.id}
-                      initialStatus={profile.friendshipStatus}
-                      locale={locale}
-                      className="min-h-11 w-full"
-                    />
-                    <Link
-                      href={`/u/${profile.username}`}
-                      className="inline-flex min-h-11 min-w-[5.75rem] items-center justify-center self-start rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:-translate-y-px"
-                    >
-                      {copy.openProfile}
-                    </Link>
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
             </article>
           ))}

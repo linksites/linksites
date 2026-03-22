@@ -28,10 +28,10 @@ export function ConversationThread({
       ? {
           label: "Conversa",
           title: "Selecione um amigo para conversar",
-          description: "As mensagens privadas vão aparecer aqui quando você abrir uma conversa.",
+          description: "As mensagens privadas vao aparecer aqui quando voce abrir uma conversa.",
           emptyTitle: "Nenhuma conversa aberta",
-          emptyDescription: "Use os botões de mensagem nas amizades aprovadas para iniciar um chat privado.",
-          ready: "Conversa pronta para começar",
+          emptyDescription: "Use os botoes de mensagem nas amizades aprovadas para iniciar um chat privado.",
+          ready: "Conversa pronta para comecar",
         }
       : {
           label: "Conversation",
@@ -74,13 +74,13 @@ export function ConversationThread({
       </h2>
       <p className="mt-3 text-sm leading-7 text-white/60">{copy.description}</p>
 
-      <div className="mx-auto mt-5 flex w-full max-w-[42rem] flex-col">
+      <div className="mx-auto mt-5 flex w-full max-w-[42rem] flex-col gap-4 rounded-[1.45rem] border border-white/7 bg-slate-950/12 p-3 sm:p-4">
         <div className="flex max-h-[28rem] flex-col gap-3 overflow-y-auto px-1">
           {messages.length ? (
             messages.map((message) => (
               <article
                 key={message.id}
-                className={`w-fit max-w-[82%] min-w-0 overflow-hidden rounded-[1.3rem] border p-4 ${
+                className={`w-fit max-w-[82%] min-w-0 overflow-hidden rounded-[1.3rem] border p-4 shadow-[0_8px_30px_rgba(0,0,0,0.08)] ${
                   message.isOwnMessage
                     ? "ml-auto border-cyan-300/18 bg-cyan-300/10"
                     : "border-white/8 bg-white/4"
